@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "wedding-app-dev",
+    "dev": "wedding-app-dev",
+    "prod": "wedding-app-prod"
+  },
+  "targets": {},
+  "etags": {
+    "wedding-app-prod": {
+      "extensionInstances": {}
+    }
+  }
+}
