@@ -1,11 +1,22 @@
+"use client";
 import styles from "./ItemGetModal.module.scss";
 import ItemGetBackground from "@/app/_images/ItemGetBackground.png";
 import ItemGetLogo from "@/app/_images/ItemGetLogo.png";
 import Image from "next/image";
 import ItemKiller from "@/app/_images/ItemKiller.png";
 import ItemAkakora from "@/app/_images/ItemAkakora.png";
+import CloseIconBlack from "@/app/_images/CloseIconBlack.png";
+import CommonButton from "../CommonButton/CommonButton";
+import Link from "next/link";
+import { UserPendingPath } from "@/app/_utils/page_link";
 
-export default function ItemGetModal() {
+type Props = {
+  gameId: string;
+  userId: string;
+  onClose: () => void;
+};
+
+export default function ItemGetModal(props: Props) {
   const items = [
     {
       image: <Image src={ItemAkakora} alt="アカカロ" />,
@@ -19,6 +30,12 @@ export default function ItemGetModal() {
 
   return (
     <div className={styles.itemGetModal}>
+      <Image
+        src={CloseIconBlack}
+        alt="閉じる"
+        className={styles.close}
+        onClick={props.onClose}
+      />
       <Image
         className={styles.background}
         src={ItemGetBackground}
@@ -49,6 +66,14 @@ export default function ItemGetModal() {
           <br />
           他チームを妨害しよう！
         </div>
+      </div>
+      <div className={styles.button}>
+        <Link
+          href={UserPendingPath(props.gameId, props.userId)}
+          className={styles.button}
+        >
+          <CommonButton color="red">つぎへ</CommonButton>
+        </Link>
       </div>
     </div>
   );

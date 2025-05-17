@@ -39,8 +39,8 @@ export const adminConverterOnGet = <T extends z.AnyZodObject>(
       return {
         ...parsedData,
         snapshot,
-        createdAt: createdAt.toDate(),
-        updatedAt: updatedAt.toDate(),
+        createdAt: createdAt?.toDate(),
+        updatedAt: updatedAt?.toDate(),
       };
     },
   };
