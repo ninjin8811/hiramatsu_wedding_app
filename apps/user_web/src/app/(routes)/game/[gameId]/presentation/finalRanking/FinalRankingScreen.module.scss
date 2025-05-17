@@ -88,8 +88,18 @@
 .rankingColumn {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
   flex: 1;
+
+  // 通常のランキングアイテム（4-15位）の間隔
+  &:nth-child(2),
+  &:nth-child(3) {
+    gap: 50px;
+  }
+
+  // 上位3位のランキングアイテムの間隔
+  &:first-child {
+    gap: 210px;
+  }
 }
 
 .rankingItemWrapper {
