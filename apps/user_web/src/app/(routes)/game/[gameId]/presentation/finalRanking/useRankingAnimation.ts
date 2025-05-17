@@ -54,7 +54,7 @@ interface TeamWithVisibility extends RankedTeam {
 export const useRankingAnimation = () => {
   const [visibleTeams, setVisibleTeams] = useState<number[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [currentTopThreeIndex, setCurrentTopThreeIndex] = useState(-1); // -1:初期, 3:3位, 2:2位, 1:1位
+  const [currentTopThreeIndex, setCurrentTopThreeIndex] = useState(-1); 
   const [ranksToAnimate, setRanksToAnimate] = useState<number[]>([]);
 
   const sortedTeams: RankedTeam[] = useMemo(() => {
@@ -69,36 +69,34 @@ export const useRankingAnimation = () => {
         ...team,
         rank: index + 1,
       }));
-    // console.log("Sorted Teams:", teams); 
     return teams;
   }, []);
 
-  // ranksToAnimate を初期化
   useEffect(() => {
     const initialRanks = sortedTeams
       .filter(team => team.rank >= 4 && team.rank <= 15)
       .map(team => team.rank)
-      .sort((a, b) => b - a); // 15位から4位の順に
+      .sort((a, b) => b - a); 
     setRanksToAnimate(initialRanks);
-    // console.log("Initial Ranks to animate (4-15):", initialRanks);
   }, [sortedTeams]);
 
-  // 4-15位のチームを順番に表示（下の順位から）
   useEffect(() => {
     if (ranksToAnimate.length === 0) {
-      // sortedTeams がロードされ、4-15位のアニメーションが完了しているかをチェック
       const isAnimationDone = sortedTeams.length > 0 &&
                              (sortedTeams.length < 4 || visibleTeams.includes(sortedTeams.find(t => t.rank === 4)?.rank ?? -1000));
+      
+      // DEBUG LOG
+      console.log(`[Effect 4-15 Done] ranksToAnimate.length: ${ranksToAnimate.length}, isAnimationDone: ${isAnimationDone}, currentTopThreeIndex: ${currentTopThreeIndex}`);
 
-      if (isAnimationDone && currentTopThreeIndex === -1) { // currentTopThreeIndexが初期状態(-1)の場合のみ実行
-        // 4-15位の表示が完了したら、3秒待ってから3位表示の準備完了
+      if (isAnimationDone && currentTopThreeIndex === -1) { 
         const timer = setTimeout(() => {
-          console.log("Setting currentTopThreeIndex to 3 (ready for keyboard nav)"); // ★ログ追加
-          setCurrentTopThreeIndex(3); // 3位から開始可能な状態
+          // DEBUG LOG
+          console.log("[Effect 4-15 Done] Timeout: Setting currentTopThreeIndex to 4 (ready for top 3 keyboard nav)");
+          setCurrentTopThreeIndex(4); 
         }, 3000);
         return () => clearTimeout(timer);
       }
-      return; // ranksToAnimateが空でも、まだアニメーション完了でない場合や、既にtop3処理が始まっている場合は何もしない
+      return; 
     }
 
     const interval = setInterval(() => {
@@ -106,38 +104,41 @@ export const useRankingAnimation = () => {
         if (prevRanks.length > 0) {
           const rankToShow = prevRanks[0];
           setVisibleTeams(prevVisible => {
-            if (!prevVisible.includes(rankToShow)) { // 重複追加を防ぐ
-              // console.log("Updating visibleTeams with:", rankToShow, "Remaining ranks:", prevRanks.slice(1));
+            if (!prevVisible.includes(rankToShow)) { 
               return [...prevVisible, rankToShow];
             }
             return prevVisible;
           });
-          return prevRanks.slice(1); // 表示したランクをリストから削除
+          return prevRanks.slice(1); 
         }
         return prevRanks;
       });
     }, 500);
 
-    // ranksToAnimate が空になったらインターバルをクリア
-    // この条件は setInterval の中で ranksToAnimate が更新された後に評価されるべきなので、
-    // setRanksToAnimate のコールバック内や、useEffectのreturn関数でのクリアがより適切です。
-    // ただし、現在のロジックでは ranksToAnimate が空になると上の if (ranksToAnimate.length === 0) に入るため、
-    // このインターバル自体が再設定されないので、大きな問題にはなりにくいですが、よりクリーンにするなら見直しの余地あり。
-    if (ranksToAnimate.length === 0) { // このチェックは実質的に次のインターバル設定を止める役割
+    if (ranksToAnimate.length === 0) { 
       clearInterval(interval);
     }
 
     return () => clearInterval(interval);
-  }, [ranksToAnimate, sortedTeams, visibleTeams, currentTopThreeIndex]); // currentTopThreeIndex も依存配列に追加
+  }, [ranksToAnimate, sortedTeams, visibleTeams, currentTopThreeIndex]); 
 
-  // 3位から1位の表示 (キーボード操作)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight') {
-        if (currentTopThreeIndex > 1) {
-          setCurrentTopThreeIndex(prev => prev - 1);
-        } else if (currentTopThreeIndex === 1) { // 1位が表示された
-          if (!showConfetti) { // 紙吹雪がまだ表示されていない場合のみ実行
+        // DEBUG LOG
+        console.log(`[KeyDown] ArrowRight pressed. currentTopThreeIndex: ${currentTopThreeIndex}`);
+        if (currentTopThreeIndex === 4) {      
+          console.log("[KeyDown] Setting currentTopThreeIndex from 4 to 3");
+          setCurrentTopThreeIndex(3);          
+        } else if (currentTopThreeIndex === 3) { 
+          console.log("[KeyDown] Setting currentTopThreeIndex from 3 to 2");
+          setCurrentTopThreeIndex(2);          
+        } else if (currentTopThreeIndex === 2) { 
+          console.log("[KeyDown] Setting currentTopThreeIndex from 2 to 1");
+          setCurrentTopThreeIndex(1);          
+        } else if (currentTopThreeIndex === 1) { 
+          console.log("[KeyDown] currentTopThreeIndex is 1. Checking confetti.");
+          if (!showConfetti) { 
             setTimeout(() => {
               setShowConfetti(true);
             }, 1000);
@@ -146,11 +147,15 @@ export const useRankingAnimation = () => {
       }
     };
 
-    if (currentTopThreeIndex >= 1 && currentTopThreeIndex <=3) { // 3位から1位の表示中のみリスナーを有効化
+    if (currentTopThreeIndex >= 1 && currentTopThreeIndex <= 4) { 
+      console.log(`[Effect KeyDownListener] Adding keydown listener. currentTopThreeIndex: ${currentTopThreeIndex}`);
       window.addEventListener('keydown', handleKeyDown);
+    } else {
+      console.log(`[Effect KeyDownListener] Not adding keydown listener or it's time to remove. currentTopThreeIndex: ${currentTopThreeIndex}`);
     }
 
     return () => {
+      console.log(`[Effect KeyDownListener] Cleaning up keydown listener. currentTopThreeIndex: ${currentTopThreeIndex} (at time of cleanup)`);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [currentTopThreeIndex, showConfetti]);
@@ -158,22 +163,34 @@ export const useRankingAnimation = () => {
 
   const rankingColumns: TeamWithVisibility[][] = useMemo(() => {
     const visibleTeamsSet = new Set(visibleTeams);
-    const topThreeActuallyVisibleRank = currentTopThreeIndex;
+    const topThreeIsVisible = (teamRank: number) => {
+      // DEBUG LOG for rank 3 specifically
+      if (teamRank === 3) {
+        console.log(`[rankingColumns useMemo] Checking visibility for Rank 3. currentTopThreeIndex: ${currentTopThreeIndex}, Calculated isVisible: ${currentTopThreeIndex >= 1 && currentTopThreeIndex <= 3 && teamRank >= currentTopThreeIndex}`);
+      }
+      return currentTopThreeIndex >= 1 && currentTopThreeIndex <= 3 && teamRank >= currentTopThreeIndex;
+    };
+    
+    // DEBUG LOG
+    console.log(`[rankingColumns useMemo] Calculating. currentTopThreeIndex: ${currentTopThreeIndex}, visibleTeams:`, Array.from(visibleTeamsSet));
 
-    return [
+    const columns = [
       sortedTeams.slice(0, 3).map(team => ({
         ...team,
-        isVisible: topThreeActuallyVisibleRank !== -1 && team.rank >= topThreeActuallyVisibleRank
+        isVisible: topThreeIsVisible(team.rank)
       })),
       sortedTeams.slice(3, 9).map(team => ({
         ...team,
         isVisible: visibleTeamsSet.has(team.rank)
       })),
-      sortedTeams.slice(9, sortedTeams.length).map(team => ({ // sortedTeams.length を使う
+      sortedTeams.slice(9, sortedTeams.length).map(team => ({
         ...team,
         isVisible: visibleTeamsSet.has(team.rank)
       }))
     ];
+    // DEBUG LOG for the visibility of top 3 teams
+    console.log("[rankingColumns useMemo] Top 3 teams visibility:", columns[0].map(t => ({rank: t.rank, isVisible: t.isVisible})));
+    return columns;
   }, [sortedTeams, visibleTeams, currentTopThreeIndex]);
 
   return { rankingColumns, showConfetti, currentTopThreeIndex };

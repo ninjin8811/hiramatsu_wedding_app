@@ -83,8 +83,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
       {showConfetti && (
         <div className={styles.confettiContainer}>
           <img
-            src={Confetti.src} // StaticImageData オブジェクトではないため .src を使用
-            alt="Confetti"
+            src={Confetti.src} alt="Confetti"
             className={styles.confettiImage}
           />
         </div>
@@ -135,11 +134,6 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
             </div>
           ))}
         </div>
-        {currentTopThreeIndex >= 1 && currentTopThreeIndex <=4 && currentTopThreeIndex !== -1 && ( /* Show prompt when ready for key input or during top 3 reveal */
-          <div className={styles.keyboardPrompt}>
-            <p>▶ キーで次へ</p>
-          </div>
-        )}
       </div>
     </div>
   );
