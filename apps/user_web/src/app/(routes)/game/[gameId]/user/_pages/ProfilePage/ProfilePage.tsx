@@ -1,11 +1,15 @@
+"use client";
 import Image from "next/image";
 import styles from "./ProfilePage.module.scss";
 import UserMainItemBox from "@/app/_images/UserMainItemBox.png";
 import SampleTeamImage from "@/app/_images/SampleTeamImage.png";
 import MarioCap from "@/app/_images/MarioCap.png";
 import CommonButton from "../../_components/CommonButton/CommonButton";
+import { useState } from "react";
+import ItemGetModal from "../../_components/ItemGetModal/ItemGetModal";
 
 export default function ProfilePage() {
+  const [showItemGetModal, setShowItemGetModal] = useState(false);
   return (
     <div className={styles.profilePage}>
       <div className={styles.content}>
@@ -25,7 +29,11 @@ export default function ProfilePage() {
         <div className={styles.item}>
           <BoxItem title="アイテムをゲット">
             <div className={styles.itemSelect}>
-              <Image src={UserMainItemBox} alt="アイテムをゲット" />
+              <Image
+                src={UserMainItemBox}
+                alt="アイテムをゲット"
+                onClick={() => setShowItemGetModal(true)}
+              />
               タップしてアイテムをゲット
             </div>
           </BoxItem>
@@ -34,6 +42,7 @@ export default function ProfilePage() {
       <div className={styles.button}>
         <CommonButton color="red">つぎへ</CommonButton>
       </div>
+      {showItemGetModal && <ItemGetModal />}
     </div>
   );
 }
