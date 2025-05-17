@@ -105,7 +105,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
                 team.rank <= 3 ? (
                   <div key={team.name} className={styles.rankingItemWrapper}>
                     {/* トップ3の表示制御は isVisible で行う */}
-                    {team.isVisible || (currentTopThreeIndex !== -1 && team.rank > currentTopThreeIndex && team.rank <=3 )? (
+                    {team.isVisible ? (
                       <RankingItemGorgeous
                         rank={team.rank}
                         name={team.name}
@@ -113,7 +113,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
                         thumbnail={team.thumbnail} // thumbnail を渡す
                       />
                     ) : (
-                      <div className={styles.placeholder} />
+                      null // プレースホルダーをレンダリングしない
                     )}
                   </div>
                 ) : (
@@ -135,7 +135,10 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
             </div>
           ))}
         </div>
-
+        {currentTopThreeIndex >= 1 && currentTopThreeIndex <=4 && currentTopThreeIndex !== -1 && ( /* Show prompt when ready for key input or during top 3 reveal */
+          <div className={styles.keyboardPrompt}>
+            <p>▶ キーで次へ</p>
+          </div>
         )}
       </div>
     </div>
