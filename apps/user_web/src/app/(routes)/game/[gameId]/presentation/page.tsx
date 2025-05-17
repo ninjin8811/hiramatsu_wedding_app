@@ -8,7 +8,7 @@ import TitleScreen from './components/TitleScreen';
 import WaitingScreen from './components/WaitingScreen';
 import CorrectAnswerScreen from './components/CorrectAnswerScreen';
 import CurrentRankingScreen from './components/CurrentRankingScreen';
-import FinalRankingScreen from './components/FinalRankingScreen';
+import FinalRankingScreen from './finalRanking/FinalRankingScreen';
 
 export type GameScreen =
   | 'title'
