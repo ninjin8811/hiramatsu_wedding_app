@@ -112,6 +112,7 @@
   bottom: 15%;
   display: flex; /* カート画像とスコア吹き出しを横に並べる */
   align-items: center; /* 垂直方向の位置を揃える */
+  transition: margin-left 0.5s ease-in-out;
 }
 
 .cartImageContainer {

@@ -86,7 +86,8 @@ export const GameSchema = z.object({
     .int()
     .positive()
     .describe("各質問の回答制限時間（秒）"),
-  users: z.array(GameUserSchema).describe("参加ユーザー情報の配列"),
+  users: z.array(GameUserSchema).describe("参加ユーザーのゲーム内情報の配列"),
+  Users: z.array(UserSchema).describe("参加ユーザーのメタデータ配列"),
   currentProcess: CurrentProcessSchema.describe("現在のゲーム進行状況"),
 });
 
