@@ -48,10 +48,5 @@ export default function GamePresentationPage() {
     }
   };
 
-  return (
-    <div>
-      <h1>Game Presentation: {gameId}</h1>
-      {renderScreen()}
-    </div>
-  );
+  return renderScreen()
 }
