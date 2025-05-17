@@ -1,0 +1,184 @@
+.bg {
+  background-image: url('/images/bg-white.png');
+  background-repeat: repeat; /* 背景画像を繰り返す */
+  background-position: center;
+  height: 100vh;
+  width: 100vw;
+  font-family: var(--font-protest-strike);
+  color: #3c3c3c;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.header {
+  width: 100vw;
+  height: 20vh; /* 全体に対する比率で調整 */
+  position: relative; /* Imageコンポーネントのレイアウト用 */
+  flex-shrink: 0; /* ヘッダーが縮まないように */
+}
+
+.header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: bottom center;
+}
+
+.rankingArea {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1; /* 利用可能な残りのスペースを占める */
+  min-height: 0; /* flexアイテムが縮小できるようにするため */
+}
+
+.laneBorderTop,
+.laneBorderBottom {
+  height: 1vh;
+  background: repeating-linear-gradient(
+    90deg,
+    #e6e9ec,
+    #e6e9ec 1.5vw,
+    #fc516c 1.5vw,
+    #fc516c 3vw
+  );
+  width: 100%; /* 親要素いっぱいに広がるように */
+  flex-shrink: 0; /* ボーダーが縮まないように */
+}
+
+.lanesContainer {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to bottom, #818FA0, #5F738A);
+  padding-right: 0.5vw;
+  width: 100%;
+  flex-grow: 1; /* rankingArea内の残りのスペースを占める */
+  min-height: 0; /* flexアイテムが縮小できるようにするため */
+}
+
+.lane {
+  display: flex;
+  align-items: center;
+  padding: 0 2vw;
+  position: relative;
+  flex-grow: 1;
+  flex-basis: 0;
+  background-image: repeating-linear-gradient(
+    to right,
+    #C7D0DA,
+    #C7D0DA 1vw,
+    transparent 1vw,
+    transparent 2vw
+  );
+  background-size: 2vw 0.5vh;
+  background-position: 0 bottom;
+  background-repeat: repeat-x;
+  height: calc(100% / 6);
+}
+
+.lane:last-child {
+  background-image: none; /* 最後のレーンは下線なし */
+  background-size: 0 0;
+  height: 0;
+}
+
+.laneNumber {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 0.5vh 0;
+  height: 100%;
+}
+
+.laneNumberImage {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+.cartAndScoreWrapper {
+  position: relative;
+  flex-grow: 1; /* レーン番号以外の残りのスペースを埋める */
+  height: 100%;
+  align-items: center;
+  margin-right: 1vw; /* 右側のレーン番号との間に少しスペース */
+}
+
+.positionedCart {
+  position: absolute;
+  bottom: 15%;
+  display: flex; /* カート画像とスコア吹き出しを横に並べる */
+  align-items: center; /* 垂直方向の位置を揃える */
+}
+
+.cartImageContainer {
+  margin-right: 0.5vw;
+}
+
+.cartImage {
+  position: relative;
+  height: 15vh;
+  width: auto;
+  object-fit: contain;
+  display: block; /* Next/Imageで余分なスペースができないように */
+  z-index: 1;
+}
+
+.scoreBubble {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(60%, 35%);
+  padding: 1.4vh 2vw 1.4vh 3.5vw;
+  border-radius: 0 15em 15em 0;
+  color: white;
+  font-size: 2.8vw;
+  font-weight: bold;
+  text-align: center;
+  z-index: 0;
+
+  span {
+    padding-left: 0.25vw;
+    font-size: 2vw;
+  }
+}
+
+.bottomRankingArea {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  height: 14vh;
+  flex-shrink: 0;
+  padding: 1vh 1vw;
+}
+
+.bottomRankItem {
+  display: flex;
+  background-color: transparent;
+  padding: 0.5vh 0.8vw;
+  border-radius: 8px;
+}
+
+.bottomRankNumber {
+  flex-shrink: 0;
+  width: 3vw;
+  height: 4.3vh;
+
+  & img {
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.bottomCartImageContainer {
+  height: 100%;
+}
+
+.bottomCartImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
