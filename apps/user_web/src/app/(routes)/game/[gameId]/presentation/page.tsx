@@ -9,7 +9,7 @@ import WaitingScreen from './components/WaitingScreen';
 import QuizScreen from './components/QuizScreen';
 import CorrectAnswerScreen from './components/CorrectAnswerScreen';
 import CurrentRankingScreen from './components/CurrentRankingScreen';
-import FinalRankingScreen from './components/FinalRankingScreen';
+import FinalRankingScreen from './finalRanking/FinalRankingScreen';
 
 export type GameScreen =
   | 'title'
