@@ -2,10 +2,10 @@
   display: flex;
   align-items: center;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
+  background: #000000;
+  border: 1px solid #9A9A9A;
   margin-bottom: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(154, 154, 154, 0.3);
 }
 
 .rankNumber {
@@ -25,7 +25,7 @@
   flex: 1;
   font-size: 18px;
   margin: 0 16px;
-  color: #333;
+  color: #FFFFFF;
 }
 
 .scoreContainer {
@@ -37,10 +37,115 @@
 .score {
   font-size: 20px;
   font-weight: bold;
-  color: #333;
+  color: #FFFFFF;
 }
 
 .unit {
-  font-size: 14px;
-  color: #666;
+  font-size: 16px;
+  color: #9A9A9A;
+}
+
+.rankingItemGorgeous {
+  display: flex;
+  align-items: center;
+  background-color: #000000;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 240px;
+  height: 80px;
+  position: relative;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &[data-rank="1"] {
+    border: 2px solid #FCD000;
+    .teamNameGorgeous, .scoreGorgeous {
+      color: #FCD000;
+    }
+    .mainThumbnail {
+      border: 2px solid #FCD000;
+    }
+  }
+
+  &[data-rank="2"] {
+    border: 2px solid #D4D5D0;
+    .teamNameGorgeous, .scoreGorgeous {
+      color: #D4D5D0;
+    }
+    .mainThumbnail {
+      border: 2px solid #D4D5D0;
+    }
+  }
+
+  &[data-rank="3"] {
+    border: 2px solid #FD8F0D;
+    .teamNameGorgeous, .scoreGorgeous {
+      color: #FD8F0D;
+    }
+    .mainThumbnail {
+      border: 2px solid #FD8F0D;
+    }
+  }
+}
+
+.thumbnailContainer {
+  position: relative;
+  margin-right: 12px;
+  margin-left: -35px;
+  margin-top: -25px;
+}
+
+.mainThumbnail {
+  border-radius: 50%;
+  object-fit: cover;
+  aspect-ratio: 1;
+  padding: 2px;
+  width: 120px;
+  height: 120px;
+}
+
+.rankOverlay {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  z-index: 1;
+}
+
+.rankImageGorgeous {
+}
+
+.detailsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.teamNameGorgeous {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scoreContainerGorgeous {
+  display: flex;
+  align-items: baseline;
+}
+
+.scoreGorgeous {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.unitGorgeous {
+  font-size: 0.9em;
+  margin-left: 4px;
+  color: #9A9A9A;
 } 

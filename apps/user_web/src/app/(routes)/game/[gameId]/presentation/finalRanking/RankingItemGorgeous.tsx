@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import Image, { StaticImageData } from 'next/image';
 import styles from './RankingItem.module.scss';
 
 // 順位の画像をインポート
@@ -37,31 +37,48 @@ const rankImages = {
   '15': Number15,
 };
 
-interface RankingItemProps {
+interface RankingItemGorgeousProps {
   rank: number;
   name: string;
   score: number;
+  thumbnail: StaticImageData;
 }
 
-const RankingItem: React.FC<RankingItemProps> = ({ rank, name, score }) => {
+const RankingItemGorgeous: React.FC<RankingItemGorgeousProps> = ({
+  rank,
+  name,
+  score,
+  thumbnail,
+}) => {
   return (
-    <div className={styles.rankingItem}>
-      <div className={styles.rankNumber}>
+    <div className={styles.rankingItemGorgeous} data-rank={rank}>
+      <div className={styles.thumbnailContainer}>
         <Image
-          src={rankImages[rank.toString() as keyof typeof rankImages]}
-          alt={`Rank ${rank}`}
-          width={32}
-          height={32}
-          className={styles.rankImage}
+          src={thumbnail}
+          alt={`${name} thumbnail`}
+          width={120}
+          height={120}
+          className={styles.mainThumbnail}
         />
+        <div className={styles.rankOverlay}>
+          <Image
+            src={rankImages[rank.toString() as keyof typeof rankImages]}
+            alt={`Rank ${rank}`}
+            width={40}
+            height={40}
+            className={styles.rankImageGorgeous}
+          />
+        </div>
       </div>
-      <div className={styles.teamName}>{name}</div>
-      <div className={styles.scoreContainer}>
-        <span className={styles.score}>{score}</span>
-        <span className={styles.unit}>pt</span>
+      <div className={styles.detailsContainer}>
+        <div className={styles.teamNameGorgeous}>{name}</div>
+        <div className={styles.scoreContainerGorgeous}>
+          <span className={styles.scoreGorgeous}>{score}</span>
+          <span className={styles.unitGorgeous}>pt</span>
+        </div>
       </div>
     </div>
   );
 };
 
-export default RankingItem; 
+export default RankingItemGorgeous; 
