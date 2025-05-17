@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Image, { StaticImageData } from 'next/image';
 import BackgroundWideGray from '@/app/_images/BackgroundWideGray.png';
 import Confetti from '@/app/_images/Confetti.png';
@@ -63,14 +63,18 @@ interface FinalRankingScreenProps {
 }
 
 const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
+  const [visibleTeams, setVisibleTeams] = useState<number[]>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [currentTopThreeIndex, setCurrentTopThreeIndex] = useState(-1);
+
   // スコアとチーム名でソートし、ランクを付与
   const sortedTeams = useMemo(() => {
     return mockTeams
       .sort((a, b) => {
         if (b.score !== a.score) {
-          return b.score - a.score; // スコアの降順
+          return b.score - a.score;
         }
-        return a.name.localeCompare(b.name); // スコアが同じ場合はチーム名の昇順
+        return a.name.localeCompare(b.name);
       })
       .map((team, index) => ({
         ...team,
@@ -78,14 +82,63 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
       }));
   }, []);
 
+  // 4-15位のチームを順番に表示（下の順位から）
+  useEffect(() => {
+    const teams4to15 = Array.from({ length: 14 }, (_, i) => i + 4).reverse(); // 15位から4位の順に
+    let currentIndex = 0;
+
+    const interval = setInterval(() => {
+      if (currentIndex < teams4to15.length) {
+        setVisibleTeams(prev => [...prev, teams4to15[currentIndex]]);
+        currentIndex++;
+      } else {
+        clearInterval(interval);
+        // 4-15位の表示が完了したら、3秒待ってから3位から順番に表示開始
+        setTimeout(() => {
+          setCurrentTopThreeIndex(2); // 3位から開始
+        }, 3000);
+      }
+    }, 500); // 0.5秒ごとに1チームずつ表示
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // 3位から順番に表示
+  useEffect(() => {
+    if (currentTopThreeIndex >= 0) {
+      const timer = setTimeout(() => {
+        if (currentTopThreeIndex > 0) {
+          setCurrentTopThreeIndex(prev => prev - 1); // 2位、1位の順に表示
+        } else {
+          // 1位の表示が完了したら紙吹雪を表示
+          setShowConfetti(true);
+        }
+      }, 3000); // 3秒間隔で表示
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentTopThreeIndex]);
+
   // 3つの列に分割
   const rankingColumns = useMemo(() => {
+    const visibleTeamsSet = new Set(visibleTeams);
+    const topThreeVisible = currentTopThreeIndex >= 0;
+
     return [
-      sortedTeams.slice(0, 3), // 上位3チーム
-      sortedTeams.slice(3, 9), // 4-9位
-      sortedTeams.slice(9),    // 10位以降
+      sortedTeams.slice(0, 3).map(team => ({
+        ...team,
+        isVisible: topThreeVisible && team.rank <= 3 - currentTopThreeIndex
+      })),
+      sortedTeams.slice(3, 9).map(team => ({
+        ...team,
+        isVisible: visibleTeamsSet.has(team.rank)
+      })),
+      sortedTeams.slice(9).map(team => ({
+        ...team,
+        isVisible: visibleTeamsSet.has(team.rank)
+      }))
     ];
-  }, [sortedTeams]);
+  }, [sortedTeams, visibleTeams, currentTopThreeIndex]);
 
   return (
     <div className={styles.container}>
@@ -98,16 +151,18 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
         priority
         className={styles.backgroundImage}
       />
-      <div className={styles.confettiContainer}>
-        <Image
-          src={Confetti}
-          alt="Confetti"
-          layout="fill"
-          objectFit="contain"
-          quality={100}
-          className={styles.confettiImage}
-        />
-      </div>
+      {showConfetti && (
+        <div className={styles.confettiContainer}>
+          <Image
+            src={Confetti}
+            alt="Confetti"
+            layout="fill"
+            objectFit="contain"
+            quality={100}
+            className={styles.confettiImage}
+          />
+        </div>
+      )}
       <div className={styles.content}>
         <div className={styles.titleContainer}>
           <Image
@@ -122,20 +177,31 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
             <div key={columnIndex} className={styles.rankingColumn}>
               {column.map((team) => (
                 team.rank <= 3 ? (
-                  <RankingItemGorgeous
-                    key={team.name}
-                    rank={team.rank}
-                    name={team.name}
-                    score={team.score}
-                    thumbnail={team.thumbnail}
-                  />
+                  <div key={team.name} className={styles.rankingItemWrapper}>
+                    {team.isVisible ? (
+                      <RankingItemGorgeous
+                        rank={team.rank}
+                        name={team.name}
+                        score={team.score}
+                        thumbnail={team.thumbnail}
+                      />
+                    ) : (
+                      <div className={styles.placeholder} />
+                    )}
+                  </div>
                 ) : (
-                  <RankingItemNormal
+                  <div
                     key={team.name}
-                    rank={team.rank}
-                    name={team.name}
-                    score={team.score}
-                  />
+                    className={`${styles.rankingItemWrapper} ${
+                      team.isVisible ? styles.visible : styles.hidden
+                    }`}
+                  >
+                    <RankingItemNormal
+                      rank={team.rank}
+                      name={team.name}
+                      score={team.score}
+                    />
+                  </div>
                 )
               ))}
             </div>
