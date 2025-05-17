@@ -50,8 +50,8 @@ const RankingItemNormal: React.FC<RankingItemProps> = ({ rank, name, score }) =>
         <Image
           src={rankImages[rank.toString() as keyof typeof rankImages]}
           alt={`Rank ${rank}`}
-          width={32}
-          height={32}
+          width={48}
+          height={48}
           className={styles.rankImage}
         />
       </div>
