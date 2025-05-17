@@ -63,8 +63,10 @@ export const ItemSchema = z.object({
   image: z.string().url().describe("アイテム画像URL (Firebase Storage PNG)"),
 });
 
-
 export type Game = z.infer<typeof GameSchema>;
+export type GameUser = z.infer<typeof GameUserSchema>;
+export type CurrentProcess = z.infer<typeof CurrentProcessSchema>;
+export type Question = z.infer<typeof QuestionSchema>;
 export type User = z.infer<typeof UserSchema>;
 export type Answer = z.infer<typeof AnswerSchema>;
 export type Item = z.infer<typeof ItemSchema>;

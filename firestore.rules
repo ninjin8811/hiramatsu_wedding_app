@@ -6,13 +6,9 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // ドキュメントの所有者かどうか
-    function isOwn(userId) {
-      return request.auth.uid == userId;
-    }
-
     match /{document=**} {
-      allow read, write: if isAuthenticated() || isOwn(request.auth.uid) || true;
+      allow read: if true;
+      allow write: if isAuthenticated();
     }
   }
 }
