@@ -2,7 +2,31 @@ import React from 'react';
 import Image from 'next/image';
 import BackgroundWideGray from '@/app/_images/BackgroundWideGray.png';
 import Confetti from '@/app/_images/Confetti.png';
-import styles from './FinalRankingScreen.module.scss'; // 新しいSCSSファイルをインポート
+// モックデータ
+const mockRankingData = [
+  // 左列（上位3チーム）
+  [
+    { rank: 1, name: "チームA", score: 1000, thumbnail: "https://example.com/team1.jpg" },
+    { rank: 2, name: "チームB", score: 850, thumbnail: "https://example.com/team2.jpg" },
+    { rank: 3, name: "チームC", score: 700, thumbnail: "https://example.com/team3.jpg" },
+  ],
+  // 中央列（6チーム）
+  [
+    { rank: 4, name: "チームD", score: 650, thumbnail: "https://example.com/team4.jpg" },
+    { rank: 5, name: "チームE", score: 600, thumbnail: "https://example.com/team5.jpg" },
+    { rank: 6, name: "チームF", score: 550, thumbnail: "https://example.com/team6.jpg" },
+    { rank: 7, name: "チームG", score: 500, thumbnail: "https://example.com/team7.jpg" },
+    { rank: 8, name: "チームH", score: 450, thumbnail: "https://example.com/team8.jpg" },
+    { rank: 9, name: "チームI", score: 400, thumbnail: "https://example.com/team9.jpg" },
+  ],
+  // 右列（残りのチーム）
+  [
+    { rank: 10, name: "チームJ", score: 350, thumbnail: "https://example.com/team10.jpg" },
+    { rank: 11, name: "チームK", score: 300, thumbnail: "https://example.com/team11.jpg" },
+    { rank: 12, name: "チームL", score: 250, thumbnail: "https://example.com/team12.jpg" },
+  ],
+];
+
 
 interface FinalRankingScreenProps {
   gameId: string;
