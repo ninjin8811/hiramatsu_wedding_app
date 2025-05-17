@@ -55,6 +55,9 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({ gameId, onNavigate }) => 
   return (
     <main className={styles.bg}>
       <div className={styles.modal}>
+        <div className={styles.headingImageContainer}>
+          <Image src="/images/item-page-logo.png" alt="アイテム" width={300} height={100} className={styles.headingImage} />
+        </div>
         <div className={styles.itemsGrid}>
           {items.map((item) => (
             <div key={item.name} className={styles.item}>
@@ -62,11 +65,14 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({ gameId, onNavigate }) => 
                 <Image src={item.image} alt={item.alt} className={styles.itemImage} width={100} height={100} />
               </div>
               <div className={styles.itemTextContainer}>
-                <p className={styles.itemName}>{item.name}</p>
+                <p className={styles.itemName}>「{item.name}」</p>
                 <p className={styles.itemDescription}>{item.description}</p>
               </div>
             </div>
           ))}
+        </div>
+        <div className={styles.jugemImageContainer}>
+          <Image src="/images/jugem.png" alt="ジュゲム" width={150} height={150} className={styles.jugemImage} />
         </div>
       </div>
     </main>
