@@ -22,7 +22,7 @@ export default function GamePresentationPage() {
   const gameId = params.gameId as string;
   const router = useRouter();
 
-  const [currentScreen, setCurrentScreen] = useState<GameScreen>('title');
+  const [currentScreen, setCurrentScreen] = useState<GameScreen>('finalRanking');
 
   const navigateTo = useCallback((screen: GameScreen) => {
     switch (screen) {

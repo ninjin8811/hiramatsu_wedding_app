@@ -1,11 +1,12 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import Image, { StaticImageData } from 'next/image';
+import React from 'react';
+import Image from 'next/image';
 import BackgroundWideGray from '@/app/_images/BackgroundWideGray.png';
 import Confetti from '@/app/_images/Confetti.png';
 import RankingResultTitleContainer from '@/app/_images/RankingResultTitleContainer.png';
 import RankingItemNormal from './RankingItemNormal';
 import RankingItemGorgeous from './RankingItemGorgeous';
 import styles from './FinalRankingScreen.module.scss';
+import { useRankingAnimation } from './useRankingAnimation'; // カスタムフックをインポート
 
 // サムネイル画像をインポート
 import ThumbnailTeamA from '@/app/_images/ThumbnailTeamA.jpg';
@@ -43,102 +44,30 @@ const mockTeams = [
   { name: "チームO", score: 100, thumbnail: ThumbnailTeamO },
 ];
 
-interface TeamItemProps {
-  rank: number;
-  name: string;
-  score: number;
-  thumbnail: StaticImageData;
-}
+// TeamItemProps と TeamItem は現状このファイルでは未使用なのでコメントアウトまたは削除
+// interface TeamItemProps {
+//   rank: number;
+//   name: string;
+//   score: number;
+//   thumbnail: StaticImageData;
+// }
 
-const TeamItem: React.FC<TeamItemProps> = ({ rank, name, score, thumbnail }) => (
-  <div className={styles.teamItem}>
-    <span className={styles.rank}>{rank}</span>
-    <span className={styles.name}>{name}</span>
-    <span className={styles.score}>{score}</span>
-  </div>
-);
+// const TeamItem: React.FC<TeamItemProps> = ({ rank, name, score, thumbnail }) => (
+//   <div className={styles.teamItem}>
+//     <span className={styles.rank}>{rank}</span>
+//     <span className={styles.name}>{name}</span>
+//     <span className={styles.score}>{score}</span>
+//   </div>
+// );
 
 interface FinalRankingScreenProps {
   gameId: string;
 }
 
 const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
-  const [visibleTeams, setVisibleTeams] = useState<number[]>([]);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [currentTopThreeIndex, setCurrentTopThreeIndex] = useState(-1);
+  const { rankingColumns, showConfetti, currentTopThreeIndex } = useRankingAnimation();
 
-  // スコアとチーム名でソートし、ランクを付与
-  const sortedTeams = useMemo(() => {
-    return mockTeams
-      .sort((a, b) => {
-        if (b.score !== a.score) {
-          return b.score - a.score;
-        }
-        return a.name.localeCompare(b.name);
-      })
-      .map((team, index) => ({
-        ...team,
-        rank: index + 1
-      }));
-  }, []);
-
-  // 4-15位のチームを順番に表示（下の順位から）
-  useEffect(() => {
-    const teams4to15 = Array.from({ length: 14 }, (_, i) => i + 4).reverse(); // 15位から4位の順に
-    let currentIndex = 0;
-
-    const interval = setInterval(() => {
-      if (currentIndex < teams4to15.length) {
-        setVisibleTeams(prev => [...prev, teams4to15[currentIndex]]);
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-        // 4-15位の表示が完了したら、3秒待ってから3位から順番に表示開始
-        setTimeout(() => {
-          setCurrentTopThreeIndex(2); // 3位から開始
-        }, 3000);
-      }
-    }, 500); // 0.5秒ごとに1チームずつ表示
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // 3位から順番に表示
-  useEffect(() => {
-    if (currentTopThreeIndex >= 0) {
-      const timer = setTimeout(() => {
-        if (currentTopThreeIndex > 0) {
-          setCurrentTopThreeIndex(prev => prev - 1); // 2位、1位の順に表示
-        } else {
-          // 1位の表示が完了したら紙吹雪を表示
-          setShowConfetti(true);
-        }
-      }, 3000); // 3秒間隔で表示
-
-      return () => clearTimeout(timer);
-    }
-  }, [currentTopThreeIndex]);
-
-  // 3つの列に分割
-  const rankingColumns = useMemo(() => {
-    const visibleTeamsSet = new Set(visibleTeams);
-    const topThreeVisible = currentTopThreeIndex >= 0;
-
-    return [
-      sortedTeams.slice(0, 3).map(team => ({
-        ...team,
-        isVisible: topThreeVisible && team.rank <= 3 - currentTopThreeIndex
-      })),
-      sortedTeams.slice(3, 9).map(team => ({
-        ...team,
-        isVisible: visibleTeamsSet.has(team.rank)
-      })),
-      sortedTeams.slice(9).map(team => ({
-        ...team,
-        isVisible: visibleTeamsSet.has(team.rank)
-      }))
-    ];
-  }, [sortedTeams, visibleTeams, currentTopThreeIndex]);
+  // 元のuseState、useEffect、useMemoはuseRankingAnimationフックに移動したため削除
 
   return (
     <div className={styles.container}>
@@ -153,12 +82,9 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
       />
       {showConfetti && (
         <div className={styles.confettiContainer}>
-          <Image
-            src={Confetti}
+          <img
+            src={Confetti.src} // StaticImageData オブジェクトではないため .src を使用
             alt="Confetti"
-            layout="fill"
-            objectFit="contain"
-            quality={100}
             className={styles.confettiImage}
           />
         </div>
@@ -166,7 +92,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
       <div className={styles.content}>
         <div className={styles.titleContainer}>
           <Image
-            src={RankingResultTitleContainer}
+            src={RankingResultTitleContainer} // StaticImageData オブジェクトではないため .src を使用
             alt="Title Background"
             className={styles.titleBackground}
           />
@@ -178,12 +104,13 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
               {column.map((team) => (
                 team.rank <= 3 ? (
                   <div key={team.name} className={styles.rankingItemWrapper}>
-                    {team.isVisible ? (
+                    {/* トップ3の表示制御は isVisible で行う */}
+                    {team.isVisible || (currentTopThreeIndex !== -1 && team.rank > currentTopThreeIndex && team.rank <=3 )? (
                       <RankingItemGorgeous
                         rank={team.rank}
                         name={team.name}
                         score={team.score}
-                        thumbnail={team.thumbnail}
+                        thumbnail={team.thumbnail} // thumbnail を渡す
                       />
                     ) : (
                       <div className={styles.placeholder} />
@@ -200,6 +127,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
                       rank={team.rank}
                       name={team.name}
                       score={team.score}
+                      // thumbnail={team.thumbnail} // RankingItemNormal に thumbnail は不要な想定
                     />
                   </div>
                 )
@@ -207,6 +135,11 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
             </div>
           ))}
         </div>
+        {currentTopThreeIndex > 0 && currentTopThreeIndex <=3 && (
+          <div className={styles.keyboardPrompt}>
+            <p>▶ キーで次へ</p>
+          </div>
+        )}
       </div>
     </div>
   );
