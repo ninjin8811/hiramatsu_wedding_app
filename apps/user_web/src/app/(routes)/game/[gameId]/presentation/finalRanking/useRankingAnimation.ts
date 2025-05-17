@@ -56,6 +56,7 @@ export const useRankingAnimation = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentTopThreeIndex, setCurrentTopThreeIndex] = useState(-1); 
   const [ranksToAnimate, setRanksToAnimate] = useState<number[]>([]);
+  const [isDrumrollPlaying, setIsDrumrollPlaying] = useState(false);
 
   const sortedTeams: RankedTeam[] = useMemo(() => {
     const teams = mockTeamsData
@@ -85,13 +86,8 @@ export const useRankingAnimation = () => {
       const isAnimationDone = sortedTeams.length > 0 &&
                              (sortedTeams.length < 4 || visibleTeams.includes(sortedTeams.find(t => t.rank === 4)?.rank ?? -1000));
       
-      // DEBUG LOG
-      console.log(`[Effect 4-15 Done] ranksToAnimate.length: ${ranksToAnimate.length}, isAnimationDone: ${isAnimationDone}, currentTopThreeIndex: ${currentTopThreeIndex}`);
-
       if (isAnimationDone && currentTopThreeIndex === -1) { 
         const timer = setTimeout(() => {
-          // DEBUG LOG
-          console.log("[Effect 4-15 Done] Timeout: Setting currentTopThreeIndex to 4 (ready for top 3 keyboard nav)");
           setCurrentTopThreeIndex(4); 
         }, 3000);
         return () => clearTimeout(timer);
@@ -125,6 +121,8 @@ export const useRankingAnimation = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight') {
+        if (isDrumrollPlaying) return; // ドラムロール再生中は操作を無視
+
         // DEBUG LOG
         console.log(`[KeyDown] ArrowRight pressed. currentTopThreeIndex: ${currentTopThreeIndex}`);
         if (currentTopThreeIndex === 4) {      
@@ -134,8 +132,21 @@ export const useRankingAnimation = () => {
           console.log("[KeyDown] Setting currentTopThreeIndex from 3 to 2");
           setCurrentTopThreeIndex(2);          
         } else if (currentTopThreeIndex === 2) { 
-          console.log("[KeyDown] Setting currentTopThreeIndex from 2 to 1");
-          setCurrentTopThreeIndex(1);          
+          console.log("[KeyDown] Setting currentTopThreeIndex from 2 to 1 (will play drumroll)");
+          setIsDrumrollPlaying(true);
+          const audio = new Audio('/sounds/drumroll.mp3'); // public/_sounds/drumroll.mp3 を想定
+          audio.play().catch(e => {
+            console.error("Error playing drumroll:", e);
+            // 再生エラーでも次に進む
+            setCurrentTopThreeIndex(1);      
+            setIsDrumrollPlaying(false);
+          });
+          audio.onended = () => {
+            // console.log("[Audio] Drumroll ended. Setting currentTopThreeIndex to 1");
+            setCurrentTopThreeIndex(1);      
+            setIsDrumrollPlaying(false);
+          };
+                   
         } else if (currentTopThreeIndex === 1) { 
           console.log("[KeyDown] currentTopThreeIndex is 1. Checking confetti.");
           if (!showConfetti) { 
@@ -158,7 +169,7 @@ export const useRankingAnimation = () => {
       console.log(`[Effect KeyDownListener] Cleaning up keydown listener. currentTopThreeIndex: ${currentTopThreeIndex} (at time of cleanup)`);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [currentTopThreeIndex, showConfetti]);
+  }, [currentTopThreeIndex, showConfetti, isDrumrollPlaying]);
 
 
   const rankingColumns: TeamWithVisibility[][] = useMemo(() => {
