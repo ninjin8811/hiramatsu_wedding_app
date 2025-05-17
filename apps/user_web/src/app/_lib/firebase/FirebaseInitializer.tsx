@@ -69,8 +69,9 @@ async function setupEmulators({
 }) {
   // Firebase: Error (auth/emulator-config-failed). を避けるため、事前にauthUrlをfetchしておく
   // https://dev.to/ilumin/fix-firebase-error-authemulator-config-failed-mng
-  const authUrl = "http://localhost:9099";
-  await fetch(authUrl);
+  const authUrl = "http://127.0.0.1:9099";
+  // ERRORが出ていたため一旦コメントアウト
+  // await fetch(authUrl);
   try {
     connectAuthEmulator(auth, authUrl, {
       disableWarnings: true,
@@ -82,7 +83,7 @@ async function setupEmulators({
       e instanceof Error &&
       !e.message.includes("Firestore has already been started")
     ) {
-      throw new Error(e.message + "a");
+      throw new Error(e.message);
     }
   }
 }
