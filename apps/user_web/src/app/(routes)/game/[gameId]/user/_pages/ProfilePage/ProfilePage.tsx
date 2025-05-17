@@ -5,16 +5,38 @@ import UserMainItemBox from "@/app/_images/UserMainItemBox.png";
 import SampleTeamImage from "@/app/_images/SampleTeamImage.png";
 import MarioCap from "@/app/_images/MarioCap.png";
 import CommonButton from "../../_components/CommonButton/CommonButton";
-import { useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import ItemGetModal from "../../_components/ItemGetModal/ItemGetModal";
+import ProfileBox from "../../_components/ProfileBox/ProfileBox";
+import ItemAkakora from "@/app/_images/ItemAkakora.png";
+import ItemDetailModal from "../../_components/ItemDetailModal/ItemDetailModal";
 
 export default function ProfilePage() {
   const [showItemGetModal, setShowItemGetModal] = useState(false);
+  const [showItemDetailModal, setShowItemDetailModal] = useState(false);
+  const [items, setItems] = useState<
+    {
+      image: ReactNode;
+      name: string;
+      description: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    setItems([
+      {
+        image: <Image src={ItemAkakora} alt="アカこうら" />,
+        name: "アカこうら",
+        description: "アカこうらはアイテムです。",
+      },
+    ]);
+  }, []);
+
   return (
     <div className={styles.profilePage}>
       <div className={styles.content}>
         <div className={styles.profileBox}>
-          <BoxItem title="プロフィール">
+          <ProfileBox title="プロフィール">
             <div className={styles.profile}>
               <Image src={MarioCap} alt="キャップ" className={styles.cap} />
               <Image
@@ -24,10 +46,10 @@ export default function ProfilePage() {
               />
               親族チーム
             </div>
-          </BoxItem>
+          </ProfileBox>
         </div>
         <div className={styles.item}>
-          <BoxItem title="アイテムをゲット">
+          <ProfileBox title="アイテムをゲット">
             <div className={styles.itemSelect}>
               <Image
                 src={UserMainItemBox}
@@ -36,27 +58,47 @@ export default function ProfilePage() {
               />
               タップしてアイテムをゲット
             </div>
-          </BoxItem>
+          </ProfileBox>
         </div>
+        {/* <ProfileBox title="手持ちアイテム">
+          <div className={styles.itemList}>
+            <div className={styles.itemList_item}>
+              <Image src={ItemAkakora} alt="アカこうら" />
+              アカこうら
+            </div>
+            <div className={styles.itemList_item}>
+              <Image src={ItemAkakora} alt="アカこうら" />
+              アカこうら
+            </div>
+            <div
+              className={styles.itemList_item}
+              onClick={() => setShowItemDetailModal(true)}
+            >
+              <Image src={ItemAkakora} alt="アカこうら" />
+              アカこうら
+            </div>
+          </div>
+        </ProfileBox> */}
       </div>
       <div className={styles.button}>
         <CommonButton color="red">つぎへ</CommonButton>
       </div>
       {showItemGetModal && <ItemGetModal />}
-    </div>
-  );
-}
+      {showItemDetailModal && (
+        <ItemDetailModal
+          image={<Image src={ItemAkakora} alt="アカこうら" />}
+          name="アカこうら"
+          description="アカこうらはアイテムです。"
+          onClose={() => setShowItemDetailModal(false)}
+        />
+      )}
 
-type BoxItemProps = {
-  title: string;
-  children: React.ReactNode;
-};
-
-function BoxItem(props: BoxItemProps) {
-  return (
-    <div className={styles.boxItem}>
-      <div className={styles.boxItem_title}>{props.title}</div>
-      <div className={styles.boxItem_content}>{props.children}</div>
+      <ItemDetailModal
+        image={<Image src={ItemAkakora} alt="アカこうら" />}
+        name="アカこうら"
+        description="アカこうらはアイテムです。アカこうらはアイテムです。アカこうらはアイテムです。"
+        onClose={() => setShowItemDetailModal(false)}
+      />
     </div>
   );
 }
