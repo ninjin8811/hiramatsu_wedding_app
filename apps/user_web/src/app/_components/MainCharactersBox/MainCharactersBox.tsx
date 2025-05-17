@@ -1,6 +1,6 @@
 import { StaticImageData } from "next/image";
 import { ReactNode } from "react";
-import styles from "./MainCharactorsBox.module.scss";
+import styles from "./MainCharactersBox.module.scss";
 
 type Props = {
   leftImage: ReactNode;
@@ -10,9 +10,9 @@ type Props = {
   size: "small" | "large";
 };
 
-export default function MainView(props: Props) {
+export default function MainCharactersBox(props: Props) {
   return (
-    <div className={`${styles.mainCharactorsBox} ${styles[props.size]}`}>
+    <div className={`${styles.mainCharactersBox} ${styles[props.size]}`}>
       <div className={`${styles.item} ${styles.left}`}>
         <div className={styles.image}>{props.leftImage}</div>
         <div className={styles.name}>{props.leftName}</div>

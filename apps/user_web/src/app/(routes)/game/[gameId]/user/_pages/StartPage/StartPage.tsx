@@ -3,7 +3,7 @@ import Background from "@/app/_images/Background.png";
 import HomeItemBox from "@/app/_images/HomeItemBox.png";
 import Image from "next/image";
 import styles from "./StartPage.module.scss";
-import MainCharactorsBox from "@/app/_components/MainCharactorsBox/MainCharactorsBox";
+import MainCharactersBox from "@/app/_components/MainCharactersBox/MainCharactersBox";
 import FumiyaImage from "@/app/_images/Fumiya.png";
 import AoiImage from "@/app/_images/Aoi.png";
 
@@ -25,7 +25,7 @@ export default function StartPage() {
       </div>
       <div className={styles.content}>
         <Image src={HomeLogo} alt="start" className={styles.logo} />
-        <MainCharactorsBox
+        <MainCharactersBox
           leftImage={<Image src={FumiyaImage} alt="start" />}
           leftName="FUMIYA"
           rightImage={<Image src={AoiImage} alt="start" />}
