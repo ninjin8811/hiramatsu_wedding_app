@@ -30,13 +30,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon.png"></link>
         <meta name="theme-color" content="#f7f7f7" />
       </head>
-      <FirebaseInitializer>
-        <AuthProvider loginComponent={undefined}>
-          <body className={`${geistSans.variable} ${geistMono.variable}`}>
-            {children}
-          </body>
-        </AuthProvider>
-      </FirebaseInitializer>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <FirebaseInitializer>
+          <AuthProvider loginComponent={undefined}>{children}</AuthProvider>
+        </FirebaseInitializer>
+      </body>
     </html>
   );
 }
