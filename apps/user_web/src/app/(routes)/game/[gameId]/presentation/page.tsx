@@ -7,7 +7,6 @@ import { useState, useCallback } from 'react';
 import TitleScreen from './components/TitleScreen';
 import WaitingScreen from './components/WaitingScreen';
 import CorrectAnswerScreen from './components/CorrectAnswerScreen';
-import CurrentRankingScreen from './components/CurrentRankingScreen';
 import FinalRankingScreen from './finalRanking/FinalRankingScreen';
 
 export type GameScreen =
@@ -26,10 +25,14 @@ export default function GamePresentationPage() {
   const [currentScreen, setCurrentScreen] = useState<GameScreen>('title');
 
   const navigateTo = useCallback((screen: GameScreen) => {
-    if (screen === 'quiz') {
-      return router.push(`/game/${gameId}/presentation/quizzes/0`);
+    switch (screen) {
+      case 'quiz':
+        return router.push(`/game/${gameId}/presentation/quizzes/0`);
+      case 'currentRanking':
+        return router.push(`/game/${gameId}/presentation/quizzes/0/ranking`);
+      default:
+        setCurrentScreen(screen);
     }
-    setCurrentScreen(screen);
   }, [router, gameId]);
 
   const renderScreen = () => {
@@ -40,11 +43,10 @@ export default function GamePresentationPage() {
         return <WaitingScreen gameId={gameId} onNavigate={navigateTo} />;
       case 'correctAnswer':
         return <CorrectAnswerScreen gameId={gameId} onNavigate={navigateTo} />;
-      case 'currentRanking':
-        return <CurrentRankingScreen gameId={gameId} onNavigate={navigateTo} />;
       case 'finalRanking':
         return <FinalRankingScreen gameId={gameId} />;
       case 'quiz':
+      case 'currentRanking':
       default:
         return <div>Unknown Screen. Game ID: {gameId} for Presentation</div>;
     }

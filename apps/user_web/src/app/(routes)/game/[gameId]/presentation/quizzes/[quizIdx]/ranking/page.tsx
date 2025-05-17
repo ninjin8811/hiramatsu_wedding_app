@@ -2,7 +2,7 @@ import { getServerDb } from "@/app/_lib/firebase/server/firestore";
 import { Game } from "@/app/_types";
 import { getDoc, doc } from "firebase/firestore";
 import { notFound } from "next/navigation";
-import QuizScreen from "./_components/QuizScreen";
+import CurrentRankingScreen from "./_components/CurrentRankingScreen";
 
 type Props = {
   params: Promise<{
@@ -11,7 +11,7 @@ type Props = {
   }>
 }
 
-export default async function QuizPage({ params }: Props) {
+export default async function CurrentRankingPage({ params }: Props) {
   const { gameId, quizIdx } = await params;
   const db = await getServerDb();
   const game = (await getDoc(doc(db, 'Games', gameId))).data() as Game;
@@ -22,7 +22,8 @@ export default async function QuizPage({ params }: Props) {
   }
 
   const totalQuestionLength = game.questions.length;
-  const nextPath = `/game/${gameId}/presentation/quizzes/${Number(quizIdx)}/ranking`;
+  const nextQuestionIdx = Number(quizIdx) + 1;
+  const nextPath = nextQuestionIdx < totalQuestionLength ? `/game/${gameId}/presentation/quizzes/${nextQuestionIdx}` : `/game/${gameId}/presentation/finalRanking`;
 
-  return <QuizScreen totalQuestionLength={totalQuestionLength} currentQuestionIdx={Number(quizIdx)} currentQuestion={currentQuestion} timeLimit={game.answerTime} nextPath={nextPath} />
+  return <CurrentRankingScreen currentQuestionIdx={Number(quizIdx)} nextPath={nextPath} />
 }
