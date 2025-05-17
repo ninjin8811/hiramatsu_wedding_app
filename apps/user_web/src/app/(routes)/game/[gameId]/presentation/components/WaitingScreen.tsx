@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import Image from 'next/image';
+import styles from './WaitingScreen.module.css';
 import { GameScreen } from '../page';
 
 interface WaitingScreenProps {
@@ -7,15 +9,68 @@ interface WaitingScreenProps {
 }
 
 const WaitingScreen: React.FC<WaitingScreenProps> = ({ gameId, onNavigate }) => {
-  // Add logic for waiting, e.g., setTimeout to automatically navigate or wait for a signal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowRight') {
+        onNavigate('quiz');
+      } else if (event.key === 'ArrowLeft') {
+        onNavigate('title');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onNavigate]);
+
+  const items = [
+    {
+      name: 'アカこうら',
+      description: '前の人が -10pt',
+      image: '/images/akakoura.png',
+      alt: 'アカこうら',
+    },
+    {
+      name: 'ダッシュキノコ',
+      description: '+5pt進む',
+      image: '/images/dash-kinoko.png',
+      alt: 'ダッシュキノコ',
+    },
+    {
+      name: 'キラー',
+      description: '+30pt進む',
+      image: '/images/killer.png',
+      alt: 'キラー',
+    },
+    {
+      name: 'トゲゾーこうら',
+      description: '1番前の人が -20pt',
+      image: '/images/togezo.png',
+      alt: 'トゲゾーこうら',
+    },
+  ];
+
   return (
-    <div>
-      <h2>Waiting Screen for Game {gameId} (Presentation)</h2>
-      <p>Waiting for other players or the game to start...</p>
-      {/* For demonstration, a button to manually proceed to quiz */}
-      <button onClick={() => onNavigate('quiz')}>Proceed to Quiz (Manual)</button>
-    </div>
+    <main className={styles.bg}>
+      <div className={styles.modal}>
+        <div className={styles.itemsGrid}>
+          {items.map((item) => (
+            <div key={item.name} className={styles.item}>
+              <div className={styles.itemImageContainer}>
+                <Image src={item.image} alt={item.alt} className={styles.itemImage} width={100} height={100} />
+              </div>
+              <div className={styles.itemTextContainer}>
+                <p className={styles.itemName}>{item.name}</p>
+                <p className={styles.itemDescription}>{item.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
   );
 };
 
-export default WaitingScreen; 
+export default WaitingScreen;

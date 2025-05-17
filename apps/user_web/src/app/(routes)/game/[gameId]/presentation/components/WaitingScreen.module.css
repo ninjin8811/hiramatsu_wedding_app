@@ -1,0 +1,85 @@
+.bg {
+  background-image: url(../../../../../_images/Background.png);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100vw;
+  padding: 2vw; /* Add some padding to prevent content from touching edges */
+}
+
+.modal {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255,255,255); /* Dark semi-transparent background */
+  border-radius: 1.5vw; /* Rounded corners */
+  padding: 3vw;
+  width: 70vw; /* Adjust width as needed */
+  max-width: 900px; /* Max width for very large screens */
+  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.5);
+  position: relative; /* For the speech bubble arrow */
+  border: 0.2vw solid white;
+}
+
+/* Speech bubble arrow */
+.modal::after {
+  content: '';
+  position: absolute;
+  bottom: -2.8vw; /* Adjust to position the arrow correctly */
+  left: 80%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 2vw solid transparent;
+  border-right: 2vw solid transparent;
+  border-top: 3vw solid white;
+}
+
+
+.itemsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
+  gap: 2vw;
+  color: white;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 1.5vw; /* Space between image and text */
+}
+
+.itemImageContainer {
+  width: 8vw; /* Adjust as needed */
+  height: 8vw; /* Adjust as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itemImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.itemTextContainer {
+  display: flex;
+  flex-direction: column;
+  color: #333333;
+  font-weight: bold;
+  font-family: var(--font-noto-sans-jp);
+}
+
+.itemName {
+  font-size: 2vw;
+  font-weight: bold;
+  margin-bottom: 0.5vw;
+}
+
+.itemDescription {
+  font-size: 1.5vw;
+  padding-left: 2px;
+}
