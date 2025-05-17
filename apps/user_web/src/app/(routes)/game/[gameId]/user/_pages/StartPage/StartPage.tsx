@@ -6,6 +6,7 @@ import styles from "./StartPage.module.scss";
 import MainCharactersBox from "@/app/_components/MainCharactersBox/MainCharactersBox";
 import FumiyaImage from "@/app/_images/Fumiya.png";
 import AoiImage from "@/app/_images/Aoi.png";
+import CommonButton from "../../_components/CommonButton/CommonButton";
 
 export default function StartPage() {
   const itemBoxComponent = (
@@ -26,12 +27,15 @@ export default function StartPage() {
       <div className={styles.content}>
         <Image src={HomeLogo} alt="start" className={styles.logo} />
         <MainCharactersBox
-          leftImage={<Image src={FumiyaImage} alt="start" />}
+          leftImage={<Image src={FumiyaImage} alt="left" />}
           leftName="FUMIYA"
-          rightImage={<Image src={AoiImage} alt="start" />}
+          rightImage={<Image src={AoiImage} alt="right" />}
           rightName="AOI"
           size="small"
         />
+      </div>
+      <div className={styles.button}>
+        <CommonButton color="blue">次へ</CommonButton>
       </div>
     </div>
   );

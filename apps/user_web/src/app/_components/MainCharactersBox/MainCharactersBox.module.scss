@@ -30,6 +30,7 @@
 
   &.small {
     width: 100%;
+    max-width: 400px;
     .item {
       &.left {
         border-radius: 32px 0 0 32px;
