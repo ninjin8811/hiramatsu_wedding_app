@@ -7,8 +7,15 @@ import MainCharactersBox from "@/app/_components/MainCharactersBox/MainCharacter
 import FumiyaImage from "@/app/_images/Fumiya.png";
 import AoiImage from "@/app/_images/Aoi.png";
 import CommonButton from "../../_components/CommonButton/CommonButton";
+import Link from "next/link";
+import { UserPreparePath } from "@/app/_utils/page_link";
 
-export default function StartPage() {
+type Props = {
+  gameId: string;
+  userId: string;
+};
+
+export default function StartPage(props: Props) {
   const itemBoxComponent = (
     <Image src={HomeItemBox} alt="start" className={styles.background_item} />
   );
@@ -34,9 +41,12 @@ export default function StartPage() {
           size="small"
         />
       </div>
-      <div className={styles.button}>
+      <Link
+        href={UserPreparePath(props.gameId, props.userId)}
+        className={styles.button}
+      >
         <CommonButton color="blue">次へ</CommonButton>
-      </div>
+      </Link>
     </div>
   );
 }
