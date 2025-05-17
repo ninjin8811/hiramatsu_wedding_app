@@ -1,0 +1,19 @@
+.profileBox {
+  border-radius: 20px 20px 32px 32px;
+  overflow: hidden;
+  background: #fff;
+  &_title {
+    background: #e60013;
+    color: #fff;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 20px 0;
+  }
+  &_content {
+    padding: 44px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
