@@ -1,0 +1,46 @@
+.rankingItem {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rankNumber {
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rankImage {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.teamName {
+  flex: 1;
+  font-size: 18px;
+  margin: 0 16px;
+  color: #333;
+}
+
+.scoreContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.unit {
+  font-size: 14px;
+  color: #666;
+} 

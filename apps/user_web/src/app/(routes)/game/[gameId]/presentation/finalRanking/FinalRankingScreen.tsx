@@ -3,6 +3,7 @@ import Image from 'next/image';
 import BackgroundWideGray from '@/app/_images/BackgroundWideGray.png';
 import Confetti from '@/app/_images/Confetti.png';
 import RankingResultTitleContainer from '@/app/_images/RankingResultTitleContainer.png';
+import RankingItem from './RankingItem';
 import styles from './FinalRankingScreen.module.scss';
 
 // モックデータ（スコアのみ）
@@ -102,12 +103,11 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
           {rankingColumns.map((column, columnIndex) => (
             <div key={columnIndex} className={styles.rankingColumn}>
               {column.map((team) => (
-                <TeamItem
+                <RankingItem
                   key={team.name}
                   rank={team.rank}
                   name={team.name}
                   score={team.score}
-                  thumbnail={team.thumbnail}
                 />
               ))}
             </div>
