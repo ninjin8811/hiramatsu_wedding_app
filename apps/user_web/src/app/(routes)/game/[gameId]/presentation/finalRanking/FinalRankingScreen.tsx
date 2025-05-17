@@ -135,10 +135,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
             </div>
           ))}
         </div>
-        {currentTopThreeIndex > 0 && currentTopThreeIndex <=3 && (
-          <div className={styles.keyboardPrompt}>
-            <p>▶ キーで次へ</p>
-          </div>
+
         )}
       </div>
     </div>
