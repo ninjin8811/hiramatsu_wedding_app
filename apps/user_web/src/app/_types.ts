@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+/**
+ * fyi: スプレッドシートの叩き
+ * https://docs.google.com/spreadsheets/d/1PibrmI3aes0JWmU-UJNl3jNfdMrprzn8bBw6st-NWkM/edit?gid=830245941#gid=830245941
+ */
+
 // [Game]/{gameId}/questions/ （質問オブジェクト）
 export const QuestionSchema = z.object({
   question: z.string().describe("質問文"),
