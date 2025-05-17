@@ -66,6 +66,16 @@
       object-fit: cover;
     }
   }
+  &_result {
+    margin: 20px auto 30px;
+    padding: 0 14px;
+    width: 100%;
+    img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+  }
   &_answers {
     display: flex;
     flex-direction: column;
@@ -204,5 +214,11 @@
     font-size: 18px;
     font-weight: bold;
     color: #3c3c3c;
+  }
+  &.disabled {
+    background-color: #e0e0e0;
+    &_label {
+      background-color: #646464;
+    }
   }
 }
