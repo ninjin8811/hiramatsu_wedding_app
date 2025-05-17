@@ -64,8 +64,8 @@ const RankingItemGorgeous: React.FC<RankingItemGorgeousProps> = ({
           <Image
             src={rankImages[rank.toString() as keyof typeof rankImages]}
             alt={`Rank ${rank}`}
-            width={40}
-            height={40}
+            width={60}
+            height={60}
             className={styles.rankImageGorgeous}
           />
         </div>
