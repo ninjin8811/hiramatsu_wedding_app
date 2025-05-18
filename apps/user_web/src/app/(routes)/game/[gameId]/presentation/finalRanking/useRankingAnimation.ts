@@ -65,10 +65,7 @@ export const useRankingAnimation = (teamsData: Team[]) => { // teamsData を pro
                              (sortedTeams.length < 4 || visibleTeams.includes(sortedTeams.find(t => t.rank === 4)?.rank ?? -1000));
       
       if (isAnimationDone && currentTopThreeIndex === -1) { 
-        const timer = setTimeout(() => {
-          setCurrentTopThreeIndex(4); 
-        }, 3000);
-        return () => clearTimeout(timer);
+        setCurrentTopThreeIndex(4); 
       }
       return; 
     }
@@ -99,10 +96,8 @@ export const useRankingAnimation = (teamsData: Team[]) => { // teamsData を pro
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight') {
-        if (isDrumrollPlaying) return; // ドラムロール再生中は操作を無視
-
         // DEBUG LOG
-        console.log(`[KeyDown] ArrowRight pressed. currentTopThreeIndex: ${currentTopThreeIndex}`);
+        console.log(`[KeyDown] ArrowRight pressed. currentTopThreeIndex: ${currentTopThreeIndex}, isDrumrollPlaying: ${isDrumrollPlaying}`);
         if (currentTopThreeIndex === 4) {      
           console.log("[KeyDown] Setting currentTopThreeIndex from 4 to 3");
           setCurrentTopThreeIndex(3);          
@@ -110,20 +105,39 @@ export const useRankingAnimation = (teamsData: Team[]) => { // teamsData を pro
           console.log("[KeyDown] Setting currentTopThreeIndex from 3 to 2");
           setCurrentTopThreeIndex(2);          
         } else if (currentTopThreeIndex === 2) { 
-          console.log("[KeyDown] Setting currentTopThreeIndex from 2 to 1 (will play drumroll)");
-          setIsDrumrollPlaying(true);
-          const audio = new Audio('/sounds/drumroll.mp3'); // public/_sounds/drumroll.mp3 を想定
-          audio.play().catch(e => {
-            console.error("Error playing drumroll:", e);
-            // 再生エラーでも次に進む
+          console.log("[KeyDown] Handling ArrowRight for currentTopThreeIndex 2. isDrumrollPlaying: " + isDrumrollPlaying);
+          if (isDrumrollPlaying) {
+            // If drumroll is playing, stop it and show 1st place immediately
+            const audioElements = document.getElementsByTagName('audio');
+            for (let i = 0; i < audioElements.length; i++) {
+              if (audioElements[i].src.includes('drumroll.mp3')) {
+                audioElements[i].pause();
+                audioElements[i].currentTime = 0; // Reset audio
+              }
+            }
             setCurrentTopThreeIndex(1);      
             setIsDrumrollPlaying(false);
-          });
-          audio.onended = () => {
-            // console.log("[Audio] Drumroll ended. Setting currentTopThreeIndex to 1");
-            setCurrentTopThreeIndex(1);      
-            setIsDrumrollPlaying(false);
-          };
+            console.log("[KeyDown] Skipped drumroll, set currentTopThreeIndex to 1");
+          } else {
+            // Start drumroll, as it's not playing yet for the 2 -> 1 transition
+            setIsDrumrollPlaying(true);
+            const audio = new Audio('/sounds/drumroll.mp3'); 
+            audio.play().catch(e => {
+              console.error("Error playing drumroll:", e);
+              // Fallback: if audio fails, still proceed to show 1st place and reset drumroll state.
+              setCurrentTopThreeIndex(1);      
+              setIsDrumrollPlaying(false); 
+            });
+            audio.onended = () => {
+              // console.log("[Audio] Drumroll ended. currentTopThreeIndex before setting: " + currentTopThreeIndex);
+              // Only set to 1 if the state is still 2 (i.e., not skipped by another key press)
+              // and drumroll was playing (which it should be if onended is called)
+              if (currentTopThreeIndex === 2) { 
+                setCurrentTopThreeIndex(1);      
+              }
+              setIsDrumrollPlaying(false);
+            };
+          }
                    
         } else if (currentTopThreeIndex === 1) { 
           console.log("[KeyDown] currentTopThreeIndex is 1. Checking confetti.");
