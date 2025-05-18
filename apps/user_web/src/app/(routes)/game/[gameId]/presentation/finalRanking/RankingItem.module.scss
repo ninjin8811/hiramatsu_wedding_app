@@ -97,13 +97,13 @@
 
 .thumbnailContainer {
   position: relative;
-  margin-right: 12px;
+  margin-right: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   overflow: visible;
-  margin-left: -120px;
+  margin-left: -140px;
 }
 
 .mainThumbnail {
@@ -118,14 +118,14 @@
 
 .rankOverlay {
   position: absolute;
-  top: -10px;
-  left: -10px;
+  top: -80px;
+  left: -20px;
   z-index: 1;
 }
 
 .rankImageGorgeous {
-  width: 60px;
-  height: 60px;
+  width: 120px;
+  height: 120px;
 }
 
 .detailsContainer {
