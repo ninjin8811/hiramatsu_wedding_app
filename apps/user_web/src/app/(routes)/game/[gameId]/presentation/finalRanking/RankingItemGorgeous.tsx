@@ -1,5 +1,5 @@
 import React from 'react';
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
 import styles from './RankingItem.module.scss';
 
 // 順位の画像をインポート
@@ -41,25 +41,51 @@ interface RankingItemGorgeousProps {
   rank: number;
   name: string;
   score: number;
-  thumbnail: StaticImageData;
+  thumbnail: string; // This will be the HTTPS URL
 }
 
 const RankingItemGorgeous: React.FC<RankingItemGorgeousProps> = ({
   rank,
   name,
   score,
-  thumbnail,
+  thumbnail, // This is now an HTTPS URL
 }) => {
+  // const getFirebaseStorageUrl = (gsUri: string): string => {
+  //   if (!gsUri || !gsUri.startsWith('gs://')) {
+  //     // Return a placeholder or empty string if the URI is invalid
+  //     // console.error('Invalid GS URI:', gsUri);
+  //     return ''; // Or a path to a default placeholder image
+  //   }
+  //   const bucketAndPath = gsUri.substring(5); // Remove 'gs://'
+  //   const parts = bucketAndPath.split('/');
+  //   const bucketName = parts.shift();
+  //   const objectPath = parts.join('/');
+  //   if (!bucketName || !objectPath) {
+  //       // console.error('Could not parse bucket name or object path from GS URI:', gsUri);
+  //       return '';
+  //   }
+  //   return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(objectPath)}?alt=media`;
+  // };
+
+  const imageUrl = thumbnail; // Directly use the thumbnail prop
+
   return (
     <div className={styles.rankingItemGorgeous} data-rank={rank}>
       <div className={styles.thumbnailContainer}>
-        <Image
-          src={thumbnail}
-          alt={`${name} thumbnail`}
-          width={120}
-          height={120}
-          className={styles.mainThumbnail}
-        />
+        {imageUrl ? (
+          <Image
+            src={imageUrl} // Use the transformed HTTPS URL
+            alt={`${name} thumbnail`}
+            width={120}
+            height={120}
+            className={styles.mainThumbnail}
+            // priority={rank <=3 } // Consider adding priority for top-ranked images if needed
+          />
+        ) : (
+          <div className={styles.thumbnailPlaceholder} style={{ width: 120, height: 120, backgroundColor: '#ccc' }}>
+            {/* You can put an icon or text here as a placeholder */}
+          </div>
+        )}
         <div className={styles.rankOverlay}>
           <Image
             src={rankImages[rank.toString() as keyof typeof rankImages]}

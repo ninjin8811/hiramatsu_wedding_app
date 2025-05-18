@@ -1,46 +1,23 @@
 import { useState, useEffect, useMemo } from 'react';
-import { StaticImageData } from 'next/image';
+// StaticImageData は string に変更するので不要になります
+// import { StaticImageData } from 'next/image';
 
-// サムネイル画像をインポート (FinalRankingScreen.tsxから移動)
-import ThumbnailTeamA from '@/app/_images/ThumbnailTeamA.jpg';
-import ThumbnailTeamB from '@/app/_images/ThumbnailTeamB.jpg';
-import ThumbnailTeamC from '@/app/_images/ThumbnailTeamC.jpg';
-import ThumbnailTeamD from '@/app/_images/ThumbnailTeamD.jpg';
-import ThumbnailTeamE from '@/app/_images/ThumbnailTeamE.jpg';
-import ThumbnailTeamF from '@/app/_images/ThumbnailTeamF.jpg';
-import ThumbnailTeamG from '@/app/_images/ThumbnailTeamG.jpg';
-import ThumbnailTeamH from '@/app/_images/ThumbnailTeamH.jpg';
-import ThumbnailTeamI from '@/app/_images/ThumbnailTeamI.jpg';
-import ThumbnailTeamJ from '@/app/_images/ThumbnailTeamJ.jpg';
-import ThumbnailTeamK from '@/app/_images/ThumbnailTeamK.jpg';
-import ThumbnailTeamL from '@/app/_images/ThumbnailTeamL.jpg';
-import ThumbnailTeamM from '@/app/_images/ThumbnailTeamM.jpg';
-import ThumbnailTeamN from '@/app/_images/ThumbnailTeamN.jpg';
-import ThumbnailTeamO from '@/app/_images/ThumbnailTeamO.jpg';
+// サムネイル画像のインポートは FinalRankingScreen.tsx で行うか、URLを直接使うため削除
+// import ThumbnailTeamA from '@/app/_images/ThumbnailTeamA.jpg';
+// ... (他のサムネイルインポートも同様に削除)
+// import ThumbnailTeamO from '@/app/_images/ThumbnailTeamO.jpg';
 
-// モックデータ（スコアのみ） (FinalRankingScreen.tsxから移動)
-const mockTeamsData = [
-  { name: "チームA", score: 1000, thumbnail: ThumbnailTeamA },
-  { name: "チームB", score: 850, thumbnail: ThumbnailTeamB },
-  { name: "チームC", score: 700, thumbnail: ThumbnailTeamC },
-  { name: "チームD", score: 650, thumbnail: ThumbnailTeamD },
-  { name: "チームE", score: 600, thumbnail: ThumbnailTeamE },
-  { name: "チームF", score: 550, thumbnail: ThumbnailTeamF },
-  { name: "チームG", score: 500, thumbnail: ThumbnailTeamG },
-  { name: "チームH", score: 450, thumbnail: ThumbnailTeamH },
-  { name: "チームI", score: 400, thumbnail: ThumbnailTeamI },
-  { name: "チームJ", score: 350, thumbnail: ThumbnailTeamJ },
-  { name: "チームK", score: 300, thumbnail: ThumbnailTeamK },
-  { name: "チームL", score: 250, thumbnail: ThumbnailTeamL },
-  { name: "チームM", score: 200, thumbnail: ThumbnailTeamM },
-  { name: "チームN", score: 150, thumbnail: ThumbnailTeamN },
-  { name: "チームO", score: 100, thumbnail: ThumbnailTeamO },
-];
+// モックデータは削除し、代わりに props からチームデータを受け取る
+// const mockTeamsData = [
+//   { name: "チームA", score: 1000, thumbnail: ThumbnailTeamA },
+//   ... (他のモックデータも削除)
+//   { name: "チームO", score: 100, thumbnail: ThumbnailTeamO },
+// ];
 
-interface Team {
+export interface Team {
   name: string;
   score: number;
-  thumbnail: StaticImageData;
+  thumbnail: string; // StaticImageData から string に変更
 }
 
 interface RankedTeam extends Team {
@@ -51,7 +28,7 @@ interface TeamWithVisibility extends RankedTeam {
   isVisible: boolean;
 }
 
-export const useRankingAnimation = () => {
+export const useRankingAnimation = (teamsData: Team[]) => { // teamsData を propsとして受け取る
   const [visibleTeams, setVisibleTeams] = useState<number[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentTopThreeIndex, setCurrentTopThreeIndex] = useState(-1); 
@@ -59,7 +36,8 @@ export const useRankingAnimation = () => {
   const [isDrumrollPlaying, setIsDrumrollPlaying] = useState(false);
 
   const sortedTeams: RankedTeam[] = useMemo(() => {
-    const teams = mockTeamsData
+    // mockTeamsData を props の teamsData に変更
+    const teams = teamsData
       .sort((a, b) => {
         if (b.score !== a.score) {
           return b.score - a.score;
@@ -71,7 +49,7 @@ export const useRankingAnimation = () => {
         rank: index + 1,
       }));
     return teams;
-  }, []);
+  }, [teamsData]);
 
   useEffect(() => {
     const initialRanks = sortedTeams

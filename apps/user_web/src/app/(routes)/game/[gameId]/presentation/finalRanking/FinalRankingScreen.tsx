@@ -1,71 +1,83 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { firebaseApp } from '@/app/_lib/firebase/FirebaseInitializer';
 import BackgroundWideGray from '@/app/_images/BackgroundWideGray.png';
 import Confetti from '@/app/_images/Confetti.png';
 import RankingResultTitleContainer from '@/app/_images/RankingResultTitleContainer.png';
 import RankingItemNormal from './RankingItemNormal';
 import RankingItemGorgeous from './RankingItemGorgeous';
 import styles from './FinalRankingScreen.module.scss';
-import { useRankingAnimation } from './useRankingAnimation'; // カスタムフックをインポート
+import { useRankingAnimation, Team } from './useRankingAnimation'; // Team型をインポート
 
-// サムネイル画像をインポート
-import ThumbnailTeamA from '@/app/_images/ThumbnailTeamA.jpg';
-import ThumbnailTeamB from '@/app/_images/ThumbnailTeamB.jpg';
-import ThumbnailTeamC from '@/app/_images/ThumbnailTeamC.jpg';
-import ThumbnailTeamD from '@/app/_images/ThumbnailTeamD.jpg';
-import ThumbnailTeamE from '@/app/_images/ThumbnailTeamE.jpg';
-import ThumbnailTeamF from '@/app/_images/ThumbnailTeamF.jpg';
-import ThumbnailTeamG from '@/app/_images/ThumbnailTeamG.jpg';
-import ThumbnailTeamH from '@/app/_images/ThumbnailTeamH.jpg';
-import ThumbnailTeamI from '@/app/_images/ThumbnailTeamI.jpg';
-import ThumbnailTeamJ from '@/app/_images/ThumbnailTeamJ.jpg';
-import ThumbnailTeamK from '@/app/_images/ThumbnailTeamK.jpg';
-import ThumbnailTeamL from '@/app/_images/ThumbnailTeamL.jpg';
-import ThumbnailTeamM from '@/app/_images/ThumbnailTeamM.jpg';
-import ThumbnailTeamN from '@/app/_images/ThumbnailTeamN.jpg';
-import ThumbnailTeamO from '@/app/_images/ThumbnailTeamO.jpg';
+// サムネイル画像のインポートは不要になるため削除
+// import ThumbnailTeamA from '@/app/_images/ThumbnailTeamA.jpg';
+// ... (他のサムネイルインポートも削除)
+// import ThumbnailTeamO from '@/app/_images/ThumbnailTeamO.jpg';
 
-// モックデータ（スコアのみ）
-const mockTeams = [
-  { name: "チームA", score: 1000, thumbnail: ThumbnailTeamA },
-  { name: "チームB", score: 850, thumbnail: ThumbnailTeamB },
-  { name: "チームC", score: 700, thumbnail: ThumbnailTeamC },
-  { name: "チームD", score: 650, thumbnail: ThumbnailTeamD },
-  { name: "チームE", score: 600, thumbnail: ThumbnailTeamE },
-  { name: "チームF", score: 550, thumbnail: ThumbnailTeamF },
-  { name: "チームG", score: 500, thumbnail: ThumbnailTeamG },
-  { name: "チームH", score: 450, thumbnail: ThumbnailTeamH },
-  { name: "チームI", score: 400, thumbnail: ThumbnailTeamI },
-  { name: "チームJ", score: 350, thumbnail: ThumbnailTeamJ },
-  { name: "チームK", score: 300, thumbnail: ThumbnailTeamK },
-  { name: "チームL", score: 250, thumbnail: ThumbnailTeamL },
-  { name: "チームM", score: 200, thumbnail: ThumbnailTeamM },
-  { name: "チームN", score: 150, thumbnail: ThumbnailTeamN },
-  { name: "チームO", score: 100, thumbnail: ThumbnailTeamO },
-];
-
-// TeamItemProps と TeamItem は現状このファイルでは未使用なのでコメントアウトまたは削除
-// interface TeamItemProps {
-//   rank: number;
-//   name: string;
-//   score: number;
-//   thumbnail: StaticImageData;
-// }
-
-// const TeamItem: React.FC<TeamItemProps> = ({ rank, name, score, thumbnail }) => (
-//   <div className={styles.teamItem}>
-//     <span className={styles.rank}>{rank}</span>
-//     <span className={styles.name}>{name}</span>
-//     <span className={styles.score}>{score}</span>
-//   </div>
-// );
+// モックデータは削除
+// const mockTeams = [
+//   { name: "チームA", score: 1000, thumbnail: ThumbnailTeamA },
+//   ... (他のモックチームデータも削除)
+//   { name: "チームO", score: 100, thumbnail: ThumbnailTeamO },
+// ];
 
 interface FinalRankingScreenProps {
   gameId: string;
 }
 
 const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
-  const { rankingColumns, showConfetti, currentTopThreeIndex } = useRankingAnimation();
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // useRankingAnimationフックにteamsを渡す
+  const { rankingColumns, showConfetti, currentTopThreeIndex } = useRankingAnimation(teams);
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      if (!gameId) {
+        setIsLoading(false);
+        setError("Game ID is not provided.");
+        return;
+      }
+      setIsLoading(true);
+      setError(null);
+      const db = getFirestore(firebaseApp);
+      try {
+        const usersCollectionRef = collection(db, 'Games', gameId, 'Users');
+        const q = query(usersCollectionRef, orderBy('score', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const fetchedTeams: Team[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          // FirestoreのドキュメントIDをidとして使用し、name, score, thumbnailを期待通りに設定
+          // thumbnailはstring URLであることを想定
+          fetchedTeams.push({
+            name: data.name as string,
+            score: data.score as number,
+            thumbnail: data.thumbnail as string, // FirestoreからはURL文字列が来る想定
+          });
+        });
+        setTeams(fetchedTeams);
+      } catch (e) {
+        console.error("Error fetching teams from Firestore:", e);
+        setError("Failed to load ranking data. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTeams();
+  }, [gameId]);
+
+  if (isLoading) {
+    return <div className={styles.loadingContainer}>Loading ranking...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.errorContainer}>Error: {error}</div>;
+  }
 
   // 元のuseState、useEffect、useMemoはuseRankingAnimationフックに移動したため削除
 
@@ -100,19 +112,18 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
         <div className={styles.rankingContainer}>
           {rankingColumns.map((column, columnIndex) => (
             <div key={columnIndex} className={styles.rankingColumn}>
-              {column.map((team) => (
+              {column.map((team) => ( // team は TeamWithVisibility 型のはず
                 team.rank <= 3 ? (
                   <div key={team.name} className={styles.rankingItemWrapper}>
-                    {/* トップ3の表示制御は isVisible で行う */}
                     {team.isVisible ? (
                       <RankingItemGorgeous
                         rank={team.rank}
                         name={team.name}
                         score={team.score}
-                        thumbnail={team.thumbnail} // thumbnail を渡す
+                        thumbnail={team.thumbnail} // thumbnail は string URL
                       />
                     ) : (
-                      null // プレースホルダーをレンダリングしない
+                      null
                     )}
                   </div>
                 ) : (
@@ -126,7 +137,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
                       rank={team.rank}
                       name={team.name}
                       score={team.score}
-                      // thumbnail={team.thumbnail} // RankingItemNormal に thumbnail は不要な想定
+                      // thumbnail={team.thumbnail} // RankingItemNormal には thumbnail props がない想定だったが、もし必要なら渡す
                     />
                   </div>
                 )
