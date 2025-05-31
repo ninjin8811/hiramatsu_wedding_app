@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
@@ -150,4 +152,4 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
   );
 };
 
-export default FinalRankingScreen; 
+export default FinalRankingScreen;

@@ -87,9 +87,5 @@ export default async function CurrentRankingPage({ params }: Props) {
     };
   });
 
-  const totalQuestionLength = game.questions.length;
-  const nextQuestionIdx = currentQuizIdx + 1;
-  const nextPath = nextQuestionIdx < totalQuestionLength ? `/game/${gameId}/presentation/quizzes/${nextQuestionIdx}` : `/game/${gameId}/presentation/finalRanking`;
-
-  return <CurrentRankingScreen nextPath={nextPath} users={usersData} />
+  return <CurrentRankingScreen gameId={gameId} currentQuizIdx={currentQuizIdx} users={usersData} />
 }

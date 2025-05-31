@@ -3,33 +3,35 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import styles from './QuizScreen.module.css';
-import { Question } from '@/app/_types';
+import { CurrentProcess, Question } from '@/app/_types';
 import { QuizScreenTimer } from './QuizScreenTimer';
 import { useRouter } from 'next/navigation';
+import { navigateToAnimation, showAnswerAction } from '../actions';
 
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
 interface QuizScreenProps {
+  gameId: string;
+  quizIdx: number;
+  mode: Omit<CurrentProcess['type'], 'animation'>;
   totalQuestionLength: number;
   currentQuestionIdx: number;
   currentQuestion: Question;
   timeLimit: number;
-  nextPath: string;
 }
 
-const QuizScreen: React.FC<QuizScreenProps> = ({ totalQuestionLength, currentQuestionIdx, currentQuestion, timeLimit, nextPath }) => {
-  const [isShowAnswer, _setIsShowAnswer] = useState(false);
+const QuizScreen: React.FC<QuizScreenProps> = ({ gameId, quizIdx,mode, totalQuestionLength, currentQuestionIdx, currentQuestion, timeLimit }) => {
   const [canShowAnswer, setCanShowAnswer] = useState(false);
   const router = useRouter();
+  const isModeAnswer = mode === 'answer';
 
   const showAnswer = useCallback(() => {
-    if (canShowAnswer) {
-      _setIsShowAnswer(true);
-    } else if (window.confirm("答えを表示しますか?")) {
-      _setIsShowAnswer(true);
+    if (!canShowAnswer && !window.confirm("答えを表示しますか?")) {
+      return
     }
-  }, [canShowAnswer]);
+    showAnswerAction(gameId, quizIdx);
+  }, [canShowAnswer, gameId, quizIdx]);
 
   const handleTimeUp = useCallback(() => {
     setCanShowAnswer(true);
@@ -42,8 +44,9 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ totalQuestionLength, currentQue
         if (window.confirm("前の画面へ戻りますか?")) {
           router.back();
         }
-      } else if (event.key === 'ArrowRight') {
-        if (isShowAnswer) return router.push(nextPath);
+      } else if (event.key === 'ArrowRight' || event.key === 'Enter') {
+        // 答えを表示したら次の画面へ遷移
+        if (isModeAnswer) return navigateToAnimation(gameId, quizIdx);
         showAnswer();
       }
     };
@@ -52,7 +55,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ totalQuestionLength, currentQue
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showAnswer, isShowAnswer, nextPath, router]);
+  }, [showAnswer, isModeAnswer, gameId, quizIdx, router]);
 
   return (
     <main className={styles.bg}>
@@ -84,7 +87,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ totalQuestionLength, currentQue
           <div className={styles.optionsContainer}>
             {currentQuestion.options.map((option, index) => {
               let optionClassName = styles.optionButton;
-              if (isShowAnswer) {
+              if (isModeAnswer) {
                 if (index === currentQuestion.correctIndex) {
                   optionClassName = `${styles.optionButton} ${styles.correct}`;
                 } else {

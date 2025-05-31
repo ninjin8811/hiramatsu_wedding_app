@@ -11,7 +11,7 @@ interface WaitingScreenProps {
 const WaitingScreen: React.FC<WaitingScreenProps> = ({ gameId, onNavigate }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight') {
+      if (event.key === 'ArrowRight' || event.key === 'Enter') {
         onNavigate('quiz');
       } else if (event.key === 'ArrowLeft') {
         onNavigate('title');

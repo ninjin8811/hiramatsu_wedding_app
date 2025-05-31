@@ -17,7 +17,7 @@ interface TitleScreenProps {
 const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight') {
+      if (event.key === 'ArrowRight' || event.key === 'Enter') {
         onNavigate('waiting');
       }
     };

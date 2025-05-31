@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import styles from './CurrentRanking.module.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { navigateToNextStep } from '../actions';
 
 const MAX_SCORE = 900; // 仮の合計最大スコア
 
@@ -18,12 +19,14 @@ export interface User {
 }
 
 interface CurrentRankingScreenProps {
-  nextPath: string;
+  gameId: string;
+  currentQuizIdx: number;
   users: Array<User>;
 }
 
 const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
-  nextPath,
+  gameId,
+  currentQuizIdx,
   users = [],
 }) => {
   const router = useRouter();
@@ -53,8 +56,8 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
         if (window.confirm("前の画面へ戻りますか?")) {
           router.back();
         }
-      } else if (event.key === 'ArrowRight') {
-        router.push(nextPath);
+      } else if (event.key === 'ArrowRight' || event.key === 'Enter') {
+        navigateToNextStep(gameId, currentQuizIdx);
       }
     };
 
@@ -62,7 +65,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [nextPath, router]);
+  }, [gameId, currentQuizIdx, router]);
 
   return (
     <main className={styles.bg}>
