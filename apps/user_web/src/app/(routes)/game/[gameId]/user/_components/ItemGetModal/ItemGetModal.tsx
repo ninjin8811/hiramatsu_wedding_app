@@ -31,12 +31,6 @@ export default function ItemGetModal(props: Props) {
   return (
     <div className={styles.itemGetModal}>
       <Image
-        src={CloseIconBlack}
-        alt="閉じる"
-        className={styles.close}
-        onClick={props.onClose}
-      />
-      <Image
         className={styles.background}
         src={ItemGetBackground}
         alt="アイテム獲得"

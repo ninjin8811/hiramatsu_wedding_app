@@ -8,7 +8,7 @@ import FumiyaImage from "@/app/_images/Fumiya.png";
 import AoiImage from "@/app/_images/Aoi.png";
 import CommonButton from "../../_components/CommonButton/CommonButton";
 import Link from "next/link";
-import { UserPreparePath } from "@/app/_utils/page_link";
+import { UserPreparePath, UserTeamsPath } from "@/app/_utils/page_link";
 
 type Props = {
   gameId: string;
@@ -42,7 +42,7 @@ export default function StartPage(props: Props) {
         />
       </div>
       <Link
-        href={UserPreparePath(props.gameId, props.userId)}
+        href={UserTeamsPath(props.gameId, props.userId)}
         className={styles.button}
       >
         <CommonButton color="blue">次へ</CommonButton>

@@ -7,7 +7,7 @@ import { UserPreparePath } from "@/app/_utils/page_link";
 type Props = {
   gameId: string;
   userId: string;
-  team: {
+  teams: {
     name: string;
     imagePath: string;
   }[];
@@ -18,7 +18,7 @@ export default function TeamPage(props: Props) {
     <div className={styles.teamPage}>
       <div className={styles.header}>参加チーム一覧</div>
       <div className={styles.content}>
-        {props.team.map((item) => (
+        {props.teams.map((item) => (
           <TeamItem
             key={item.name}
             name={item.name}
@@ -44,7 +44,14 @@ type TeamItemProps = {
 function TeamItem(props: TeamItemProps) {
   return (
     <div className={styles.teamItem}>
-      <StorageImage path={props.imagePath} fit="contain" alt={props.name} />
+      <StorageImage
+        className={styles.image}
+        path={props.imagePath}
+        fit="contain"
+        alt={props.name}
+        width={200}
+        height={200}
+      />
       <div className={styles.name}>{props.name}</div>
     </div>
   );

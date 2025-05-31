@@ -47,8 +47,8 @@ export const AnswerSchema = z.object({
     .describe("Option(選択した回答)のインデックス"),
   usedItemId: z
     .string()
-    .optional()
-    .describe("使用したアイテムID（未使用の場合は未設定）"),
+    .nullable()
+    .describe("使用したアイテムID（未使用の場合はnull）"),
 });
 
 // [Game]/{gameId}/users/（ゲーム参加者）
