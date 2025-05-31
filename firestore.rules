@@ -6,6 +6,16 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Games コレクションとその全てのサブコレクション内のドキュメント
+    // 例: /Games/game1, /Games/game1/teams/teamA
+    match /Games/{gamePath=**} {
+      allow read: if true;
+      allow write: if true; // Gamesとそのサブコレクションは誰でも書き込み可能
+    }
+
+    // "Games" 以外の全てのコレクションとそのドキュメント
+    // 例: /Users/user1, /Settings/config
+    // このルールは、リクエストパスが /Games/ で始まらない場合に適用される
     match /{document=**} {
       allow read: if true;
       allow write: if isAuthenticated();

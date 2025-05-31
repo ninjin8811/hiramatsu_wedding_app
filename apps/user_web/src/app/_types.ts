@@ -97,6 +97,7 @@ export const ItemSchema = z.object({
   name: z.string().describe("アイテム名"),
   description: z.string().describe("アイテム説明"),
   image: z.string().url().describe("アイテム画像URL (Firebase Storage PNG)"),
+  movie: z.string().url().describe("アイテム効果動画URL (Firebase Storage MP4)"),
 });
 
 export type Game = z.infer<typeof GameSchema>;

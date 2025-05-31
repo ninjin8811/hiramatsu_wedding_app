@@ -1,9 +1,8 @@
 import { getServerDb } from "@/app/_lib/firebase/server/firestore";
-import { Game, Answer, Question } from "@/app/_types";
+import { Game, Answer, Question, Item } from "@/app/_types";
 import { getDoc, doc, collection, getDocs } from "firebase/firestore";
 import { notFound } from "next/navigation";
 import CurrentRankingScreen, { User } from "./_components/CurrentRankingScreen";
-import console from "console";
 
 type Props = {
   params: Promise<{
@@ -35,6 +34,10 @@ export default async function CurrentRankingPage({ params }: Props) {
   const { gameId, quizIdx: currentQuizIdxStr } = await params;
   const currentQuizIdx = Number(currentQuizIdxStr);
   const db = await getServerDb();
+
+  const itemRef = collection(db, "Games", gameId, "Items");
+  const itemSnap = await getDocs(itemRef);
+  const allItems = itemSnap.docs.map(doc => doc.data() as Item);
 
   const gameRef = doc(db, "Games", gameId);
   const gameSnap = await getDoc(gameRef);
@@ -82,5 +85,26 @@ export default async function CurrentRankingPage({ params }: Props) {
     };
   });
 
-  return <CurrentRankingScreen gameId={gameId} currentQuizIdx={currentQuizIdx} users={usersData} />
+  const itemEvents = allAnswers.filter(ans => ans.questionIndex === currentQuizIdx && ans.usedItemId).flatMap((answer) => {
+    const item = allItems.find(item => item.itemId === answer.usedItemId);
+    if (!item) return [];
+    return {
+      userId: answer.userId,
+      itemId: item.itemId,
+      itemName: item.name,
+      itemImage: item.image,
+      itemMovie: item.movie,
+      effect: () => {}
+    }
+  });
+
+  return (
+    <CurrentRankingScreen
+      gameId={gameId}
+      currentQuizIdx={currentQuizIdx}
+      users={usersData}
+      itemEvents={itemEvents}
+      animationMode="staggered"
+    />
+  );
 }

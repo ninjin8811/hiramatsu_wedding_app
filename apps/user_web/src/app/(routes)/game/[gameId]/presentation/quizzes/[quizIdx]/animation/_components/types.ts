@@ -1,0 +1,44 @@
+/** 基本的なユーザー情報 */
+export interface User {
+  userId: string;
+  teamName: string;
+  thumbnail: string;
+  characterImage: string;
+  characterColor: string;
+  prevScore: number;
+  currentScore: number;
+}
+
+/** アニメーション用に拡張されたユーザー情報 */
+export interface AnimatedUser extends User {
+  animatedScore: number;           // アニメーション中の表示スコア
+  isAnimating: boolean;            // アニメーション実行中フラグ
+  finalRank: number;               // 最終的な順位（0ベース）
+  currentDisplayRank: number;      // 現在の表示順位（0ベース）
+  targetDisplayRank: number;       // 目標表示順位（0ベース）
+  isPromotionFromBottom?: boolean; // 下位(7位以降)から上位(6位以内)への昇格フラグ
+  isDemotionToBottom?: boolean;    // 上位(6位以内)から下位(7位以降)への降格フラグ
+  isRankDown?: boolean;            // 上位6位内での順位下降フラグ
+  isRankUp?: boolean;              // 上位6位内での順位上昇フラグ
+}
+
+/** アイテムイベント情報 */
+export interface ItemEvent {
+  userId: string;
+  itemId: string;
+  itemName: string;
+  itemImage: string;
+  itemMovie: string;
+  effect: () => void;
+}
+
+/** アニメーション実行モード */
+export type AnimationMode = 'sequential' | 'staggered' | 'simultaneous';
+
+/** タイヤ痕の表示データ */
+export interface TireTrail {
+  userId: string;
+  startX: number;
+  endX: number;
+  laneIndex: number;
+}
