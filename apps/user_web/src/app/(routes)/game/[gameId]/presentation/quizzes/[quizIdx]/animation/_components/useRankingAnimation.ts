@@ -1,13 +1,14 @@
 import { useState, useCallback } from 'react';
-import { User, AnimatedUser, AnimationMode, TireTrail } from './types';
+import { User, AnimatedUser, AnimationMode, TireTrail, ItemEvent } from './types';
 import { getAnimationDelay, getXPosition } from './animationUtils';
 
 interface UseRankingAnimationProps {
   users: User[];
   animationMode: AnimationMode;
+  itemEvents: ItemEvent[];
 }
 
-export const useRankingAnimation = ({ users, animationMode }: UseRankingAnimationProps) => {
+export const useRankingAnimation = ({ users, animationMode, itemEvents }: UseRankingAnimationProps) => {
   /** 全体のアニメーションが実行中かどうか */
   const [isGlobalAnimating, setIsGlobalAnimating] = useState(false);
 
@@ -16,6 +17,13 @@ export const useRankingAnimation = ({ users, animationMode }: UseRankingAnimatio
 
   /** アニメーション完了フラグ（重複実行防止） */
   const [animationCompleted, setAnimationCompleted] = useState(false);
+
+  /** 動画再生関連の状態 */
+  const [moviePlaybackState, setMoviePlaybackState] = useState({
+    isPlayingMovies: false,
+    currentMovieIndex: 0,
+    allMoviesCompleted: false
+  });
 
   /**
    * 初期表示用のアニメーションデータを作成
@@ -81,6 +89,50 @@ export const useRankingAnimation = ({ users, animationMode }: UseRankingAnimatio
       }
     });
   }, []);
+
+  /**
+   * 次の動画を再生する
+   */
+  const playNextMovie = useCallback(() => {
+    setMoviePlaybackState(prev => {
+      const nextIndex = prev.currentMovieIndex + 1;
+
+      if (nextIndex >= itemEvents.length) {
+        // 全ての動画再生完了
+        return {
+          ...prev,
+          isPlayingMovies: false,
+          allMoviesCompleted: true
+        };
+      } else {
+        // 次の動画に進む
+        return {
+          ...prev,
+          currentMovieIndex: nextIndex
+        };
+      }
+    });
+  }, [itemEvents.length]);
+
+  /**
+   * 動画再生を開始する
+   */
+  const startMoviePlayback = useCallback(() => {
+    if (itemEvents.length > 0) {
+      setMoviePlaybackState({
+        isPlayingMovies: true,
+        currentMovieIndex: 0,
+        allMoviesCompleted: false
+      });
+    } else {
+      // 動画がない場合は即座に完了扱い
+      setMoviePlaybackState({
+        isPlayingMovies: false,
+        currentMovieIndex: 0,
+        allMoviesCompleted: true
+      });
+    }
+  }, [itemEvents.length]);
 
   /**
    * 段階的ランキングアニメーションの実行
@@ -240,7 +292,12 @@ export const useRankingAnimation = ({ users, animationMode }: UseRankingAnimatio
 
     // 全アニメーション完了
     setIsGlobalAnimating(false);
-  }, [users, updateUserRanks, animationCompleted, animationMode]);
+
+    // アニメーション完了後に動画再生を開始
+    setTimeout(() => {
+      startMoviePlayback();
+    }, 1000); // 1秒後に動画開始
+  }, [users, updateUserRanks, animationCompleted, animationMode, startMoviePlayback]);
 
   return {
     isGlobalAnimating,
@@ -248,6 +305,8 @@ export const useRankingAnimation = ({ users, animationMode }: UseRankingAnimatio
     tireTrails,
     animationCompleted,
     animatedUsers,
-    startAnimation
+    startAnimation,
+    moviePlaybackState,
+    playNextMovie
   };
 };

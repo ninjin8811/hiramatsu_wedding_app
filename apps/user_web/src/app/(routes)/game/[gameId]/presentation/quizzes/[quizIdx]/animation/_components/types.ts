@@ -29,7 +29,6 @@ export interface ItemEvent {
   itemName: string;
   itemImage: string;
   itemMovie: string;
-  effect: () => void;
 }
 
 /** アニメーション実行モード */

@@ -35,7 +35,7 @@ export default async function CurrentRankingPage({ params }: Props) {
   const currentQuizIdx = Number(currentQuizIdxStr);
   const db = await getServerDb();
 
-  const itemRef = collection(db, "Games", gameId, "Items");
+  const itemRef = collection(db, "Items");
   const itemSnap = await getDocs(itemRef);
   const allItems = itemSnap.docs.map(doc => doc.data() as Item);
 
@@ -94,7 +94,6 @@ export default async function CurrentRankingPage({ params }: Props) {
       itemName: item.name,
       itemImage: item.image,
       itemMovie: item.movie,
-      effect: () => {}
     }
   });
 

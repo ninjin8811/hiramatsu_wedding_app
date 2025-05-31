@@ -6,10 +6,11 @@ import styles from './CurrentRanking.module.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { navigateToNextStep } from '../actions';
-import { User, AnimationMode } from './types';
+import { User, AnimationMode, ItemEvent } from './types';
 import { ExhaustParticles, DarkSmokeParticles, TireTrail, SpeedLines } from './RankingEffects';
 import { getXPosition, getLaneYPosition, getAnimationSettings } from './animationUtils';
 import { useRankingAnimation } from './useRankingAnimation';
+import { MoviePlayer } from './MoviePlayer';
 
 // User型を再エクスポート（下位互換性のため）
 export type { User } from './types';
@@ -19,6 +20,7 @@ interface CurrentRankingScreenProps {
   gameId: string;
   currentQuizIdx: number;
   users: Array<User>;
+  itemEvents: Array<ItemEvent>;
   animationMode?: AnimationMode; // デフォルトは'staggered'
 }
 
@@ -28,7 +30,8 @@ interface CurrentRankingScreenProps {
 const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   gameId,
   currentQuizIdx,
-  users = [],
+  users,
+  itemEvents,
   animationMode = 'staggered', // デフォルトは段階的実行
 }) => {
   const router = useRouter();
@@ -40,8 +43,10 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     tireTrails,
     animationCompleted,
     animatedUsers,
-    startAnimation
-  } = useRankingAnimation({ users, animationMode });
+    startAnimation,
+    moviePlaybackState,
+    playNextMovie
+  } = useRankingAnimation({ users, animationMode, itemEvents });
 
   /**
    * アニメーション自動開始（2秒後）
@@ -67,13 +72,18 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
           router.back();
         }
       } else if (event.key === 'ArrowRight' || event.key === 'Enter') {
-        navigateToNextStep(gameId, currentQuizIdx);
+        // 動画再生中の場合はスキップ
+        if (moviePlaybackState.isPlayingMovies) {
+          playNextMovie();
+        } else if (moviePlaybackState.allMoviesCompleted) {
+          navigateToNextStep(gameId, currentQuizIdx);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameId, currentQuizIdx, router]);
+  }, [gameId, currentQuizIdx, router, moviePlaybackState, playNextMovie]);
 
   // 現在の表示順位でソート
   const sortedUsers = animatedUsers.toSorted((a, b) => a.currentDisplayRank - b.currentDisplayRank);
@@ -81,12 +91,17 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   // 上位6位と7位以降に分割
   const otherUsers = sortedUsers.filter(user => user.currentDisplayRank >= 6);
 
+  // 現在再生中の動画
+  const currentMovie = moviePlaybackState.isPlayingMovies && itemEvents[moviePlaybackState.currentMovieIndex]
+    ? itemEvents[moviePlaybackState.currentMovieIndex]
+    : null;
+
   return (
     <main className={styles.bg}>
-      {/* 🌟 全体スピードラインエフェクト */}
+      {/* 全体スピードラインエフェクト */}
       <SpeedLines isActive={isGlobalAnimating} />
 
-      {/* 🏟️ ヘッダー（ステージ背景） */}
+      {/* ヘッダー（ステージ背景） */}
       <div className={styles.header}>
         <Image
           src="/images/stage.png"
@@ -97,7 +112,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
         />
       </div>
 
-      {/* 🏁 メインランキングエリア（上位6位） */}
+      {/* メインランキングエリア（上位6位） */}
       <div className={styles.rankingArea}>
         <div className={styles.laneBorderTop}></div>
         <div className={styles.lanesContainer}>
@@ -116,7 +131,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
             </div>
           ))}
 
-          {/* 🛞 タイヤ痕レイヤー */}
+          {/* タイヤ痕レイヤー */}
           <div className={styles.tireTrailLayer}>
             {tireTrails.map((trail, index) => (
               <TireTrail
@@ -170,7 +185,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     )}
                     </div>
 
-                    {/* 🌟 昇格エフェクト */}
+                    {/* 昇格エフェクト */}
                     {user.isPromotionFromBottom && user.isAnimating && (
                       <div className={styles.promotionEffect}>
                         <div className={styles.promotionGlow}></div>
@@ -178,7 +193,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                       </div>
                     )}
 
-                    {/* 🌑 降格エフェクト */}
+                    {/* 降格エフェクト */}
                     {user.isDemotionToBottom && user.isAnimating && (
                       <div className={styles.demotionEffect}>
                         <div className={styles.demotionShadow}></div>
@@ -186,7 +201,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                       </div>
                     )}
 
-                    {/* 🏎️ カート画像とスコア吹き出し */}
+                    {/* カート画像とスコア吹き出し */}
                     <div className={styles.cartWithScore}>
                       <Image
                         src={user.characterImage}
@@ -218,7 +233,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
         <div className={styles.laneBorderBottom}></div>
       </div>
 
-      {/* 📋 下部ランキングエリア（7位以降） */}
+      {/* 下部ランキングエリア（7位以降） */}
       <div className={styles.bottomRankingArea}>
         <AnimatePresence>
           {otherUsers.map((user) => {
@@ -258,6 +273,17 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
           })}
         </AnimatePresence>
       </div>
+
+      {/* 動画プレイヤー */}
+      <AnimatePresence>
+        {currentMovie && (
+          <MoviePlayer
+            movieUrl={currentMovie.itemMovie}
+            isVisible={moviePlaybackState.isPlayingMovies}
+            onMovieEnd={playNextMovie}
+          />
+        )}
+      </AnimatePresence>
     </main>
   );
 };
