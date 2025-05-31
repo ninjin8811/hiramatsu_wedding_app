@@ -18,7 +18,11 @@ export async function navigateToNextStep(gameId: string, currentQuizIdx: number)
   const isLastQuestion = currentQuizIdx >= totalQuestions - 1;
 
   if (isLastQuestion) {
-    // 最後の問題の場合は最終ランキングに遷移
+    // 最後の問題の場合はstatusをcompletedにして最終ランキングに遷移
+    await updateDoc(gameRef, {
+      status: "completed",
+    });
+
     redirect(`/game/${gameId}/presentation/final-ranking`);
   } else {
     // 次の問題に遷移
