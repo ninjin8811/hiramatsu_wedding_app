@@ -3,6 +3,7 @@ import { Game, Answer, Question } from "@/app/_types";
 import { getDoc, doc, collection, getDocs } from "firebase/firestore";
 import { notFound } from "next/navigation";
 import CurrentRankingScreen, { User } from "./_components/CurrentRankingScreen";
+import console from "console";
 
 type Props = {
   params: Promise<{
@@ -58,20 +59,14 @@ export default async function CurrentRankingPage({ params }: Props) {
     let prevScore = 0;
     let currentScore = 0;
 
-    for (let i = 0; i < currentQuizIdx; i++) {
-      const question: Question | undefined = game.questions[i];
-      if (!question) continue;
-      const userAnswer = allAnswers.find(ans => ans.userId === user.userId && ans.questionIndex === i);
-      if (userAnswer && userAnswer.optionIndex === question.correctIndex) {
-        prevScore += question.point;
-      }
-    }
-
     for (let i = 0; i <= currentQuizIdx; i++) {
       const question: Question | undefined = game.questions[i];
       if (!question) continue;
       const userAnswer = allAnswers.find(ans => ans.userId === user.userId && ans.questionIndex === i);
       if (userAnswer && userAnswer.optionIndex === question.correctIndex) {
+        if (i < currentQuizIdx) {
+          prevScore += question.point;
+        }
         currentScore += question.point;
       }
     }
