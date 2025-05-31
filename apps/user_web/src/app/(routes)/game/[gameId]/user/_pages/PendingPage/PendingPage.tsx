@@ -13,6 +13,7 @@ import { documentGet } from "@/app/_lib/firebase/ClientConverter";
 import { onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { UserQuestionsPath } from "@/app/_utils/page_link";
+import CapImage from "../../_components/CapImage/CapImage";
 
 type Props = {
   gameId: string;
@@ -24,6 +25,10 @@ type Props = {
 export default function PendingPage(props: Props) {
   const [game, setGame] = useState<Game>(props.game);
   const userSummary = props.game.users.find(
+    (summary) => summary.id === props.userId
+  );
+
+  const userIndex = props.game.users.findIndex(
     (summary) => summary.id === props.userId
   );
 
@@ -53,7 +58,7 @@ export default function PendingPage(props: Props) {
         <div className={styles.prepareBox}>
           <PrepareBox title="プロフィール">
             <div className={styles.profile}>
-              <Image src={MarioCap} alt="キャップ" className={styles.cap} />
+              <CapImage index={userIndex} className={styles.cap} />
               {userSummary?.thumbnail ? (
                 <StorageImage
                   path={userSummary.thumbnail}
@@ -65,7 +70,7 @@ export default function PendingPage(props: Props) {
               ) : (
                 <div className={styles.thumbnail} />
               )}
-              親族チーム
+              {userSummary?.name}
             </div>
           </PrepareBox>
         </div>
@@ -75,12 +80,19 @@ export default function PendingPage(props: Props) {
               {ownItems.map((item) => (
                 <ItemButton
                   key={item.itemId}
-                  image={<StorageImage path={item.image} alt="アカこうら" />}
+                  image={
+                    <StorageImage
+                      path={item.image}
+                      alt={item.name}
+                      width={60}
+                      height={55}
+                    />
+                  }
                   name={item.name}
                   description={item.description}
                 />
               ))}
-              <ItemButton
+              {/* <ItemButton
                 image={<Image src={ItemAkakora} alt="アカこうら" />}
                 name="アカこうら"
                 description="アカこうらはアイテムです。"
@@ -94,7 +106,7 @@ export default function PendingPage(props: Props) {
                 image={<Image src={ItemAkakora} alt="アカこうら" />}
                 name="アカこうら"
                 description="アカこうらはアイテムです。"
-              />
+              /> */}
             </div>
           </PrepareBox>
         </div>

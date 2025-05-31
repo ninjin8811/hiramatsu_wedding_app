@@ -18,7 +18,7 @@ export default async function UserPage(props: Props) {
     <TeamPage
       userId={userId}
       gameId={gameId}
-      team={teams.map((team) => ({
+      teams={teams.map((team) => ({
         name: team.name,
         imagePath: team.thumbnail,
       }))}
@@ -28,6 +28,6 @@ export default async function UserPage(props: Props) {
 
 async function getTeams(gameId: string) {
   initializeAdminSdk();
-  const game = await documentGet(GameSchema, "games", gameId).get();
+  const game = await documentGet(GameSchema, "Games", gameId).get();
   return game.data()?.users ?? [];
 }

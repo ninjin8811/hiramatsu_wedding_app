@@ -201,6 +201,9 @@
     font-weight: bold;
     color: #3c3c3c;
   }
+  &.selected {
+    border: 3px solid #e60013;
+  }
   &.disabled {
     background-color: #e0e0e0;
     &_label {
@@ -222,5 +225,11 @@
   img {
     height: 56px;
     width: auto;
+  }
+  &.used {
+    background-color: #e0e0e0;
+  }
+  &.highlight {
+    border: 3px solid #e60013;
   }
 }

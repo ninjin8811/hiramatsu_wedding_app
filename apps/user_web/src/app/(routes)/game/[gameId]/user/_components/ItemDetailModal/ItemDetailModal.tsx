@@ -10,6 +10,8 @@ type Props = {
   name: string;
   description: string;
   canUse?: boolean;
+  isUsed?: boolean;
+  onUse?: () => void;
   onClose: () => void;
 };
 
@@ -28,14 +30,22 @@ export default function ItemDetailModal(props: Props) {
         <div className={styles.content_description}>{props.description}</div>
         {props.canUse && (
           <div className={styles.content_button}>
-            <div className={`${styles.content_button_item} ${styles.use}`}>
-              アイテムを使う
+            <div
+              className={`${styles.content_button_item} ${styles.use} ${
+                props.isUsed ? styles.used : ""
+              }`}
+              onClick={() => {
+                if (props.isUsed) return;
+                props.onUse?.();
+              }}
+            >
+              {props.isUsed ? "使用済み " : "アイテムを使う"}
             </div>
             <div
               className={`${styles.content_button_item} ${styles.cancel}`}
               onClick={props.onClose}
             >
-              やめておく
+              {props.isUsed ? "閉じる" : "やめておく"}
             </div>
           </div>
         )}

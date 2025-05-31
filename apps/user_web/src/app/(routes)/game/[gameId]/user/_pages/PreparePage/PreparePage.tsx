@@ -6,16 +6,22 @@ import MarioCap from "@/app/_images/MarioCap.png";
 import { useState } from "react";
 import ItemGetModal from "../../_components/ItemGetModal/ItemGetModal";
 import PrepareBox from "../../_components/PrepareBox/PrepareBox";
-import { User } from "@/app/_types";
+import { Game, User } from "@/app/_types";
+import CapImage from "../../_components/CapImage/CapImage";
 
 type Props = {
   gameId: string;
   userId: string;
   user: User;
+  game: Game;
 };
 
 export default function PreparePage(props: Props) {
   const [showItemGetModal, setShowItemGetModal] = useState(false);
+
+  const userIndex = props.game.users.findIndex(
+    (summary) => summary.id === props.userId
+  );
 
   return (
     <div className={styles.preparePage}>
@@ -23,7 +29,7 @@ export default function PreparePage(props: Props) {
         <div className={styles.prepareBox}>
           <PrepareBox title="プロフィール">
             <div className={styles.profile}>
-              <Image src={MarioCap} alt="キャップ" className={styles.cap} />
+              <CapImage index={userIndex} className={styles.cap} />
               <Image
                 src={props.user.thumbnail}
                 alt="プロフィール"
@@ -31,7 +37,7 @@ export default function PreparePage(props: Props) {
                 height={111}
                 className={styles.thumbnail}
               />
-              親族チーム
+              {props.user.name}
             </div>
           </PrepareBox>
         </div>
