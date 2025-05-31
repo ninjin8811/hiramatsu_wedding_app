@@ -1,0 +1,193 @@
+.rankingItem {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: #000000;
+  border: 1px solid #9a9a9a;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(154, 154, 154, 0.3);
+  width: 100%;
+}
+
+.rankNumber {
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rankImage {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.teamName {
+  flex: 1;
+  font-size: 33px;
+  margin: 0 16px;
+  color: #ffffff;
+}
+
+.scoreContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.score {
+  font-size: 33px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.unit {
+  font-size: 24px;
+  color: #9a9a9a;
+}
+
+.rankingItemGorgeous {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  overflow: visible;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &[data-rank="1"] {
+    .teamNameGorgeous,
+    .scoreGorgeous {
+      color: #fcd000;
+    }
+    .mainThumbnail {
+      border: 2px solid #fcd000;
+    }
+    .detailsContainer {
+      border: 2px solid #fcd000;
+    }
+  }
+
+  &[data-rank="2"] {
+    .teamNameGorgeous,
+    .scoreGorgeous {
+      color: #d4d5d0;
+    }
+    .mainThumbnail {
+      border: 2px solid #d4d5d0;
+    }
+    .detailsContainer {
+      border: 2px solid #d4d5d0;
+    }
+  }
+
+  &[data-rank="3"] {
+    .teamNameGorgeous,
+    .scoreGorgeous {
+      color: #fd8f0d;
+    }
+    .mainThumbnail {
+      border: 2px solid #fd8f0d;
+    }
+    .detailsContainer {
+      border: 2px solid #fd8f0d;
+    }
+  }
+}
+
+.thumbnailContainer {
+  position: relative;
+  margin-right: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  overflow: visible;
+}
+
+.mainThumbnail {
+  border-radius: 50%;
+  object-fit: cover;
+  aspect-ratio: 1;
+  padding: 2px;
+  width: 100px;
+  height: 100px;
+  background-color: #ffffff;
+  [data-rank="1"] &,
+  [data-rank="2"] &,
+  [data-rank="3"] & {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+.rankOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-20%, -20%);
+  z-index: 1;
+}
+
+.rankImageGorgeous {
+  width: auto;
+  height: 42px;
+  filter: drop-shadow(0px 2px 3px black);
+  [data-rank="1"] &,
+  [data-rank="2"] &,
+  [data-rank="3"] & {
+    filter: none;
+  }
+}
+
+.detailsContainer {
+  margin-left: -50px;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  background-color: #000000;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px 20px 15px 50px;
+  [data-rank="1"] &,
+  [data-rank="2"] &,
+  [data-rank="3"] & {
+    padding: 20px 20px 20px 40px;
+  }
+}
+
+.teamNameGorgeous {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  [data-rank="1"] &,
+  [data-rank="2"] &,
+  [data-rank="3"] & {
+    font-size: 22px;
+  }
+}
+
+.scoreContainerGorgeous {
+  display: flex;
+  align-items: baseline;
+}
+
+.scoreGorgeous {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.unitGorgeous {
+  font-size: 0.9em;
+  margin-left: 4px;
+  color: #9a9a9a;
+}
