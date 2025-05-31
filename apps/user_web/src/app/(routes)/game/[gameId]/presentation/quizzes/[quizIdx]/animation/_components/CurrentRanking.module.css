@@ -1,3 +1,31 @@
+/* アニメーション定義 */
+@keyframes scrollHorizontal {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: -6vw;
+  }
+}
+
+@keyframes scrollLane {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: -4vw;
+  }
+}
+
+@keyframes scrollImage {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
 .bg {
   background-image: url('/images/bg-white.png');
   background-repeat: repeat; /* 背景画像を繰り返す */
@@ -18,6 +46,20 @@
   height: 20vh; /* 全体に対する比率で調整 */
   position: relative; /* Imageコンポーネントのレイアウト用 */
   flex-shrink: 0; /* ヘッダーが縮まないように */
+  overflow: hidden; /* はみ出した画像を隠す */
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 100%;
+  height: 100%;
+  background-image: url('/images/stage.png');
+  background-size: cover;
+  background-position: bottom center;
+  animation: scrollImage 14s linear infinite;
 }
 
 .header img {
@@ -25,6 +67,7 @@
   height: 100%;
   object-fit: cover;
   object-position: bottom center;
+  animation: scrollImage 14s linear infinite;
 }
 
 .rankingArea {
@@ -48,6 +91,7 @@
   );
   width: 100%; /* 親要素いっぱいに広がるように */
   flex-shrink: 0; /* ボーダーが縮まないように */
+  animation: scrollHorizontal 0.84s linear infinite;
 }
 
 .lanesContainer {
@@ -78,6 +122,7 @@
   background-position: 0 bottom;
   background-repeat: repeat-x;
   height: calc(100% / 6);
+  animation: scrollLane 0.55s linear infinite;
 }
 
 .lane:last-child {
