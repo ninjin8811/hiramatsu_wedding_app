@@ -1,6 +1,8 @@
-import { collectionGet, documentGet } from "@/app/_lib/firebase/AdminConverter";
 import QuestionPage from "../../../_pages/QuestionPage/QuestionPage";
-import { GameSchema, ItemSchema } from "@/app/_types";
+import { getGame, getItems } from "../../../_repositories/server";
+import { UserQuestionsPath } from "@/app/_utils/page_link";
+import { redirectPathByStatus } from "../../../_utils/redirectPathByStatus";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: {
@@ -12,19 +14,13 @@ type Props = {
 export default async function Page(props: Props) {
   const { gameId, userId } = await props.params;
   const game = await getGame(gameId);
-  const items = await getItems(gameId);
+  const items = await getItems();
+
+  const currentPath = UserQuestionsPath(gameId, userId);
+  const redirectPath = redirectPathByStatus(game, userId, currentPath);
+  if (redirectPath) return redirect(redirectPath);
 
   return (
     <QuestionPage gameId={gameId} game={game} userId={userId} items={items} />
   );
-}
-
-async function getGame(gameId: string) {
-  const game = await documentGet(GameSchema, `Games`, gameId).get();
-  return GameSchema.parse(game.data());
-}
-
-async function getItems(gameId: string) {
-  const items = await collectionGet(ItemSchema, `Items`).get();
-  return items.docs.map((doc) => ItemSchema.parse(doc.data()));
 }
