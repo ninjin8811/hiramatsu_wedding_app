@@ -1,7 +1,8 @@
-import { documentGet } from "@/app/_lib/firebase/AdminConverter";
 import ResultPage from "../../../_pages/ResultPage/ResultPage";
-import { initializeAdminSdk } from "@/app/_lib/firebase/FirebaseAdminInitializer";
-import { Game, GameSchema } from "@/app/_types";
+import { redirect } from "next/navigation";
+import { UserResultPath } from "@/app/_utils/page_link";
+import { getGame } from "../../../_repositories/server";
+import { redirectPathByStatus } from "../../../_utils/redirectPathByStatus";
 
 type Props = {
   params: {
@@ -11,13 +12,11 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
-  const game = await getGame(params.gameId);
-  return <ResultPage gameId={params.gameId} game={game} />;
-}
+  const { gameId, userId } = await params;
+  const game = await getGame(gameId);
+  const currentPath = UserResultPath(gameId, userId);
+  const redirectPath = redirectPathByStatus(game, userId, currentPath);
+  if (redirectPath) return redirect(redirectPath);
 
-async function getGame(gameId: string) {
-  initializeAdminSdk();
-  const ref = documentGet(GameSchema, "Games", gameId);
-  const game = await ref.get();
-  return GameSchema.parse(game.data());
+  return <ResultPage gameId={gameId} game={game} />;
 }

@@ -2,6 +2,10 @@ import { documentGet } from "@/app/_lib/firebase/AdminConverter";
 import { initializeAdminSdk } from "@/app/_lib/firebase/FirebaseAdminInitializer";
 import { GameSchema, UserSchema } from "@/app/_types";
 import PreparePage from "@user/_pages/PreparePage/PreparePage";
+import { getGame, getUser } from "../../../_repositories/server";
+import { UserPreparePath } from "@/app/_utils/page_link";
+import { redirectPathByStatus } from "../../../_utils/redirectPathByStatus";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: {
@@ -15,23 +19,11 @@ export default async function Page(props: Props) {
   const user = await getUser(gameId, userId);
   const game = await getGame(gameId);
 
+  const currentPath = UserPreparePath(gameId, userId);
+  const redirectPath = redirectPathByStatus(game, userId, currentPath);
+  if (redirectPath) return redirect(redirectPath);
+
   return (
     <PreparePage gameId={gameId} userId={userId} user={user} game={game} />
   );
-}
-
-async function getUser(gameId: string, userId: string) {
-  initializeAdminSdk();
-  const user = await documentGet(
-    UserSchema,
-    `Games/${gameId}/Users`,
-    userId
-  ).get();
-  return UserSchema.parse(user.data());
-}
-
-async function getGame(gameId: string) {
-  initializeAdminSdk();
-  const game = await documentGet(GameSchema, `Games`, gameId).get();
-  return GameSchema.parse(game.data());
 }
