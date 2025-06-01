@@ -1,8 +1,8 @@
 import { getServerDb } from "@/app/_lib/firebase/server/firestore";
-import { Game, Answer, Question, Item } from "@/app/_types";
+import { Game, Answer, Item, User } from "@/app/_types";
 import { getDoc, doc, collection, getDocs } from "firebase/firestore";
 import { notFound } from "next/navigation";
-import CurrentRankingScreen, { User } from "./_components/CurrentRankingScreen";
+import CurrentRankingScreen from "./_components/CurrentRankingScreen";
 
 type Props = {
   params: Promise<{
@@ -58,25 +58,24 @@ export default async function CurrentRankingPage({ params }: Props) {
     return notFound();
   }
 
-  const usersData = allUsers.map((user: User, index: number) => {
-    let prevScore = 0;
-    let currentScore = 0;
+  const usersData = allUsers.map((user, index) => {
+    // Firestoreのgame.usersからscoreを取得
+    const gameUser = game.users.find(gu => gu.id === user.userId);
+    console.log(gameUser);
+    const prevScore = gameUser?.score || 0;
+    let currentScore = prevScore;
 
-    for (let i = 0; i <= currentQuizIdx; i++) {
-      const question: Question | undefined = game.questions[i];
-      if (!question) continue;
-      const userAnswer = allAnswers.find(ans => ans.userId === user.userId && ans.questionIndex === i);
-      if (userAnswer && userAnswer.optionIndex === question.correctIndex) {
-        if (i < currentQuizIdx) {
-          prevScore += question.point;
-        }
-        currentScore += question.point;
+    const currentQuestion = game.questions[currentQuizIdx];
+    if (currentQuestion) {
+      const userAnswer = allAnswers.find(ans => ans.userId === user.userId && ans.questionIndex === currentQuizIdx);
+      if (userAnswer && userAnswer.optionIndex === currentQuestion.correctIndex) {
+        currentScore += currentQuestion.point;
       }
     }
 
     return {
       userId: user.userId,
-      teamName: user.teamName,
+      teamName: user.name,
       thumbnail: user.thumbnail,
       characterImage: `/images/carts/cart_${index + 1}.png`,
       characterColor: characterColors.get(index % characterColors.size) || "#FFFFFF",

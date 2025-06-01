@@ -1,9 +1,16 @@
 'use server';
 import { getServerDb } from "@/app/_lib/firebase/server/firestore";
+import { GameUser } from "@/app/_types";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { redirect } from "next/navigation";
 
-export async function navigateToNextStep(gameId: string, currentQuizIdx: number) {
+// ユーザーのスコア更新データの型
+interface UserScore {
+  userId: string;
+  score: number;
+}
+
+export async function navigateToNextStep(gameId: string, currentQuizIdx: number, usersScores: UserScore[]) {
   const db = await getServerDb();
   const gameRef = doc(db, "Games", gameId);
 
@@ -16,6 +23,24 @@ export async function navigateToNextStep(gameId: string, currentQuizIdx: number)
   const gameData = gameDoc.data();
   const totalQuestions = gameData.questions?.length || 0;
   const isLastQuestion = currentQuizIdx >= totalQuestions - 1;
+
+  // ユーザーのスコアを更新
+  if (usersScores.length > 0) {
+    const currentUsers: GameUser[] = gameData.users || [];
+    const updatedUsers = currentUsers.map((user) => {
+      const scoreUpdate = usersScores.find(us => us.userId === user.id);
+      if (scoreUpdate) {
+        return { ...user, score: scoreUpdate.score };
+      }
+      return user;
+    });
+
+    await updateDoc(gameRef, {
+      users: updatedUsers,
+    });
+
+    console.log('📊 Updated user scores:', usersScores);
+  }
 
   if (isLastQuestion) {
     // 最後の問題の場合はstatusをcompletedにして最終ランキングに遷移

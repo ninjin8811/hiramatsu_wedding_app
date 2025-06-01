@@ -100,7 +100,7 @@ export const useRankingAnimation = ({ users,  itemEvents }: UseRankingAnimationP
   /**
    * エフェクト実行後のランキングアニメーションを開始
    */
-  const startEffectAnimation = useCallback(async (updatedUsers: AnimatedUser[]) => {
+  const startEffectAnimation = useCallback(async (updatedUsers: AnimatedUser[], onComplete?: () => void) => {
     console.log('🎬 Starting effect animation...');
 
     setIsGlobalAnimating(true);
@@ -283,28 +283,18 @@ export const useRankingAnimation = ({ users,  itemEvents }: UseRankingAnimationP
     await Promise.all(animationPromises);
 
     setIsGlobalAnimating(false);
+
+    // アニメーション完了後のコールバックを実行
+    if (onComplete) {
+      onComplete();
+    }
   }, [animatedUsers, getRankByScore]);
 
   /**
-   * 次の動画を再生する（動画終了後にエフェクトを実行）
+   * 次の動画に進む
    */
-  const playNextMovie = useCallback(() => {
+  const proceedToNextMovie = useCallback(() => {
     setMoviePlaybackState(prev => {
-      const currentEvent = itemEvents[prev.currentMovieIndex];
-
-      // 現在の動画のエフェクトを実行
-      if (currentEvent) {
-        console.log(`🎬 Applying effects for item: ${currentEvent.itemName}`);
-
-        // エフェクトを適用（animatedUsersに直接適用）
-        const updatedUsers = applyItemEffect(currentEvent.effect, animatedUsers);
-
-        // エフェクトアニメーションを開始
-        setTimeout(() => {
-          startEffectAnimation(updatedUsers);
-        }, 500); // 少し遅延してからアニメーション開始
-      }
-
       const nextIndex = prev.currentMovieIndex + 1;
 
       if (nextIndex >= itemEvents.length) {
@@ -322,7 +312,30 @@ export const useRankingAnimation = ({ users,  itemEvents }: UseRankingAnimationP
         };
       }
     });
-  }, [itemEvents, animatedUsers, applyItemEffect, startEffectAnimation]);
+  }, [itemEvents.length]);
+
+  /**
+   * 動画終了後にエフェクトを実行する
+   */
+  const playNextMovie = useCallback(() => {
+    const currentEvent = itemEvents[moviePlaybackState.currentMovieIndex];
+
+    // 現在の動画のエフェクトを実行
+    if (currentEvent) {
+      console.log(`🎬 Applying effects for item: ${currentEvent.itemName}`);
+
+      // エフェクトを適用（animatedUsersに直接適用）
+      const updatedUsers = applyItemEffect(currentEvent.effect, animatedUsers);
+
+      // エフェクトアニメーションを開始（完了後に次の動画に進む）
+      setTimeout(() => {
+        startEffectAnimation(updatedUsers, proceedToNextMovie);
+      }, 500); // 少し遅延してからアニメーション開始
+    } else {
+      // エフェクトがない場合は直接次の動画に進む
+      proceedToNextMovie();
+    }
+  }, [itemEvents, moviePlaybackState.currentMovieIndex, animatedUsers, applyItemEffect, startEffectAnimation, proceedToNextMovie]);
 
   /**
    * 動画再生を開始する

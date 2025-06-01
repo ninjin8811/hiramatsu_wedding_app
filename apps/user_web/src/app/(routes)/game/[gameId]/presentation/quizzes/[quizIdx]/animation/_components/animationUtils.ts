@@ -1,7 +1,6 @@
-import { AnimationMode } from './types';
 
 /** スコアの最大値（画面右端の基準） */
-const MAX_SCORE = 900;
+const MAX_SCORE = 1000;
 
 /**
  * スコアに基づいてX軸位置を計算（0%〜85%の範囲）
@@ -20,22 +19,6 @@ export const getLaneYPosition = (displayRank: number): number => {
   const laneHeight = 100 / 6;
   const safeRank = Math.max(0, Math.min(5, displayRank));
   return safeRank * laneHeight;
-};
-
-/**
- * アニメーションモードに応じた遅延時間を計算
- */
-export const getAnimationDelay = (mode: AnimationMode, index: number): number => {
-  switch (mode) {
-    case 'sequential':
-      return index * 3600; // 前のアニメーション完了後に開始
-    case 'staggered':
-      return index * 400;  // 400ms間隔で段階的に開始
-    case 'simultaneous':
-      return 0;            // 全て同時開始
-    default:
-      return index * 400;
-  }
 };
 
 /**

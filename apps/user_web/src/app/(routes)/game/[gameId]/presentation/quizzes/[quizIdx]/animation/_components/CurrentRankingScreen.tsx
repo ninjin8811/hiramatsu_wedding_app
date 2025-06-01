@@ -71,14 +71,19 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
         if (moviePlaybackState.isPlayingMovies) {
           playNextMovie();
         } else if (moviePlaybackState.allMoviesCompleted) {
-          navigateToNextStep(gameId, currentQuizIdx);
+          // 現在のスコア情報を抽出してナビゲート
+          const usersScores = animatedUsers.map(user => ({
+            userId: user.userId,
+            score: user.currentScore
+          }));
+          navigateToNextStep(gameId, currentQuizIdx, usersScores);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameId, currentQuizIdx, router, moviePlaybackState, playNextMovie]);
+  }, [gameId, currentQuizIdx, router, moviePlaybackState, playNextMovie, animatedUsers]);
 
   // animatedScoreベースで並び順を決定（prev→currentへの変化をアニメーションで表現）
   const sortedUsers = animatedUsers.toSorted((a, b) => b.animatedScore - a.animatedScore);
@@ -275,8 +280,9 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
       <AnimatePresence>
         {currentMovie && (
           <MoviePlayer
+            key={currentMovie.userId}
             movieUrl={currentMovie.itemMovie}
-            isVisible={moviePlaybackState.isPlayingMovies}
+            isVisible={moviePlaybackState.isPlayingMovies && !isGlobalAnimating}
             onMovieEnd={playNextMovie}
           />
         )}
