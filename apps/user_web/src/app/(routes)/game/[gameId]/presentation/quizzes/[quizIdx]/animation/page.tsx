@@ -94,6 +94,12 @@ export default async function CurrentRankingPage({ params }: Props) {
       itemName: item.name,
       itemImage: item.image,
       itemMovie: item.movie,
+      effect: {
+        targetType: 'rank_position' as const,
+        targetValue: 1,
+        scoreChange: -50,
+        description: '1位のスコアを50pt減点'
+      }
     }
   });
 
@@ -103,7 +109,6 @@ export default async function CurrentRankingPage({ params }: Props) {
       currentQuizIdx={currentQuizIdx}
       users={usersData}
       itemEvents={itemEvents}
-      animationMode="staggered"
     />
   );
 }

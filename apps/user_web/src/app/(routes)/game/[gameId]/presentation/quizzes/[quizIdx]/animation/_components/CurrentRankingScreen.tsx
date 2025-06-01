@@ -6,7 +6,7 @@ import styles from './CurrentRanking.module.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { navigateToNextStep } from '../actions';
-import { User, AnimationMode, ItemEvent } from './types';
+import { User, ItemEvent } from './types';
 import { ExhaustParticles, DarkSmokeParticles, TireTrail, SpeedLines } from './RankingEffects';
 import { getXPosition, getLaneYPosition, getAnimationSettings } from './animationUtils';
 import { useRankingAnimation } from './useRankingAnimation';
@@ -21,18 +21,13 @@ interface CurrentRankingScreenProps {
   currentQuizIdx: number;
   users: Array<User>;
   itemEvents: Array<ItemEvent>;
-  animationMode?: AnimationMode; // デフォルトは'staggered'
 }
 
-// ========================================
-// 🏁 メインコンポーネント
-// ========================================
 const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   gameId,
   currentQuizIdx,
   users,
   itemEvents,
-  animationMode = 'staggered', // デフォルトは段階的実行
 }) => {
   const router = useRouter();
 
@@ -46,7 +41,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     startAnimation,
     moviePlaybackState,
     playNextMovie
-  } = useRankingAnimation({ users, animationMode, itemEvents });
+  } = useRankingAnimation({ users, itemEvents });
 
   /**
    * アニメーション自動開始（2秒後）
@@ -85,11 +80,11 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameId, currentQuizIdx, router, moviePlaybackState, playNextMovie]);
 
-  // 現在の表示順位でソート
-  const sortedUsers = animatedUsers.toSorted((a, b) => a.currentDisplayRank - b.currentDisplayRank);
+  // animatedScoreベースで並び順を決定（prev→currentへの変化をアニメーションで表現）
+  const sortedUsers = animatedUsers.toSorted((a, b) => b.animatedScore - a.animatedScore);
 
-  // 上位6位と7位以降に分割
-  const otherUsers = sortedUsers.filter(user => user.currentDisplayRank >= 6);
+  // 7位以降の判定
+  const otherUsers = sortedUsers.filter((user, index) => index >= 6);
 
   // 現在再生中の動画
   const currentMovie = moviePlaybackState.isPlayingMovies && itemEvents[moviePlaybackState.currentMovieIndex]
@@ -147,13 +142,15 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
           <div className={styles.cartsLayer}>
             <AnimatePresence>
               {/* 上位6位または降格アニメーション中のユーザーを表示 */}
-              {animatedUsers
-                .filter(user =>
+              {sortedUsers
+                .filter((user, index) =>
                   // 上位6位または降格アニメーション中
-                  user.currentDisplayRank < 6 || (user.isDemotionToBottom && user.isAnimating)
+                  index < 6 || (user.isDemotionToBottom && user.isAnimating)
                 )
-                .map(user => {
+                .map((user, index) => {
                 const xPosition = getXPosition(user.animatedScore);
+                // currentScoreベースでのレーン位置を計算
+                const laneIndex = Math.min(index, 5);
 
                 const animationSettings = getAnimationSettings(user);
 
@@ -164,7 +161,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     initial={animationSettings.initial}
                     animate={{
                       marginLeft: `${xPosition}%`,
-                      top: `${getLaneYPosition(user.currentDisplayRank) - 4}%`,
+                      top: `${getLaneYPosition(laneIndex) - 4}%`,
                       ...animationSettings.animate
                     }}
                     transition={{
@@ -205,7 +202,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     <div className={styles.cartWithScore}>
                       <Image
                         src={user.characterImage}
-                        alt={`${user.currentDisplayRank + 1}位`}
+                        alt={`${index + 1}位`}
                         width={180}
                         height={100}
                         className={`${styles.cartImage} ${user.isAnimating ? styles.cartMoving : ''} ${user.isPromotionFromBottom ? styles.cartPromotion : ''} ${user.isDemotionToBottom ? styles.cartDemotion : ''} ${user.isRankUp ? styles.cartRankUp : ''} ${user.isRankDown ? styles.cartRankDown : ''}`}
@@ -236,8 +233,8 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
       {/* 下部ランキングエリア（7位以降） */}
       <div className={styles.bottomRankingArea}>
         <AnimatePresence>
-          {otherUsers.map((user) => {
-            const displayRankNumber = user.currentDisplayRank + 1; // 1ベースの順位表示
+          {otherUsers.map((user, index) => {
+            const displayRankNumber = index + 7; // 7位から開始
 
             return (
               <motion.div
