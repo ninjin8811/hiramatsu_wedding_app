@@ -15,21 +15,13 @@
   padding-top: 2.6vw;
 }
 
+.mainCharactersContainer {
+  margin-top: 4vh;
+}
+
 .logo {
   width: 50vw;
   margin-bottom: 2.1vw;
-  animation: slideInFromLeft 0.5s ease-out forwards;
-}
-
-@keyframes slideInFromLeft {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
 }
 
 .itemBox1 {
@@ -38,7 +30,6 @@
   left: 4vw;
   width: 9vw;
   height: auto;
-  transform: rotate(0deg);
 }
 
 .itemBox2 {
@@ -47,7 +38,6 @@
   right: 8vw;
   width: 12vw;
   height: auto;
-  transform: rotate(30deg);
 }
 
 .itemBox3 {
@@ -56,5 +46,4 @@
   left: 12vw;
   width: 10vw;
   height: auto;
-  transform: rotate(0deg);
 }

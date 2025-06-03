@@ -13,7 +13,7 @@
   top: 33%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(255,255,255); /* Dark semi-transparent background */
+  background-color: rgba(255, 255, 255); /* Dark semi-transparent background */
   border-radius: 1.5vw; /* Rounded corners */
   padding: 8vh 6vw;
   width: 80vw; /* Adjust width as needed */
@@ -24,7 +24,7 @@
 
 /* Speech bubble arrow */
 .modal::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2.8vw; /* Adjust to position the arrow correctly */
   left: 65%;
@@ -36,7 +36,6 @@
   border-top: 6vw solid white;
   rotate: -20deg;
 }
-
 
 .itemsGrid {
   display: grid;
