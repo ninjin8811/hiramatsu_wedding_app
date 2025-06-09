@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
-import { firebaseApp } from '@/app/_lib/firebase/FirebaseInitializer';
-import BackgroundWideGray from '@/app/_images/BackgroundWideGray.png';
-import Confetti from '@/app/_images/Confetti.png';
-import RankingResultTitleContainer from '@/app/_images/RankingResultTitleContainer.png';
-import RankingItemNormal from './RankingItemNormal';
-import RankingItemGorgeous from './RankingItemGorgeous';
-import styles from './FinalRankingScreen.module.scss';
-import { useRankingAnimation, Team } from './useRankingAnimation'; // Team型をインポート
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { firebaseApp } from "@/app/_lib/firebase/FirebaseInitializer";
+import BackgroundWideGray from "@/app/_images/BackgroundWideGray.png";
+import Confetti from "@/app/_images/Confetti.png";
+import RankingResultTitleContainer from "@/app/_images/RankingResultTitleContainer.png";
+import RankingItemNormal from "./RankingItemNormal";
+import RankingItemGorgeous from "./RankingItemGorgeous";
+import styles from "./FinalRankingScreen.module.scss";
+import { useRankingAnimation, Team } from "./useRankingAnimation"; // Team型をインポート
+import { GameUser } from "@/app/_types"; // GameUser型をインポート
 
 // サムネイル画像のインポートは不要になるため削除
 // import ThumbnailTeamA from '@/app/_images/ThumbnailTeamA.jpg';
@@ -34,7 +35,8 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
   const [error, setError] = useState<string | null>(null);
 
   // useRankingAnimationフックにteamsを渡す
-  const { rankingColumns, showConfetti, currentTopThreeIndex } = useRankingAnimation(teams);
+  const { rankingColumns, showConfetti, currentTopThreeIndex } =
+    useRankingAnimation(teams);
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -47,20 +49,28 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
       setError(null);
       const db = getFirestore(firebaseApp);
       try {
-        const usersCollectionRef = collection(db, 'Games', gameId, 'Users');
-        const q = query(usersCollectionRef, orderBy('score', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const fetchedTeams: Team[] = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          // FirestoreのドキュメントIDをidとして使用し、name, score, thumbnailを期待通りに設定
-          // thumbnailはstring URLであることを想定
-          fetchedTeams.push({
-            name: data.name as string,
-            score: data.score as number,
-            thumbnail: data.thumbnail as string, // FirestoreからはURL文字列が来る想定
-          });
-        });
+        // Gamesドキュメントから直接usersフィールドを取得
+        const gameDocRef = doc(db, "Games", gameId);
+        const gameDocSnap = await getDoc(gameDocRef);
+
+        if (!gameDocSnap.exists()) {
+          setError("Game not found.");
+          return;
+        }
+
+        const gameData = gameDocSnap.data();
+        const users = gameData.users || [];
+
+        // GameUserスキーマに合わせてデータを変換
+        const fetchedTeams: Team[] = users.map((user: GameUser) => ({
+          name: user.name,
+          score: user.score,
+          thumbnail: user.thumbnail,
+        }));
+
+        // スコア順でソート
+        fetchedTeams.sort((a, b) => b.score - a.score);
+
         setTeams(fetchedTeams);
       } catch (e) {
         console.error("Error fetching teams from Firestore:", e);
@@ -97,7 +107,8 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
       {showConfetti && (
         <div className={styles.confettiContainer}>
           <img
-            src={Confetti.src} alt="Confetti"
+            src={Confetti.src}
+            alt="Confetti"
             className={styles.confettiImage}
           />
         </div>
@@ -114,36 +125,37 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
         <div className={styles.rankingContainer}>
           {rankingColumns.map((column, columnIndex) => (
             <div key={columnIndex} className={styles.rankingColumn}>
-              {column.map((team) => ( // team は TeamWithVisibility 型のはず
-                team.rank <= 3 ? (
-                  <div key={team.name} className={styles.rankingItemWrapper}>
-                    {team.isVisible ? (
-                      <RankingItemGorgeous
+              {column.map(
+                (
+                  team // team は TeamWithVisibility 型のはず
+                ) =>
+                  team.rank <= 3 ? (
+                    <div key={team.name} className={styles.rankingItemWrapper}>
+                      {team.isVisible ? (
+                        <RankingItemGorgeous
+                          rank={team.rank}
+                          name={team.name}
+                          score={team.score}
+                          thumbnail={team.thumbnail} // thumbnail は string URL
+                        />
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div
+                      key={team.name}
+                      className={`${styles.rankingItemWrapper} ${
+                        team.isVisible ? styles.visible : styles.hidden
+                      }`}
+                    >
+                      <RankingItemNormal
                         rank={team.rank}
                         name={team.name}
                         score={team.score}
-                        thumbnail={team.thumbnail} // thumbnail は string URL
+                        // thumbnail={team.thumbnail} // RankingItemNormal には thumbnail props がない想定だったが、もし必要なら渡す
                       />
-                    ) : (
-                      null
-                    )}
-                  </div>
-                ) : (
-                  <div
-                    key={team.name}
-                    className={`${styles.rankingItemWrapper} ${
-                      team.isVisible ? styles.visible : styles.hidden
-                    }`}
-                  >
-                    <RankingItemNormal
-                      rank={team.rank}
-                      name={team.name}
-                      score={team.score}
-                      // thumbnail={team.thumbnail} // RankingItemNormal には thumbnail props がない想定だったが、もし必要なら渡す
-                    />
-                  </div>
-                )
-              ))}
+                    </div>
+                  )
+              )}
             </div>
           ))}
         </div>
