@@ -5,10 +5,10 @@ import { getGame } from "../_repositories/server";
 import { redirect } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     gameId: string;
     userId: string;
-  };
+  }>;
 };
 
 export default async function UserPage(props: Props) {

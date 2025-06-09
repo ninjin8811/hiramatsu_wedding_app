@@ -14,7 +14,7 @@ export function redirectPathByStatus(
     case "created":
       if (currentPath.endsWith("prepare")) return null;
       if (currentPath.endsWith("pending")) return null;
-      if (currentPath == UserQuestionsPath(game.gameId, userId)) return null;
+      if (currentPath == UserHomePath(game.gameId, userId)) return null;
       return UserHomePath(game.gameId, userId);
     case "inProgress":
       if (currentPath == UserQuestionsPath(game.gameId, userId)) return null;

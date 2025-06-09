@@ -5,10 +5,10 @@ import { redirectPathByStatus } from "../../../_utils/redirectPathByStatus";
 import { redirect } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     gameId: string;
     userId: string;
-  };
+  }>;
 };
 
 export default async function Page(props: Props) {

@@ -16,6 +16,8 @@ import {
 import StorageImage from "../../_components/StorageImage/StorageImage";
 import Indicator from "./QuestionIndicator";
 import { randomUUID } from "crypto";
+import { useRouter } from "next/navigation";
+import { UserResultPath } from "@/app/_utils/page_link";
 
 type Props = {
   gameId: string;
@@ -64,6 +66,8 @@ export default function QuestionPage(props: Props) {
     ownAnswers,
   ]);
 
+  const { replace } = useRouter();
+
   useEffect(() => {
     const unsub = listenGame(props.gameId, (game) => setGame(game));
     return () => unsub();
@@ -86,6 +90,12 @@ export default function QuestionPage(props: Props) {
     };
     await setAnswer(props.gameId, answer);
   }
+
+  useEffect(() => {
+    if (game.status === "completed") {
+      replace(UserResultPath(props.gameId, props.userId));
+    }
+  }, [game.status, props.gameId, props.userId, replace]);
 
   return (
     <div className={styles.questionPage}>
@@ -164,7 +174,7 @@ export default function QuestionPage(props: Props) {
                   submitAnswer(selectedAnswerIndex);
                 }
               }}
-              canUse={selectedItemId === null}
+              canUse={true}
             />
           ))}
           {Array.from({ length: 3 - ownItems.length }).map((_, index) => (
