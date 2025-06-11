@@ -31,7 +31,7 @@ export default function QuestionPage(props: Props) {
 
   const currentQuestionIndex = game.currentProcess.index;
   const currentQuestion = game.questions[currentQuestionIndex];
-  const showAnswer = game.currentProcess.type === "answer";
+  const showAnswer = game.currentProcess.type !== "question";
 
   const user = props.game.users.find((user) => user.id === props.userId);
   const ownItems = props.items.filter((item) =>
@@ -47,7 +47,7 @@ export default function QuestionPage(props: Props) {
 
   const correctRate = useCallback(() => {
     const finishedLength =
-      game.currentProcess.type === "answer"
+      game.currentProcess.type !== "question"
         ? game.currentProcess.index + 1
         : game.currentProcess.index;
     return (
