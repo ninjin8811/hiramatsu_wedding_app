@@ -3,7 +3,8 @@ import ItemDetailModalBaseImage from "@/app/_images/ItemDetailModalBaseImage.png
 import CloseIconBlack from "@/app/_images/CloseIconBlack.png";
 import Image from "next/image";
 import styles from "./ItemDetailModal.module.scss";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { motion } from "framer-motion";
 
 type Props = {
   image: ReactNode;
@@ -16,14 +17,44 @@ type Props = {
 };
 
 export default function ItemDetailModal(props: Props) {
+  const [isClosing, setIsClosing] = useState(false);
+  const close = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      props.onClose();
+    }, 200);
+  };
   return (
-    <div className={styles.itemDetailModal}>
-      <div className={styles.content}>
+    <motion.div
+      className={styles.itemDetailModal}
+      animate={{
+        opacity: isClosing ? [1, 0] : [0, 1],
+      }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+      onClick={close}
+    >
+      <motion.div
+        className={styles.content}
+        animate={{
+          scale: isClosing ? [1, 0] : [0, 1],
+          opacity: isClosing ? [1, 0] : [0, 1],
+        }}
+        transition={{
+          duration: isClosing ? 0.1 : 0.2,
+          ease: "easeInOut",
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         <Image
           src={CloseIconBlack}
           alt="閉じる"
           className={styles.close}
-          onClick={props.onClose}
+          onClick={close}
         />
         <div className={styles.content_image}>{props.image}</div>
         <div className={styles.content_name}>「{props.name}」</div>
@@ -49,7 +80,7 @@ export default function ItemDetailModal(props: Props) {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

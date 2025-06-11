@@ -14,6 +14,7 @@ import { onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { UserQuestionsPath } from "@/app/_utils/page_link";
 import CapImage from "../../_components/CapImage/CapImage";
+import { motion } from "framer-motion";
 
 type Props = {
   gameId: string;
