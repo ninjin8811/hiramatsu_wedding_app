@@ -32,9 +32,9 @@ export default function PendingPage(props: Props) {
     (summary) => summary.id === props.userId
   );
 
-  const ownItems = props.items.filter((item) =>
-    userSummary?.itemIds.includes(item.itemId)
-  );
+  const ownItems = userSummary?.itemIds
+    .map((itemId) => props.items.find((item) => item.itemId === itemId))
+    .filter((item) => item !== undefined);
 
   const { replace } = useRouter();
 
@@ -77,7 +77,7 @@ export default function PendingPage(props: Props) {
         <div className={styles.item}>
           <PrepareBox title="手持ちアイテム">
             <div className={styles.itemList}>
-              {ownItems.map((item) => (
+              {ownItems?.map((item) => (
                 <ItemButton
                   key={item.itemId}
                   image={

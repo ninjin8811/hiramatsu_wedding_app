@@ -34,16 +34,18 @@ export default function QuestionPage(props: Props) {
   const showAnswer = game.currentProcess.type !== "question";
 
   const user = props.game.users.find((user) => user.id === props.userId);
-  const ownItems = props.items.filter((item) =>
-    user?.itemIds.includes(item.itemId)
-  );
+  const ownItems = user?.itemIds
+    .map((itemId) => props.items.find((item) => item.itemId === itemId))
+    .filter((item) => item !== undefined);
   const [ownAnswers, setOwnAnswers] = useState<Answer[]>([]);
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>();
 
-  const selectedAnswerIndex = ownAnswers.find(
-    (answer) => answer.questionIndex === currentQuestionIndex
-  )?.optionIndex;
+  const selectedAnswerIndex = ownAnswers.find((answer) => {
+    console.log(answer.questionIndex, currentQuestionIndex);
+    console.log(ownAnswers[0].optionIndex);
+    return answer.questionIndex === currentQuestionIndex;
+  })?.optionIndex;
 
   const correctRate = useCallback(() => {
     const finishedLength =
@@ -75,6 +77,7 @@ export default function QuestionPage(props: Props) {
 
   useEffect(() => {
     const unsub = listenAnswers(props.gameId, props.userId, (answers) => {
+      console.log(answers);
       setOwnAnswers(answers);
     });
     return () => unsub();
@@ -88,6 +91,7 @@ export default function QuestionPage(props: Props) {
       optionIndex: index,
       usedItemId: selectedItemId || null,
     };
+    console.log(answer);
     await setAnswer(props.gameId, answer);
   }
 
@@ -149,7 +153,7 @@ export default function QuestionPage(props: Props) {
       </div>
       <div className={styles.foot}>
         <div className={styles.items}>
-          {ownItems.map((item) => (
+          {ownItems?.map((item) => (
             <ItemBox
               key={item.itemId}
               image={
@@ -177,9 +181,11 @@ export default function QuestionPage(props: Props) {
               canUse={true}
             />
           ))}
-          {Array.from({ length: 3 - ownItems.length }).map((_, index) => (
-            <ItemBox key={index} />
-          ))}
+          {Array.from({ length: 3 - (ownItems?.length || 0) }).map(
+            (_, index) => (
+              <ItemBox key={index} />
+            )
+          )}
         </div>
         <div className={styles.status}>
           <div className={styles.status_point}>ポイント:{user?.score}</div>
