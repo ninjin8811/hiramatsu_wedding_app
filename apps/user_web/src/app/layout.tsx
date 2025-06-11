@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Black_Han_Sans, Noto_Sans_JP, Protest_Strike } from "next/font/google";
 import "./globals.css";
 import FirebaseInitializer from "./_lib/firebase/FirebaseInitializer";
 import AuthProvider from "./_lib/firebase/FirebaseAuthProvider";
@@ -12,6 +12,26 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const blackHanSans = Black_Han_Sans({
+  variable: "--font-black-han-sans",
+  weight: ["400"],
+  subsets: ["latin"],
+});
+
+const notoSansJP = Noto_Sans_JP({
+  weight: '700',
+  subsets: ['latin'],
+  variable: '--font-noto-sans-jp',
+  display: 'swap',
+});
+
+const protestStrike = Protest_Strike({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-protest-strike',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -27,10 +47,13 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="apple-touch-icon" href="/icon.png"></link>
         <meta name="theme-color" content="#f7f7f7" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${blackHanSans.variable} ${notoSansJP.variable} ${protestStrike.variable}`}
+      >
         <FirebaseInitializer>
           <AuthProvider loginComponent={undefined}>{children}</AuthProvider>
         </FirebaseInitializer>

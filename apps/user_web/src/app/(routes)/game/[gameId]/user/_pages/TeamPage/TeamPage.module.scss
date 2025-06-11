@@ -1,0 +1,64 @@
+.startPage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.header {
+  background: #e60013;
+  color: #fff;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 10px 0;
+}
+
+.content {
+  height: 100%;
+  padding: 20px 20px 60px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  .logo {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+  }
+}
+
+.teamItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  .image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 1000px;
+    overflow: hidden;
+    border: 3px solid #e60013;
+    img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+  }
+  .name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #e60013;
+  }
+}
+
+.button {
+  position: absolute;
+  bottom: 60px;
+  left: 20px;
+  right: 20px;
+}
+// .animationLogo {
+//   position: absolute;
+// }

@@ -1,0 +1,182 @@
+.bg {
+  background-image: url('/images/bg-white.png');
+  background-repeat: repeat; /* 背景画像を繰り返す */
+  background-position: center;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2vw;
+  font-family: var(--font-noto-sans-jp);
+  color: #3c3c3c;
+  font-weight: bold;
+}
+
+.quizContainer {
+  display: flex;
+  flex-direction: column;
+  width: 90vw;
+  background-color: #F7F7F7;
+  border-radius: 1.5vw;
+  border: none;
+  padding: 3vw 3.5vw;
+  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.1);
+  position: relative; /* タイマーを内部に配置するため */
+}
+
+.header {
+  margin-right: -3.5vw;
+  margin-left: -3.5vw;
+  display: flex;
+  align-items: center; /* 中央揃えから変更 */
+  margin-bottom: 1.5vw;
+}
+
+.progressText {
+  font-size: 2.5vw;
+  font-weight: normal;
+  font-family: var(--font-protest-strike);
+  background-color: #E60013; /* 背景を赤 */
+  color: white; /* 文字色を白 */
+  padding: 0.8vw 2.2vw; /* 左右のpaddingを調整して横長に見せる */
+  border-radius: 0 1.5em 1.5em 0;
+  white-space: nowrap;
+  border: none; /* 枠線は不要に */
+  line-height: 1.2; /* テキストが中央に来るように微調整 */
+  display: inline-block; /* line-heightを適用しやすくするため */
+}
+
+.questionTextContainer {
+  flex-grow: 1;
+  text-align: left; /* 左寄せに変更 */
+  padding: 0 2.5vw; /* 左右のパディングを調整 */
+}
+
+.questionText {
+  font-size: 2.5vw; /* 少し調整 */
+  line-height: 1.5; /* 行間を少し調整 */
+}
+
+.mainContent {
+  display: flex;
+  gap: 5vw;
+  margin-top: 1.5vw;
+}
+/* 画像とタイマーをまとめるコンテナ */
+.imageAndTimerContainer {
+  display: flex;
+  flex: 1.15;
+  flex-direction: column;
+}
+
+.imageContainer {
+  width: 100%;
+  background-color: white;
+  border-radius: 2vw;
+  aspect-ratio: 1.5 / 1;
+  rotate: -2deg;
+  transform-origin: center center;
+  box-shadow: 0 0.3vw 0.6vw rgba(0, 0, 0, 0.1);
+}
+
+.quizImage {
+  display: block;
+  border-radius: 2vw;
+  rotate: 2deg;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  padding: 1vw 1.5vw;
+}
+
+.optionsContainer {
+  padding-top: 0.8vw;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vw; /* 選択肢間のスペースを調整 */
+}
+
+.optionButton {
+  display: flex;
+  align-items: center;
+  gap: 1.5vw;
+  background-color: white;
+  border-radius: 1vw;
+  padding: 1.2vw;
+  text-align: left;
+  box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.1);
+}
+
+.optionButton.correct {
+  background-color: white;
+}
+
+.optionButton.incorrect {
+  background: #E0E0E0;
+}
+
+.optionButton.incorrect .optionLabel {
+  background-color: #646464;
+}
+.optionLabel {
+  font-size: 2.7vw; /* 少し調整 */
+  background-color: #E60013; /* 背景を赤 */
+  color: white; /* 文字色を白 */
+  font-weight: bold;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1vw;
+  line-height: 1;
+  border: none;
+  width: 4.7vw; /* 幅を指定してaspect-ratioの基準とする */
+  aspect-ratio: 1; /* これで高さも4.7vwになるはず */
+  box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
+}
+
+.optionText {
+  font-size: 2.3vw;
+  font-weight: bold;
+}
+
+.timerContainer {
+  margin-top: auto;
+  width: 100%;
+  overflow: hidden;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  position: relative;
+  gap: 1vw;
+}
+
+.timerIcon {
+  min-height: 20px;
+  height: 3.2vh;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.timerBar {
+  min-height: 12px;
+  height: 1.2vh;
+  background-color: #d9d9d9;
+  border-radius: 1em;
+  width: 100%;
+  flex-grow: 1;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.timerProgress {
+  height: 100%;
+  background-color: #195EBE;
+  border-radius: 1em 0 0 1em;
+  transition: width 0.1s linear;
+  border: none;
+}

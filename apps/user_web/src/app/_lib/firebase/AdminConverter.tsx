@@ -35,12 +35,12 @@ export const adminConverterOnGet = <T extends z.AnyZodObject>(
       const createdAt = snapshot.get("createdAt");
       const updatedAt = snapshot.get("updatedAt");
       const { createdAt: _c, updatedAt: _u, ...data } = snapshot.data();
-      const parsedData = schema.strict().parse(data);
+      const parsedData = schema.parse(data);
       return {
         ...parsedData,
         snapshot,
-        createdAt: createdAt.toDate(),
-        updatedAt: updatedAt.toDate(),
+        createdAt: createdAt?.toDate(),
+        updatedAt: updatedAt?.toDate(),
       };
     },
   };
