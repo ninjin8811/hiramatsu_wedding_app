@@ -40,12 +40,18 @@ export default function QuestionPage(props: Props) {
   const [ownAnswers, setOwnAnswers] = useState<Answer[]>([]);
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>();
+  const currentOwnAnswer = ownAnswers.find(
+    (answer) => answer.questionIndex === currentQuestionIndex
+  );
 
-  const selectedAnswerIndex = ownAnswers.find((answer) => {
-    console.log(answer.questionIndex, currentQuestionIndex);
-    console.log(ownAnswers[0].optionIndex);
-    return answer.questionIndex === currentQuestionIndex;
-  })?.optionIndex;
+  const selectedAnswerIndex = currentOwnAnswer?.optionIndex;
+  useEffect(() => {
+    if (currentOwnAnswer) {
+      setSelectedItemId(currentOwnAnswer.usedItemId);
+    } else {
+      setSelectedItemId(null);
+    }
+  }, [currentOwnAnswer, currentQuestionIndex]);
 
   const correctRate = useCallback(() => {
     const finishedLength =
