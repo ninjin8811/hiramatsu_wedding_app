@@ -63,10 +63,7 @@
 }
 
 .itemList {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: grid;
   gap: 10px;
   margin-top: 20px;
   .item {
@@ -77,6 +74,20 @@
     img {
       width: 127px;
       height: auto;
+    }
+  }
+  &.length_1 {
+    grid-template-columns: 1fr;
+  }
+  &.length_2 {
+    grid-template-columns: 1fr;
+  }
+  &.length_3 {
+    grid-template-columns: repeat(2, 1fr);
+    .item {
+      &:first-child {
+        grid-column: 1 / 3;
+      }
     }
   }
 }

@@ -9,25 +9,16 @@ import CloseIconBlack from "@/app/_images/CloseIconBlack.png";
 import CommonButton from "../CommonButton/CommonButton";
 import Link from "next/link";
 import { UserPendingPath } from "@/app/_utils/page_link";
+import { Item } from "@/app/_types";
 
 type Props = {
   gameId: string;
   userId: string;
+  items: Item[];
   onClose: () => void;
 };
 
 export default function ItemGetModal(props: Props) {
-  const items = [
-    {
-      image: <Image src={ItemAkakora} alt="アカカロ" />,
-      name: "アカこうら",
-    },
-    {
-      image: <Image src={ItemKiller} alt="キラー" />,
-      name: "キラー",
-    },
-  ];
-
   return (
     <div className={styles.itemGetModal}>
       <Image
@@ -39,10 +30,19 @@ export default function ItemGetModal(props: Props) {
       <div className={styles.content}>
         <div className={styles.content_main}>
           <div className={styles.title}>アイテムゲット！</div>
-          <div className={styles.itemList}>
-            {items.map((item) => (
+          <div
+            className={`${styles.itemList} ${
+              styles[`length_${props.items.length}`]
+            }`}
+          >
+            {props.items.map((item) => (
               <div className={styles.item} key={item.name}>
-                {item.image}
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={127}
+                  height={120}
+                />
                 <div className={styles.itemName}>{item.name}</div>
               </div>
             ))}
