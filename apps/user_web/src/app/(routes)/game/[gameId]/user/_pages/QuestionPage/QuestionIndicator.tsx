@@ -11,8 +11,8 @@ export default function Indicator(props: IndicatorProps) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((t) => t + 0.2);
-    }, 200);
+      setTimer((t) => t + 1);
+    }, 1000);
     return () => clearInterval(interval);
   }, [timer]);
 
@@ -21,7 +21,7 @@ export default function Indicator(props: IndicatorProps) {
       <div
         className={styles.indicator_active}
         style={{
-          width: `${(timer / props.answerTime) * 100}%`,
+          width: `${Math.max(1 - timer / props.answerTime, 0) * 100}%`,
         }}
       />
     </div>

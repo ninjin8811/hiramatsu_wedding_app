@@ -83,13 +83,13 @@ export default function QuestionPage(props: Props) {
     return () => unsub();
   }, [props.gameId, props.userId]);
 
-  async function submitAnswer(index: number) {
+  async function submitAnswer(index: number, itemId: string | null) {
     const answer = {
       answerId: props.userId + "_" + currentQuestionIndex,
       questionIndex: currentQuestionIndex,
       userId: props.userId,
       optionIndex: index,
-      usedItemId: selectedItemId || null,
+      usedItemId: itemId || null,
     };
     console.log(answer);
     await setAnswer(props.gameId, answer);
@@ -139,7 +139,7 @@ export default function QuestionPage(props: Props) {
                 onClick={() => {
                   if (showAnswer) return;
                   // if (selectedAnswerIndex) return;
-                  submitAnswer(index);
+                  submitAnswer(index, selectedItemId || null);
                 }}
                 isSelected={selectedAnswerIndex === index}
               />
@@ -175,7 +175,7 @@ export default function QuestionPage(props: Props) {
               onUse={() => {
                 setSelectedItemId(item.itemId);
                 if (selectedAnswerIndex) {
-                  submitAnswer(selectedAnswerIndex);
+                  submitAnswer(selectedAnswerIndex, item.itemId);
                 }
               }}
               canUse={true}
