@@ -6,7 +6,7 @@ import MarioCap from "@/app/_images/MarioCap.png";
 import { useState } from "react";
 import ItemGetModal from "../../_components/ItemGetModal/ItemGetModal";
 import PrepareBox from "../../_components/PrepareBox/PrepareBox";
-import { Game, User } from "@/app/_types";
+import { Game, Item, User } from "@/app/_types";
 import CapImage from "../../_components/CapImage/CapImage";
 
 type Props = {
@@ -14,6 +14,7 @@ type Props = {
   userId: string;
   user: User;
   game: Game;
+  items: Item[];
 };
 
 export default function PreparePage(props: Props) {
@@ -22,6 +23,10 @@ export default function PreparePage(props: Props) {
   const userIndex = props.game.users.findIndex(
     (summary) => summary.id === props.userId
   );
+
+  const ownItems = props.game.users[userIndex].itemIds
+    .map((itemId) => props.items.find((item) => item.itemId === itemId))
+    .filter((item) => item !== undefined);
 
   return (
     <div className={styles.preparePage}>
@@ -59,6 +64,7 @@ export default function PreparePage(props: Props) {
           onClose={() => setShowItemGetModal(false)}
           gameId={props.gameId}
           userId={props.userId}
+          items={ownItems}
         />
       )}
     </div>

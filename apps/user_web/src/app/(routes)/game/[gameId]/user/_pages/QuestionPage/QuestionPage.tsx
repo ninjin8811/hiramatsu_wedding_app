@@ -3,7 +3,9 @@ import Image from "next/image";
 import styles from "./QuestionPage.module.scss";
 import IconTimer from "@/app/_images/IconTimer.png";
 import UserResultCorrect from "@/app/_images/UserResultCorrect.png";
+import UserResultCorrectGif from "@/app/_images/UserResultCorrect.gif";
 import UserResultIncorrect from "@/app/_images/UserResultIncorrect.png";
+import UserResultIncorrectGif from "@/app/_images/UserResultIncorrect.gif";
 import ItemDetailModal from "@user/_components/ItemDetailModal/ItemDetailModal";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Answer, AnswerSchema, Game, GameSchema, Item } from "@/app/_types";
@@ -33,19 +35,33 @@ export default function QuestionPage(props: Props) {
   const currentQuestion = game.questions[currentQuestionIndex];
   const showAnswer = game.currentProcess.type !== "question";
 
-  const user = props.game.users.find((user) => user.id === props.userId);
-  const ownItems = props.items.filter((item) =>
-    user?.itemIds.includes(item.itemId)
-  );
+  const user = game.users.find((user) => user.id === props.userId);
+  const ownItems = user?.itemIds
+    .map((itemId) => props.items.find((item) => item.itemId === itemId))
+    .filter((item) => item !== undefined);
   const [ownAnswers, setOwnAnswers] = useState<Answer[]>([]);
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>();
-
-  const selectedAnswerIndex = ownAnswers.find(
+  const currentOwnAnswer = ownAnswers.find(
     (answer) => answer.questionIndex === currentQuestionIndex
-  )?.optionIndex;
+  );
+
+  const selectedAnswerIndex = currentOwnAnswer?.optionIndex;
+  useEffect(() => {
+    if (currentOwnAnswer) {
+      setSelectedItemId(currentOwnAnswer.usedItemId);
+    } else {
+      setSelectedItemId(null);
+    }
+  }, [currentOwnAnswer, currentQuestionIndex]);
 
   const correctRate = useCallback(() => {
+    if (
+      game.currentProcess.index === 0 &&
+      game.currentProcess.type === "question"
+    ) {
+      return null;
+    }
     const finishedLength =
       game.currentProcess.type !== "question"
         ? game.currentProcess.index + 1
@@ -75,19 +91,21 @@ export default function QuestionPage(props: Props) {
 
   useEffect(() => {
     const unsub = listenAnswers(props.gameId, props.userId, (answers) => {
+      console.log(answers);
       setOwnAnswers(answers);
     });
     return () => unsub();
   }, [props.gameId, props.userId]);
 
-  async function submitAnswer(index: number) {
+  async function submitAnswer(index: number, itemId: string | null) {
     const answer = {
       answerId: props.userId + "_" + currentQuestionIndex,
       questionIndex: currentQuestionIndex,
       userId: props.userId,
       optionIndex: index,
-      usedItemId: selectedItemId || null,
+      usedItemId: itemId || null,
     };
+    console.log(answer);
     await setAnswer(props.gameId, answer);
   }
 
@@ -108,9 +126,9 @@ export default function QuestionPage(props: Props) {
           {showAnswer ? (
             <div className={styles.content_result}>
               {selectedAnswerIndex === currentQuestion.correctIndex ? (
-                <Image src={UserResultCorrect} alt="sample question" />
+                <Image src={UserResultCorrectGif} alt="sample question" />
               ) : (
-                <Image src={UserResultIncorrect} alt="sample question" />
+                <Image src={UserResultIncorrectGif} alt="sample question" />
               )}
             </div>
           ) : (
@@ -135,7 +153,7 @@ export default function QuestionPage(props: Props) {
                 onClick={() => {
                   if (showAnswer) return;
                   // if (selectedAnswerIndex) return;
-                  submitAnswer(index);
+                  submitAnswer(index, selectedItemId || null);
                 }}
                 isSelected={selectedAnswerIndex === index}
               />
@@ -149,7 +167,7 @@ export default function QuestionPage(props: Props) {
       </div>
       <div className={styles.foot}>
         <div className={styles.items}>
-          {ownItems.map((item) => (
+          {ownItems?.map((item) => (
             <ItemBox
               key={item.itemId}
               image={
@@ -171,20 +189,22 @@ export default function QuestionPage(props: Props) {
               onUse={() => {
                 setSelectedItemId(item.itemId);
                 if (selectedAnswerIndex) {
-                  submitAnswer(selectedAnswerIndex);
+                  submitAnswer(selectedAnswerIndex, item.itemId);
                 }
               }}
-              canUse={true}
+              canUse={game.currentProcess.type === "question"}
             />
           ))}
-          {Array.from({ length: 3 - ownItems.length }).map((_, index) => (
-            <ItemBox key={index} />
-          ))}
+          {Array.from({ length: 3 - (ownItems?.length || 0) }).map(
+            (_, index) => (
+              <ItemBox key={index} />
+            )
+          )}
         </div>
         <div className={styles.status}>
           <div className={styles.status_point}>ポイント:{user?.score}</div>
           <div className={styles.status_rate}>
-            正解率:{correctRate() ? correctRate() * 100 + "%" : "-"}
+            正解率:{correctRate() === null ? "-" : correctRate()! * 100 + "%"}
           </div>
         </div>
       </div>

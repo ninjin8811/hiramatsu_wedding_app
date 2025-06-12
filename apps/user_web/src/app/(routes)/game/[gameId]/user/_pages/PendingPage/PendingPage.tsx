@@ -14,6 +14,7 @@ import { onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { UserQuestionsPath } from "@/app/_utils/page_link";
 import CapImage from "../../_components/CapImage/CapImage";
+import { motion } from "framer-motion";
 
 type Props = {
   gameId: string;
@@ -32,9 +33,9 @@ export default function PendingPage(props: Props) {
     (summary) => summary.id === props.userId
   );
 
-  const ownItems = props.items.filter((item) =>
-    userSummary?.itemIds.includes(item.itemId)
-  );
+  const ownItems = userSummary?.itemIds
+    .map((itemId) => props.items.find((item) => item.itemId === itemId))
+    .filter((item) => item !== undefined);
 
   const { replace } = useRouter();
 
@@ -77,7 +78,7 @@ export default function PendingPage(props: Props) {
         <div className={styles.item}>
           <PrepareBox title="手持ちアイテム">
             <div className={styles.itemList}>
-              {ownItems.map((item) => (
+              {ownItems?.map((item) => (
                 <ItemButton
                   key={item.itemId}
                   image={

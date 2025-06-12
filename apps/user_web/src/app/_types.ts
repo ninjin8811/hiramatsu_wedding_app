@@ -29,6 +29,14 @@ export const UserSchema = z.object({
     .string()
     .url()
     .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
+  smileThumbnail: z
+    .string()
+    .url()
+    .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
+  sadThumbnail: z
+    .string()
+    .url()
+    .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
 });
 
 // [Game]/{gameId}/[Answer]/{answerId}
@@ -97,7 +105,10 @@ export const ItemSchema = z.object({
   name: z.string().describe("アイテム名"),
   description: z.string().describe("アイテム説明"),
   image: z.string().url().describe("アイテム画像URL (Firebase Storage PNG)"),
-  movie: z.string().url().describe("アイテム効果動画URL (Firebase Storage MP4)"),
+  movie: z
+    .string()
+    .url()
+    .describe("アイテム効果動画URL (Firebase Storage MP4)"),
 });
 
 export type Game = z.infer<typeof GameSchema>;
