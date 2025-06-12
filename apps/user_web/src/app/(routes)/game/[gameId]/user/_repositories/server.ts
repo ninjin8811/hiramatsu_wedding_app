@@ -26,7 +26,7 @@ export async function getItems() {
 
 export async function getUser(gameId: string, userId: string) {
   const request = unstable_cache(
-    async () => {
+    async (gameId: string, userId: string) => {
       const user = await documentGet(
         UserSchema,
         `Games/${gameId}/Users`,
@@ -34,12 +34,12 @@ export async function getUser(gameId: string, userId: string) {
       ).get();
       return UserSchema.parse(user.data());
     },
-    ["user"],
+    ["user", gameId, userId],
     {
       revalidate: 60,
     }
   );
-  return request();
+  return request(gameId, userId);
 }
 export async function getTeams(gameId: string) {
   const game = await documentGet(GameSchema, "Games", gameId).get();
