@@ -11,11 +11,15 @@
   font-size: 24px;
   font-weight: bold;
   padding: 10px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 .content {
   height: 100%;
-  padding: 20px 20px 60px;
+  padding: 60px 20px 80px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -54,8 +58,8 @@
 }
 
 .button {
-  position: absolute;
-  bottom: 60px;
+  position: fixed;
+  bottom: 20px;
   left: 20px;
   right: 20px;
 }
