@@ -3,7 +3,9 @@ import Image from "next/image";
 import styles from "./QuestionPage.module.scss";
 import IconTimer from "@/app/_images/IconTimer.png";
 import UserResultCorrect from "@/app/_images/UserResultCorrect.png";
+import UserResultCorrectGif from "@/app/_images/UserResultCorrect.gif";
 import UserResultIncorrect from "@/app/_images/UserResultIncorrect.png";
+import UserResultIncorrectGif from "@/app/_images/UserResultIncorrect.gif";
 import ItemDetailModal from "@user/_components/ItemDetailModal/ItemDetailModal";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Answer, AnswerSchema, Game, GameSchema, Item } from "@/app/_types";
@@ -33,7 +35,7 @@ export default function QuestionPage(props: Props) {
   const currentQuestion = game.questions[currentQuestionIndex];
   const showAnswer = game.currentProcess.type !== "question";
 
-  const user = props.game.users.find((user) => user.id === props.userId);
+  const user = game.users.find((user) => user.id === props.userId);
   const ownItems = user?.itemIds
     .map((itemId) => props.items.find((item) => item.itemId === itemId))
     .filter((item) => item !== undefined);
@@ -54,6 +56,12 @@ export default function QuestionPage(props: Props) {
   }, [currentOwnAnswer, currentQuestionIndex]);
 
   const correctRate = useCallback(() => {
+    if (
+      game.currentProcess.index === 0 &&
+      game.currentProcess.type === "question"
+    ) {
+      return null;
+    }
     const finishedLength =
       game.currentProcess.type !== "question"
         ? game.currentProcess.index + 1
@@ -118,9 +126,9 @@ export default function QuestionPage(props: Props) {
           {showAnswer ? (
             <div className={styles.content_result}>
               {selectedAnswerIndex === currentQuestion.correctIndex ? (
-                <Image src={UserResultCorrect} alt="sample question" />
+                <Image src={UserResultCorrectGif} alt="sample question" />
               ) : (
-                <Image src={UserResultIncorrect} alt="sample question" />
+                <Image src={UserResultIncorrectGif} alt="sample question" />
               )}
             </div>
           ) : (
@@ -184,7 +192,7 @@ export default function QuestionPage(props: Props) {
                   submitAnswer(selectedAnswerIndex, item.itemId);
                 }
               }}
-              canUse={true}
+              canUse={game.currentProcess.type === "question"}
             />
           ))}
           {Array.from({ length: 3 - (ownItems?.length || 0) }).map(
@@ -196,7 +204,7 @@ export default function QuestionPage(props: Props) {
         <div className={styles.status}>
           <div className={styles.status_point}>ポイント:{user?.score}</div>
           <div className={styles.status_rate}>
-            正解率:{correctRate() ? correctRate() * 100 + "%" : "-"}
+            正解率:{correctRate() === null ? "-" : correctRate()! * 100 + "%"}
           </div>
         </div>
       </div>
