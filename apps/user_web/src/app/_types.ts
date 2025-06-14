@@ -99,6 +99,45 @@ export const GameSchema = z.object({
   currentProcess: CurrentProcessSchema.describe("現在のゲーム進行状況"),
 });
 
+// アイテムエフェクトのターゲット指定方法
+export const EffectTargetTypeSchema = z
+  .enum(["rank_position", "specific_user", "all_users", "random_users"])
+  .describe("エフェクトのターゲット指定方法");
+
+// 単一のエフェクト定義
+export const ItemEffectSchema = z.object({
+  targetType:
+    EffectTargetTypeSchema.optional().describe(
+      "エフェクトのターゲット指定方法"
+    ),
+  targetValue: z
+    .union([z.number(), z.string()])
+    .optional()
+    .describe(
+      "rank_position: 順位(1-based), specific_user: userId, random_users: 対象数"
+    ),
+  scoreChange: z
+    .number()
+    .optional()
+    .describe("スコア変動量（負の値で減点、正の値で加点）"),
+  effectType: z
+    .enum(["score_change", "copy_rank_score", "conditional_bonus"])
+    .optional()
+    .describe("エフェクトの種類"),
+  copyFromRank: z
+    .number()
+    .optional()
+    .describe("copy_rank_score用: コピー元の順位(1-based)"),
+  condition: z
+    .enum(["correct_answer"])
+    .optional()
+    .describe("conditional_bonus用: 効果発動条件"),
+  topRanksOnly: z
+    .number()
+    .optional()
+    .describe("上位N位のみを対象にする場合のN"),
+});
+
 // [Item]/{itemId}
 export const ItemSchema = z.object({
   itemId: z.string().describe("アイテムID"),
@@ -108,7 +147,8 @@ export const ItemSchema = z.object({
   movie: z
     .string()
     .url()
-    .describe("アイテム効果動画URL (Firebase Storage MP4)"),
+    .describe("アイテム効果動画URL (Firebase Storage Mov)"),
+  effect: ItemEffectSchema.describe("アイテムの効果定義"),
 });
 
 export type Game = z.infer<typeof GameSchema>;
@@ -118,3 +158,5 @@ export type Question = z.infer<typeof QuestionSchema>;
 export type User = z.infer<typeof UserSchema>;
 export type Answer = z.infer<typeof AnswerSchema>;
 export type Item = z.infer<typeof ItemSchema>;
+export type EffectTargetType = z.infer<typeof EffectTargetTypeSchema>;
+export type ItemEffect = z.infer<typeof ItemEffectSchema>;

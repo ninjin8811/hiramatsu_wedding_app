@@ -31,28 +31,28 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
   const items = [
     {
-      name: "アカこうら",
-      description: "前の人が -10pt",
-      image: "/images/akakoura.png",
-      alt: "アカこうら",
-    },
-    {
       name: "ダッシュキノコ",
-      description: "+5pt進む",
+      description: "クイズ正解時に得点2倍",
       image: "/images/dash-kinoko.png",
       alt: "ダッシュキノコ",
     },
     {
+      name: "ボム兵",
+      description: "上位6チームに-50pt",
+      image: "/images/bomb.png",
+      alt: "ボム兵",
+    },
+    {
       name: "キラー",
-      description: "+30pt進む",
+      description: "2位と同じ点数まで追い上げる",
       image: "/images/killer.png",
       alt: "キラー",
     },
     {
-      name: "トゲゾーこうら",
-      description: "1番前の人が -20pt",
-      image: "/images/togezo.png",
-      alt: "トゲゾーこうら",
+      name: "ランダムこうら",
+      description: "謎の力が秘められた甲羅",
+      image: "/images/koura.png",
+      alt: "ランダム甲羅",
     },
   ];
 

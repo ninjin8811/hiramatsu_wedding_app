@@ -54,12 +54,13 @@ export default async function CurrentRankingPage({ params }: Props) {
     return notFound();
   }
 
+  const currentQuestion = game.questions[currentQuizIdx];
+
   const usersData = game.users.map((gameUser, index) => {
     // Firestoreのgame.usersからscoreを取得
     const prevScore = gameUser?.score || 0;
     let currentScore = prevScore;
 
-    const currentQuestion = game.questions[currentQuizIdx];
     if (currentQuestion) {
       const userAnswer = allAnswers.find(
         (ans) =>
@@ -96,6 +97,7 @@ export default async function CurrentRankingPage({ params }: Props) {
         itemName: item.name,
         itemImage: item.image,
         itemMovie: item.movie,
+        isCorrectAnswer: answer.optionIndex === currentQuestion.correctIndex,
         effect: {
           targetType: "rank_position" as const,
           targetValue: 1,
