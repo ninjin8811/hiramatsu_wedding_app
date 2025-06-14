@@ -1,5 +1,5 @@
 import { getServerDb } from "@/app/_lib/firebase/server/firestore";
-import { Game, Answer, Item, User } from "@/app/_types";
+import { Game, Answer, Item } from "@/app/_types";
 import { getDoc, doc, collection, getDocs } from "firebase/firestore";
 import { notFound } from "next/navigation";
 import CurrentRankingScreen from "./_components/CurrentRankingScreen";
@@ -8,8 +8,8 @@ type Props = {
   params: Promise<{
     gameId: string;
     quizIdx: string;
-  }>
-}
+  }>;
+};
 
 const characterColors = new Map<number, string>([
   [0, "#FB0025"],
@@ -37,7 +37,7 @@ export default async function CurrentRankingPage({ params }: Props) {
 
   const itemRef = collection(db, "Items");
   const itemSnap = await getDocs(itemRef);
-  const allItems = itemSnap.docs.map(doc => doc.data() as Item);
+  const allItems = itemSnap.docs.map((doc) => doc.data() as Item);
 
   const gameRef = doc(db, "Games", gameId);
   const gameSnap = await getDoc(gameRef);
@@ -48,59 +48,62 @@ export default async function CurrentRankingPage({ params }: Props) {
 
   const answersRef = collection(db, "Games", gameId, "Answers");
   const answersSnap = await getDocs(answersRef);
-  const allAnswers = answersSnap.docs.map(doc => doc.data() as Answer);
-
-  const usersRef = collection(db, "Games", gameId, "Users");
-  const usersSnap = await getDocs(usersRef);
-  const allUsers = usersSnap.docs.map(doc => doc.data() as User);
+  const allAnswers = answersSnap.docs.map((doc) => doc.data() as Answer);
 
   if (!game.questions || game.questions.length === 0) {
     return notFound();
   }
 
-  const usersData = allUsers.map((user, index) => {
+  const usersData = game.users.map((gameUser, index) => {
     // Firestoreのgame.usersからscoreを取得
-    const gameUser = game.users.find(gu => gu.id === user.userId);
-    console.log(gameUser);
     const prevScore = gameUser?.score || 0;
     let currentScore = prevScore;
 
     const currentQuestion = game.questions[currentQuizIdx];
     if (currentQuestion) {
-      const userAnswer = allAnswers.find(ans => ans.userId === user.userId && ans.questionIndex === currentQuizIdx);
-      if (userAnswer && userAnswer.optionIndex === currentQuestion.correctIndex) {
+      const userAnswer = allAnswers.find(
+        (ans) =>
+          ans.userId === gameUser.id && ans.questionIndex === currentQuizIdx
+      );
+      if (
+        userAnswer &&
+        userAnswer.optionIndex === currentQuestion.correctIndex
+      ) {
         currentScore += currentQuestion.point;
       }
     }
 
     return {
-      userId: user.userId,
-      teamName: user.name,
-      thumbnail: user.thumbnail,
+      userId: gameUser.id,
+      teamName: gameUser.name,
+      thumbnail: gameUser.thumbnail,
       characterImage: `/images/carts/cart_${index + 1}.png`,
-      characterColor: characterColors.get(index % characterColors.size) || "#FFFFFF",
+      characterColor:
+        characterColors.get(index % characterColors.size) || "#FFFFFF",
       prevScore: prevScore,
       currentScore: currentScore,
     };
   });
 
-  const itemEvents = allAnswers.filter(ans => ans.questionIndex === currentQuizIdx && ans.usedItemId).flatMap((answer) => {
-    const item = allItems.find(item => item.itemId === answer.usedItemId);
-    if (!item) return [];
-    return {
-      userId: answer.userId,
-      itemId: item.itemId,
-      itemName: item.name,
-      itemImage: item.image,
-      itemMovie: item.movie,
-      effect: {
-        targetType: 'rank_position' as const,
-        targetValue: 1,
-        scoreChange: -50,
-        description: '1位のスコアを50pt減点'
-      }
-    }
-  });
+  const itemEvents = allAnswers
+    .filter((ans) => ans.questionIndex === currentQuizIdx && ans.usedItemId)
+    .flatMap((answer) => {
+      const item = allItems.find((item) => item.itemId === answer.usedItemId);
+      if (!item) return [];
+      return {
+        userId: answer.userId,
+        itemId: item.itemId,
+        itemName: item.name,
+        itemImage: item.image,
+        itemMovie: item.movie,
+        effect: {
+          targetType: "rank_position" as const,
+          targetValue: 1,
+          scoreChange: -50,
+          description: "1位のスコアを50pt減点",
+        },
+      };
+    });
 
   return (
     <CurrentRankingScreen

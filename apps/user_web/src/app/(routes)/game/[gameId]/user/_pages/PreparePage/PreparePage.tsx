@@ -2,17 +2,16 @@
 import Image from "next/image";
 import styles from "./PreparePage.module.scss";
 import UserMainItemBox from "@/app/_images/UserMainItemBox.png";
-import MarioCap from "@/app/_images/MarioCap.png";
 import { useState } from "react";
 import ItemGetModal from "../../_components/ItemGetModal/ItemGetModal";
 import PrepareBox from "../../_components/PrepareBox/PrepareBox";
-import { Game, Item, User } from "@/app/_types";
+import { Game, Item, GameUser } from "@/app/_types";
 import CapImage from "../../_components/CapImage/CapImage";
 
 type Props = {
   gameId: string;
   userId: string;
-  user: User;
+  user: GameUser;
   game: Game;
   items: Item[];
 };

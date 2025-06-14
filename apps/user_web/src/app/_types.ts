@@ -29,14 +29,6 @@ export const UserSchema = z.object({
     .string()
     .url()
     .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
-  smileThumbnail: z
-    .string()
-    .url()
-    .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
-  sadThumbnail: z
-    .string()
-    .url()
-    .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
 });
 
 // [Game]/{gameId}/[Answer]/{answerId}
@@ -67,6 +59,14 @@ export const GameUserSchema = z.object({
     .string()
     .url()
     .describe("ユーザーサムネイル画像URL (Firebase Storage JPG)"),
+  smileThumbnail: z
+    .string()
+    .url()
+    .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
+  sadThumbnail: z
+    .string()
+    .url()
+    .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
   itemIds: z.array(z.string()).describe("所持しているアイテムIDの配列"),
   score: z.number().int().nonnegative().describe("現在のスコア"),
 });

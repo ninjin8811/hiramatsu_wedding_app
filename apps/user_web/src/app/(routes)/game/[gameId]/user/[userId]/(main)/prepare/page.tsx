@@ -1,6 +1,3 @@
-import { documentGet } from "@/app/_lib/firebase/AdminConverter";
-import { initializeAdminSdk } from "@/app/_lib/firebase/FirebaseAdminInitializer";
-import { GameSchema, UserSchema } from "@/app/_types";
 import PreparePage from "@user/_pages/PreparePage/PreparePage";
 import { getGame, getItems, getUser } from "../../../_repositories/server";
 import { UserPreparePath } from "@/app/_utils/page_link";
