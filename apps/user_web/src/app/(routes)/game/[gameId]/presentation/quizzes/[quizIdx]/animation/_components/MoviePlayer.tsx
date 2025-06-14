@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import styles from './MoviePlayer.module.css';
+import { motion } from "framer-motion";
+import styles from "./MoviePlayer.module.css";
 
 interface MoviePlayerProps {
   movieUrl: string;
@@ -12,14 +12,16 @@ interface MoviePlayerProps {
 export const MoviePlayer: React.FC<MoviePlayerProps> = ({
   movieUrl,
   isVisible,
-  onMovieEnd
+  onMovieEnd,
 }) => {
   const handleVideoEnd = () => {
     onMovieEnd();
   };
 
-  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    console.error('動画再生エラー:', e);
+  const handleVideoError = (
+    e: React.SyntheticEvent<HTMLVideoElement, Event>
+  ) => {
+    console.error("動画再生エラー:", e);
     // エラーが発生した場合も次に進む
     onMovieEnd();
   };
@@ -39,12 +41,11 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
         className={styles.movieVideo}
         onEnded={handleVideoEnd}
         onError={handleVideoError}
-        muted={true}
+        muted={false}
         playsInline
         preload="auto"
         autoPlay
-      >
-      </video>
+      ></video>
     </motion.div>
   );
 };
