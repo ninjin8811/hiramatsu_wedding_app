@@ -41,13 +41,13 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     startAnimation,
     moviePlaybackState,
     playNextMovie,
-    currentItemEvent,
+    currentGroupedEvent,
   } = useRankingAnimation({ users, itemEvents });
 
   const isKillerAnimating =
     animationCompleted &&
     isGlobalAnimating &&
-    currentItemEvent?.effect.effectType === "copy_rank_score";
+    currentGroupedEvent?.effect.effectType === "copy_rank_score";
 
   /**
    * アニメーション自動開始（2秒後）
@@ -187,7 +187,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     index={index}
                     isGlobalAnimating={isGlobalAnimating}
                     isKillerAnimating={isKillerAnimating}
-                    currentItemEvent={currentItemEvent}
+                    currentItemEvent={currentGroupedEvent?.groupedEvents[0]}
                   />
                 ))}
             </AnimatePresence>
@@ -216,24 +216,29 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
 
       {/* 動画プレイヤー */}
       <AnimatePresence>
-        {currentMovie &&
+        {currentGroupedEvent &&
           (() => {
-            // アイテムを使用したユーザーの情報を取得
-            const itemUser = animatedUsers.find(
-              (user) => user.userId === currentMovie.userId
-            );
-            const itemUserNames = itemUser?.teamName ? [itemUser.teamName] : [];
+            // グループ化されたアイテムイベントから複数のユーザー情報を取得
+            const itemUserNames = currentGroupedEvent.userIds
+              .map((userId: string) => {
+                const user = animatedUsers.find((u) => u.userId === userId);
+                return user?.teamName;
+              })
+              .filter(Boolean) as string[];
+
+            // グループ化されたイベントから最初のイベントをitemEventとして渡す
+            const firstEvent = currentGroupedEvent.groupedEvents[0];
 
             return (
               <MoviePlayer
-                key={currentMovie.userId}
-                movieUrl={currentMovie.itemMovie}
+                key={currentGroupedEvent.itemName}
+                movieUrl={currentGroupedEvent.itemMovie}
                 isVisible={
                   moviePlaybackState.isPlayingMovies && !isGlobalAnimating
                 }
                 onMovieEnd={playNextMovie}
                 itemUserNames={itemUserNames}
-                itemEvent={currentMovie}
+                itemEvent={firstEvent}
               />
             );
           })()}
