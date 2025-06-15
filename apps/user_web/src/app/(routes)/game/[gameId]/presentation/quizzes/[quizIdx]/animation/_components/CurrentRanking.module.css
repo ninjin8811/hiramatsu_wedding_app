@@ -39,7 +39,8 @@
 }
 
 @keyframes cartBounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -71,7 +72,8 @@
 }
 
 @keyframes beingOvertakenShake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0) scale(1);
     filter: brightness(1);
   }
@@ -90,7 +92,8 @@
 }
 
 @keyframes overtakingScoreGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: none;
     transform: scale(1);
   }
@@ -134,7 +137,8 @@
 }
 
 @keyframes cartVibration {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
   25% {
@@ -149,7 +153,8 @@
 }
 
 @keyframes tireBlur {
-  0%, 100% {
+  0%,
+  100% {
     filter: blur(0px);
   }
   50% {
@@ -159,7 +164,8 @@
 
 /* 🚀 昇格アニメーションエフェクト */
 @keyframes promotionGlow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.5;
     transform: scale(1);
   }
@@ -185,7 +191,8 @@
 }
 
 @keyframes promotionCartGlow {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1) drop-shadow(0 0 0 transparent);
   }
   50% {
@@ -194,7 +201,8 @@
 }
 
 @keyframes promotionScorePulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: none;
   }
@@ -206,7 +214,8 @@
 
 /* 📉 降格アニメーションエフェクト */
 @keyframes demotionShadow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1.5);
   }
@@ -232,7 +241,8 @@
 }
 
 @keyframes demotionCartDim {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1) drop-shadow(0 0 0 transparent);
   }
   50% {
@@ -241,7 +251,8 @@
 }
 
 @keyframes demotionScoreFade {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: none;
   }
@@ -252,7 +263,7 @@
 }
 
 .bg {
-  background-image: url('/images/bg-white.png');
+  background-image: url("/images/bg-white.png");
   background-repeat: repeat; /* 背景画像を繰り返す */
   background-position: center;
   height: 100vh;
@@ -282,7 +293,12 @@
   position: absolute;
   width: 15vw;
   height: 0.3vh;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
   border-radius: 2px;
   animation: speedLineMove 0.6s linear infinite;
 }
@@ -296,13 +312,13 @@
 }
 
 .header::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 100%;
   width: 100%;
   height: 100%;
-  background-image: url('/images/stage.png');
+  background-image: url("/images/stage.png");
   background-size: cover;
   background-position: bottom center;
   animation: scrollImage 14s linear infinite;
@@ -344,7 +360,7 @@
 .lanesContainer {
   display: flex;
   flex-direction: column;
-  background: linear-gradient(to bottom, #818FA0, #5F738A);
+  background: linear-gradient(to bottom, #818fa0, #5f738a);
   padding-right: 0.5vw;
   width: 100%;
   flex-grow: 1; /* rankingArea内の残りのスペースを占める */
@@ -362,8 +378,8 @@
   flex-basis: 0;
   background-image: repeating-linear-gradient(
     to right,
-    #C7D0DA,
-    #C7D0DA 1vw,
+    #c7d0da,
+    #c7d0da 1vw,
     transparent 1vw,
     transparent 2vw
   );
@@ -478,23 +494,75 @@
   width: 1.2vw;
   height: 1.2vw;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(60, 60, 60, 0.8), rgba(0, 0, 0, 0.6));
+  background: radial-gradient(
+    circle,
+    rgba(60, 60, 60, 0.8),
+    rgba(0, 0, 0, 0.6)
+  );
   filter: blur(2px);
 }
 
-.exhaustParticle:nth-child(1) { left: 10%; top: 20%; }
-.exhaustParticle:nth-child(2) { left: 20%; top: 60%; }
-.exhaustParticle:nth-child(3) { left: 0%; top: 40%; }
-.exhaustParticle:nth-child(4) { left: 30%; top: 10%; }
-.exhaustParticle:nth-child(5) { left: 15%; top: 70%; }
-.exhaustParticle:nth-child(6) { left: 5%; top: 80%; }
-.exhaustParticle:nth-child(7) { left: 25%; top: 30%; }
-.exhaustParticle:nth-child(8) { left: 35%; top: 50%; }
+.exhaustParticle:nth-child(1) {
+  left: 10%;
+  top: 20%;
+}
+.exhaustParticle:nth-child(2) {
+  left: 20%;
+  top: 60%;
+}
+.exhaustParticle:nth-child(3) {
+  left: 0%;
+  top: 40%;
+}
+.exhaustParticle:nth-child(4) {
+  left: 30%;
+  top: 10%;
+}
+.exhaustParticle:nth-child(5) {
+  left: 15%;
+  top: 70%;
+}
+.exhaustParticle:nth-child(6) {
+  left: 5%;
+  top: 80%;
+}
+.exhaustParticle:nth-child(7) {
+  left: 25%;
+  top: 30%;
+}
+.exhaustParticle:nth-child(8) {
+  left: 35%;
+  top: 50%;
+}
 
 .cartWithScore {
   display: flex;
   align-items: center;
   white-space: nowrap;
+}
+
+.cartContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.userThumbnailContainer {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  z-index: 1;
+  transform: translate(4.2%, 24%);
+  border-radius: 50%;
+  overflow: hidden;
+  height: 10.2vh;
+  aspect-ratio: 1/1;
+}
+
+.userThumbnail {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .cartImage {
@@ -503,12 +571,13 @@
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
-  z-index: 1;
+  z-index: 2;
   transition: filter 0.3s ease;
 }
 
 .cartMoving {
-  animation: cartVibration 0.1s ease-in-out infinite, tireBlur 0.2s ease-in-out infinite;
+  animation: cartVibration 0.1s ease-in-out infinite,
+    tireBlur 0.2s ease-in-out infinite;
   filter: brightness(1.1);
 }
 
@@ -550,8 +619,8 @@
   flex-basis: 0;
   background-image: repeating-linear-gradient(
     to right,
-    #C7D0DA,
-    #C7D0DA 1vw,
+    #c7d0da,
+    #c7d0da 1vw,
     transparent 1vw,
     transparent 2vw
   );
@@ -608,7 +677,10 @@
 .bottomRankingArea {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(8vw, 1fr)); /* 自動調整で16チーム対応 */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(8vw, 1fr)
+  ); /* 自動調整で16チーム対応 */
   gap: 0.5vw; /* アイテム間にスペース */
   height: 14vh;
   flex-shrink: 0;
@@ -654,6 +726,8 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  position: relative;
+  z-index: 2;
   transition: filter 0.3s ease;
 }
 
@@ -707,7 +781,11 @@
   transform: translate(-50%, -50%);
   width: 20vw;
   height: 20vw;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.6) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   animation: promotionGlow 2s ease-in-out infinite;
 }
@@ -718,7 +796,12 @@
   left: 50%;
   transform: translateX(-50%);
   width: 2vw;
-  background: linear-gradient(to bottom, rgba(255, 215, 0, 0.8), rgba(255, 165, 0, 0.6), transparent);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 215, 0, 0.8),
+    rgba(255, 165, 0, 0.6),
+    transparent
+  );
   border-radius: 1vw;
   animation: promotionTrail 3.6s ease-out;
 }
@@ -763,7 +846,12 @@
   left: 50%;
   transform: translateX(-50%);
   width: 1.5vw;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(60, 60, 60, 0.4), transparent);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.6),
+    rgba(60, 60, 60, 0.4),
+    transparent
+  );
   border-radius: 0.75vw;
   animation: demotionTrail 3.6s ease-in;
 }
@@ -778,7 +866,8 @@
 
 /* 🔺 順位上昇アニメーション（上位6位内） */
 @keyframes rankUpBounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) scale(1);
   }
   30% {
@@ -790,7 +879,8 @@
 }
 
 @keyframes rankUpGlow {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1) drop-shadow(0 0 0 transparent);
   }
   50% {
@@ -799,7 +889,8 @@
 }
 
 @keyframes rankUpScorePop {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: none;
   }
@@ -814,7 +905,8 @@
 }
 
 .cartRankUp {
-  animation: rankUpBounce 2.4s ease-out forwards, rankUpGlow 2.0s ease-out forwards;
+  animation: rankUpBounce 2.4s ease-out forwards,
+    rankUpGlow 2s ease-out forwards;
 }
 
 .rankUpScore {
@@ -824,7 +916,8 @@
 
 /* 🔻 順位下降アニメーション（上位6位内） */
 @keyframes rankDownSink {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) scale(1);
   }
   40% {
@@ -836,7 +929,8 @@
 }
 
 @keyframes rankDownDim {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1) saturate(1);
   }
   50% {
@@ -845,7 +939,8 @@
 }
 
 @keyframes rankDownScoreShrink {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: none;
   }
@@ -860,10 +955,37 @@
 }
 
 .cartRankDown {
-  animation: rankDownSink 3.0s ease-in forwards, rankDownDim 2.4s ease-in forwards;
+  animation: rankDownSink 3s ease-in forwards, rankDownDim 2.4s ease-in forwards;
 }
 
 .rankDownScore {
-  animation: rankDownScoreShrink 2.0s ease-in forwards;
+  animation: rankDownScoreShrink 2s ease-in forwards;
   border: 0.2vw solid #ff6464;
+}
+
+/* 下部ランキングエリア用のカートコンテナとサムネイル */
+.bottomCartContainer {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+.bottomUserThumbnailContainer {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  z-index: 1;
+  transform: translate(3%, 36.5%);
+  border-radius: 50%;
+  overflow: hidden;
+  height: 6.3vh;
+  aspect-ratio: 1/1;
+}
+
+.bottomUserThumbnail {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
 }

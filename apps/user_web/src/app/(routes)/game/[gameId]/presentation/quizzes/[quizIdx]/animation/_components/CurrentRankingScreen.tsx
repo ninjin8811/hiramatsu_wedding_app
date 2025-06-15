@@ -1,19 +1,27 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import styles from './CurrentRanking.module.css';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { navigateToNextStep } from '../actions';
-import { User, ItemEvent } from './types';
-import { ExhaustParticles, DarkSmokeParticles, TireTrail, SpeedLines } from './RankingEffects';
-import { getXPosition, getLaneYPosition, getAnimationSettings } from './animationUtils';
-import { useRankingAnimation } from './useRankingAnimation';
-import { MoviePlayer } from './MoviePlayer';
+import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import styles from "./CurrentRanking.module.css";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { navigateToNextStep } from "../actions";
+import { User, ItemEvent } from "./types";
+import {
+  ExhaustParticles,
+  DarkSmokeParticles,
+  TireTrail,
+  SpeedLines,
+} from "./RankingEffects";
+import {
+  getXPosition,
+  getLaneYPosition,
+  getAnimationSettings,
+} from "./animationUtils";
+import { useRankingAnimation } from "./useRankingAnimation";
+import { MoviePlayer } from "./MoviePlayer";
 
-// User型を再エクスポート（下位互換性のため）
-export type { User } from './types';
+export type { User } from "./types";
 
 /** コンポーネントのProps */
 interface CurrentRankingScreenProps {
@@ -40,7 +48,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     animatedUsers,
     startAnimation,
     moviePlaybackState,
-    playNextMovie
+    playNextMovie,
   } = useRankingAnimation({ users, itemEvents });
 
   /**
@@ -55,46 +63,62 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
 
       return () => clearTimeout(timer);
     }
-  }, [startAnimation, animationCompleted, isGlobalAnimating, setIsGlobalAnimating]);
+  }, [
+    startAnimation,
+    animationCompleted,
+    isGlobalAnimating,
+    setIsGlobalAnimating,
+  ]);
 
   /**
    * キーボードナビゲーション
    */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') {
+      if (event.key === "ArrowLeft") {
         if (window.confirm("前の画面へ戻りますか?")) {
           router.back();
         }
-      } else if (event.key === 'ArrowRight' || event.key === 'Enter') {
+      } else if (event.key === "ArrowRight" || event.key === "Enter") {
         // 動画再生中の場合はスキップ
         if (moviePlaybackState.isPlayingMovies) {
           playNextMovie();
         } else if (moviePlaybackState.allMoviesCompleted) {
           // 現在のスコア情報を抽出してナビゲート
-          const usersScores = animatedUsers.map(user => ({
+          const usersScores = animatedUsers.map((user) => ({
             userId: user.userId,
-            score: user.currentScore
+            score: user.currentScore,
           }));
           navigateToNextStep(gameId, currentQuizIdx, usersScores);
         }
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameId, currentQuizIdx, router, moviePlaybackState, playNextMovie, animatedUsers]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    gameId,
+    currentQuizIdx,
+    router,
+    moviePlaybackState,
+    playNextMovie,
+    animatedUsers,
+  ]);
 
   // animatedScoreベースで並び順を決定（prev→currentへの変化をアニメーションで表現）
-  const sortedUsers = animatedUsers.toSorted((a, b) => b.animatedScore - a.animatedScore);
+  const sortedUsers = animatedUsers.toSorted(
+    (a, b) => b.animatedScore - a.animatedScore
+  );
 
   // 7位以降の判定
   const otherUsers = sortedUsers.filter((user, index) => index >= 6);
 
   // 現在再生中の動画
-  const currentMovie = moviePlaybackState.isPlayingMovies && itemEvents[moviePlaybackState.currentMovieIndex]
-    ? itemEvents[moviePlaybackState.currentMovieIndex]
-    : null;
+  const currentMovie =
+    moviePlaybackState.isPlayingMovies &&
+    itemEvents[moviePlaybackState.currentMovieIndex]
+      ? itemEvents[moviePlaybackState.currentMovieIndex]
+      : null;
 
   return (
     <main className={styles.bg}>
@@ -118,7 +142,12 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
         <div className={styles.lanesContainer}>
           {/* 🛣️ レーン背景（6レーン） */}
           {Array.from({ length: 6 }, (_, laneIndex) => (
-            <div key={`lane-bg-${laneIndex}`} className={`${styles.laneBackground} ${laneIndex === 5 ? styles.lastLane : ''}`}>
+            <div
+              key={`lane-bg-${laneIndex}`}
+              className={`${styles.laneBackground} ${
+                laneIndex === 5 ? styles.lastLane : ""
+              }`}
+            >
               <div className={styles.laneNumber}>
                 <Image
                   src={`/images/lane/lane_${laneIndex + 1}.png`}
@@ -148,87 +177,147 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
             <AnimatePresence>
               {/* 上位6位または降格アニメーション中のユーザーを表示 */}
               {sortedUsers
-                .filter((user, index) =>
-                  // 上位6位または降格アニメーション中
-                  index < 6 || (user.isDemotionToBottom && user.isAnimating)
+                .filter(
+                  (user, index) =>
+                    // 上位6位または降格アニメーション中
+                    index < 6 || (user.isDemotionToBottom && user.isAnimating)
                 )
                 .map((user, index) => {
-                const xPosition = getXPosition(user.animatedScore);
-                // currentScoreベースでのレーン位置を計算
-                const laneIndex = Math.min(index, 5);
+                  const xPosition = getXPosition(user.animatedScore);
+                  // currentScoreベースでのレーン位置を計算
+                  const laneIndex = Math.min(index, 5);
 
-                const animationSettings = getAnimationSettings(user);
+                  const animationSettings = getAnimationSettings(user);
 
-                return (
-                  <motion.div
-                    key={user.userId}
-                    className={`${styles.animatedCart} ${user.isPromotionFromBottom ? styles.promotionCart : ''} ${user.isDemotionToBottom ? styles.demotionCart : ''} ${user.isRankUp ? styles.rankUpCart : ''} ${user.isRankDown ? styles.rankDownCart : ''}`}
-                    initial={animationSettings.initial}
-                    animate={{
-                      marginLeft: `${xPosition}%`,
-                      top: `${getLaneYPosition(laneIndex) - 4}%`,
-                      ...animationSettings.animate
-                    }}
-                    transition={{
-                      marginLeft: { duration: user.isAnimating ? 3.0 : 0, ease: "easeOut" },
-                      top: { duration: user.isAnimating ? 2.4 : 0, ease: "easeOut" },
-                      ...animationSettings.transition
-                    }}
-                  >
-                    {/* 💨 パーティクルエフェクト（通常・上昇・下降・降格用） */}
-                    <div style={{position:"relative"}}>
-                    {user.isDemotionToBottom || user.isRankDown ? (
-                      <DarkSmokeParticles isActive={user.isAnimating} />
-                    ) : (
-                      <ExhaustParticles
-                        isActive={user.isAnimating}
-                        color={user.characterColor}
-                      />
-                    )}
-                    </div>
-
-                    {/* 昇格エフェクト */}
-                    {user.isPromotionFromBottom && user.isAnimating && (
-                      <div className={styles.promotionEffect}>
-                        <div className={styles.promotionGlow}></div>
-                        <div className={styles.promotionTrail}></div>
+                  return (
+                    <motion.div
+                      key={user.userId}
+                      className={`${styles.animatedCart} ${
+                        user.isPromotionFromBottom ? styles.promotionCart : ""
+                      } ${user.isDemotionToBottom ? styles.demotionCart : ""} ${
+                        user.isRankUp ? styles.rankUpCart : ""
+                      } ${user.isRankDown ? styles.rankDownCart : ""}`}
+                      initial={animationSettings.initial}
+                      animate={{
+                        marginLeft: `${xPosition}%`,
+                        top: `${getLaneYPosition(laneIndex) - 4}%`,
+                        ...animationSettings.animate,
+                      }}
+                      transition={{
+                        marginLeft: {
+                          duration: user.isAnimating ? 3.0 : 0,
+                          ease: "easeOut",
+                        },
+                        top: {
+                          duration: user.isAnimating ? 2.4 : 0,
+                          ease: "easeOut",
+                        },
+                        ...animationSettings.transition,
+                      }}
+                    >
+                      {/* 💨 パーティクルエフェクト（通常・上昇・下降・降格用） */}
+                      <div style={{ position: "relative" }}>
+                        {user.isDemotionToBottom || user.isRankDown ? (
+                          <DarkSmokeParticles isActive={user.isAnimating} />
+                        ) : (
+                          <ExhaustParticles
+                            isActive={user.isAnimating}
+                            color={user.characterColor}
+                          />
+                        )}
                       </div>
-                    )}
 
-                    {/* 降格エフェクト */}
-                    {user.isDemotionToBottom && user.isAnimating && (
-                      <div className={styles.demotionEffect}>
-                        <div className={styles.demotionShadow}></div>
-                        <div className={styles.demotionTrail}></div>
+                      {/* 昇格エフェクト */}
+                      {user.isPromotionFromBottom && user.isAnimating && (
+                        <div className={styles.promotionEffect}>
+                          <div className={styles.promotionGlow}></div>
+                          <div className={styles.promotionTrail}></div>
+                        </div>
+                      )}
+
+                      {/* 降格エフェクト */}
+                      {user.isDemotionToBottom && user.isAnimating && (
+                        <div className={styles.demotionEffect}>
+                          <div className={styles.demotionShadow}></div>
+                          <div className={styles.demotionTrail}></div>
+                        </div>
+                      )}
+
+                      {/* カート画像とスコア吹き出し */}
+                      <div className={styles.cartWithScore}>
+                        <div className={styles.cartContainer}>
+                          <Image
+                            src={user.cartImage}
+                            alt={`${index + 1}位`}
+                            width={180}
+                            height={100}
+                            className={`${styles.cartImage} ${
+                              user.isAnimating ? styles.cartMoving : ""
+                            } ${
+                              user.isPromotionFromBottom
+                                ? styles.cartPromotion
+                                : ""
+                            } ${
+                              user.isDemotionToBottom ? styles.cartDemotion : ""
+                            } ${user.isRankUp ? styles.cartRankUp : ""} ${
+                              user.isRankDown ? styles.cartRankDown : ""
+                            }`}
+                          />
+                          <div className={styles.userThumbnailContainer}>
+                            <Image
+                              src={
+                                user.currentScore < user.prevScore ||
+                                user.isRankDown ||
+                                user.isDemotionToBottom
+                                  ? user.sadThumbnail
+                                  : user.thumbnail
+                              }
+                              alt={user.teamName}
+                              width={150}
+                              height={150}
+                              className={styles.userThumbnail}
+                            />
+                          </div>
+                        </div>
+                        <motion.div
+                          className={`${styles.scoreBubble} ${
+                            user.isAnimating ? styles.animatingScore : ""
+                          } ${
+                            user.isPromotionFromBottom
+                              ? styles.promotionScore
+                              : ""
+                          } ${
+                            user.isDemotionToBottom ? styles.demotionScore : ""
+                          } ${user.isRankUp ? styles.rankUpScore : ""} ${
+                            user.isRankDown ? styles.rankDownScore : ""
+                          }`}
+                          style={{
+                            backgroundColor: `rgba(${parseInt(
+                              user.characterColor.slice(1, 3),
+                              16
+                            )}, ${parseInt(
+                              user.characterColor.slice(3, 5),
+                              16
+                            )}, ${parseInt(
+                              user.characterColor.slice(5, 7),
+                              16
+                            )}, 0.8)`,
+                          }}
+                          animate={{
+                            scale: user.isAnimating ? 1.1 : 1,
+                          }}
+                          transition={{
+                            duration: user.isAnimating ? 0.6 : 0,
+                            ease: "easeOut",
+                          }}
+                        >
+                          {user.animatedScore}
+                          <span>pt</span>
+                        </motion.div>
                       </div>
-                    )}
-
-                    {/* カート画像とスコア吹き出し */}
-                    <div className={styles.cartWithScore}>
-                      <Image
-                        src={user.characterImage}
-                        alt={`${index + 1}位`}
-                        width={180}
-                        height={100}
-                        className={`${styles.cartImage} ${user.isAnimating ? styles.cartMoving : ''} ${user.isPromotionFromBottom ? styles.cartPromotion : ''} ${user.isDemotionToBottom ? styles.cartDemotion : ''} ${user.isRankUp ? styles.cartRankUp : ''} ${user.isRankDown ? styles.cartRankDown : ''}`}
-                      />
-                      <motion.div
-                        className={`${styles.scoreBubble} ${user.isAnimating ? styles.animatingScore : ''} ${user.isPromotionFromBottom ? styles.promotionScore : ''} ${user.isDemotionToBottom ? styles.demotionScore : ''} ${user.isRankUp ? styles.rankUpScore : ''} ${user.isRankDown ? styles.rankDownScore : ''}`}
-                        style={{
-                          backgroundColor: `rgba(${parseInt(user.characterColor.slice(1, 3), 16)}, ${parseInt(user.characterColor.slice(3, 5), 16)}, ${parseInt(user.characterColor.slice(5, 7), 16)}, 0.8)`
-                        }}
-                        animate={{
-                          scale: user.isAnimating ? 1.1 : 1
-                        }}
-                        transition={{ duration: user.isAnimating ? 0.6 : 0, ease: "easeOut" }}
-                      >
-                        {user.animatedScore}
-                        <span>pt</span>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                );
-              })}
+                    </motion.div>
+                  );
+                })}
             </AnimatePresence>
           </div>
         </div>
@@ -249,7 +338,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{
-                  opacity: { duration: 0.3 }
+                  opacity: { duration: 0.3 },
                 }}
               >
                 <div className={styles.bottomRankNumber}>
@@ -258,17 +347,36 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     alt={`Rank ${displayRankNumber}`}
                     width={39}
                     height={47}
-                    />
+                  />
                 </div>
 
                 <div className={styles.bottomCartImageContainer}>
-                  <Image
-                    src={user.characterImage}
-                    alt={`${displayRankNumber}位`}
-                    width={130}
-                    height={139}
-                    className={`${styles.bottomCartImage} ${user.isAnimating ? styles.cartMoving : ''}`}
-                  />
+                  <div className={styles.bottomCartContainer}>
+                    <Image
+                      src={user.cartImage}
+                      alt={`${displayRankNumber}位`}
+                      width={130}
+                      height={139}
+                      className={`${styles.bottomCartImage} ${
+                        user.isAnimating ? styles.cartMoving : ""
+                      }`}
+                    />
+                    <div className={styles.bottomUserThumbnailContainer}>
+                      <Image
+                        src={
+                          user.currentScore < user.prevScore ||
+                          user.isRankDown ||
+                          user.isDemotionToBottom
+                            ? user.sadThumbnail
+                            : user.thumbnail
+                        }
+                        alt={user.teamName}
+                        width={30}
+                        height={30}
+                        className={styles.bottomUserThumbnail}
+                      />
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             );

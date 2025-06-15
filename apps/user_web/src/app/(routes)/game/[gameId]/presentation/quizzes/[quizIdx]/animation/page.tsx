@@ -78,7 +78,9 @@ export default async function CurrentRankingPage({ params }: Props) {
       userId: gameUser.id,
       teamName: gameUser.name,
       thumbnail: gameUser.thumbnail,
-      characterImage: `/images/carts/cart_${index + 1}.png`,
+      smileThumbnail: gameUser.smileThumbnail,
+      sadThumbnail: gameUser.sadThumbnail,
+      cartImage: `/images/carts/cart_${index + 1}.png`,
       characterColor:
         characterColors.get(index % characterColors.size) || "#FFFFFF",
       prevScore: prevScore,

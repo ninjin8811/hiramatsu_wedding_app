@@ -5,7 +5,9 @@ export interface User {
   userId: string;
   teamName: string;
   thumbnail: string;
-  characterImage: string;
+  smileThumbnail: string;
+  sadThumbnail: string;
+  cartImage: string;
   characterColor: string;
   prevScore: number;
   currentScore: number;
