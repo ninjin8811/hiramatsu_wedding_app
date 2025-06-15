@@ -549,3 +549,24 @@
   border-radius: 50%;
   object-fit: cover;
 }
+
+/* チーム名表示 */
+.teamName {
+  margin-left: 1.5vw;
+  font-size: 2.5vw;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  z-index: 15;
+  max-width: 15vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+/* 左側に表示するチーム名 */
+.teamNameLeft {
+  margin-left: 0;
+  margin-right: 1.5vw;
+  order: -1; /* flexboxで左側に配置 */
+}
