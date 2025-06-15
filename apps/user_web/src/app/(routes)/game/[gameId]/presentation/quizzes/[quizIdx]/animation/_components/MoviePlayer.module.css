@@ -21,3 +21,36 @@
   object-position: center;
   background-color: transparent;
 }
+
+/* 再生状態の情報表示（デバッグ用） */
+.playbackInfo {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.3);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-family: monospace;
+  font-size: 0.75rem;
+  z-index: 1001;
+}
+
+.playbackInfo p {
+  margin: 0.25rem 0;
+}
+
+.playbackInfo button {
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.4);
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.playbackInfo button:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
