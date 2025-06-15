@@ -89,6 +89,10 @@ export const GameSchema = z.object({
   status: z
     .enum(["created", "inProgress", "completed"])
     .describe("ゲームステータス"),
+  finalRankingStatus: z
+    .string()
+    .optional()
+    .describe("最終ランキング発表ステータス（順位発表の進行状況）"),
   answerTime: z
     .number()
     .int()

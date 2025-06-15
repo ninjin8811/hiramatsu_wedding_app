@@ -34,9 +34,9 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // useRankingAnimationフックにteamsを渡す
+  // useRankingAnimationフックにteamsとgameIdを渡す
   const { rankingColumns, showConfetti, currentTopThreeIndex } =
-    useRankingAnimation(teams);
+    useRankingAnimation(teams, gameId);
 
   useEffect(() => {
     const fetchTeams = async () => {
