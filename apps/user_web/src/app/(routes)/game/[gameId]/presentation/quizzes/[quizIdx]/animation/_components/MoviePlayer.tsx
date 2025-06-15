@@ -3,14 +3,11 @@
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
 import styles from "./MoviePlayer.module.css";
-import RankingCart from "./RankingCart";
-import { AnimatedUser } from "./types";
 
 interface MoviePlayerProps {
   movieUrl: string;
   isVisible: boolean;
   onMovieEnd: () => void;
-  itemUser?: AnimatedUser;
   itemUserName?: string;
 }
 
@@ -18,7 +15,6 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
   movieUrl,
   isVisible,
   onMovieEnd,
-  itemUser,
   itemUserName,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -74,11 +70,8 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
       ></video>
 
       {/* アイテム使用者の情報表示（左上） */}
-      {itemUser && itemUserName && (
+      {itemUserName && (
         <div className={styles.itemUserInfo}>
-          <div className={styles.itemUserCart}>
-            <RankingCart user={itemUser} index={0} isGlobalAnimating={false} />
-          </div>
           <div className={styles.itemUserName}>{itemUserName}</div>
         </div>
       )}
