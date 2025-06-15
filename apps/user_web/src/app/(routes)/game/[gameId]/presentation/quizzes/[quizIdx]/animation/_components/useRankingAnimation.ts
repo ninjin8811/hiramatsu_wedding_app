@@ -179,7 +179,7 @@ export const useRankingAnimation = ({
    * エフェクト実行後のランキングアニメーションを開始
    */
   const startEffectAnimation = useCallback(
-    async (updatedUsers: AnimatedUser[], onComplete?: () => void) => {
+    async (updatedUsers: AnimatedUser[], onComplete: () => void) => {
       console.log("🎬 Starting effect animation...");
 
       setIsGlobalAnimating(true);
@@ -209,6 +209,7 @@ export const useRankingAnimation = ({
       if (allAnimationUsers.length === 0) {
         console.log("🚫 No score or rank changes detected, skipping animation");
         setIsGlobalAnimating(false);
+        onComplete();
         return;
       }
 
@@ -398,9 +399,7 @@ export const useRankingAnimation = ({
       setIsGlobalAnimating(false);
 
       // アニメーション完了後のコールバックを実行
-      if (onComplete) {
-        onComplete();
-      }
+      onComplete();
     },
     [animatedUsers, getRankByScore]
   );

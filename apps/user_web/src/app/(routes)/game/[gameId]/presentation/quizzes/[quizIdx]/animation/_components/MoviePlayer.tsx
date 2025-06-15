@@ -41,7 +41,7 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
         className={styles.movieVideo}
         onEnded={handleVideoEnd}
         onError={handleVideoError}
-        muted={false}
+        muted={true}
         playsInline
         preload="auto"
         autoPlay

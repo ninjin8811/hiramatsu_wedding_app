@@ -98,12 +98,7 @@ export default async function CurrentRankingPage({ params }: Props) {
         itemImage: item.image,
         itemMovie: item.movie,
         isCorrectAnswer: answer.optionIndex === currentQuestion.correctIndex,
-        effect: {
-          targetType: "rank_position" as const,
-          targetValue: 1,
-          scoreChange: -50,
-          description: "1位のスコアを50pt減点",
-        },
+        effect: item.effect,
       };
     });
 
