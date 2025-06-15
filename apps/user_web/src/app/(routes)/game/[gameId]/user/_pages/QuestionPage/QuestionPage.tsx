@@ -53,7 +53,7 @@ export default function QuestionPage(props: Props) {
     } else {
       setSelectedItemId(null);
     }
-  }, [currentOwnAnswer, currentQuestionIndex]);
+  }, [currentOwnAnswer]);
 
   const correctRate = useCallback(() => {
     if (
@@ -153,7 +153,7 @@ export default function QuestionPage(props: Props) {
                 onClick={() => {
                   if (showAnswer) return;
                   // if (selectedAnswerIndex) return;
-                  submitAnswer(index, selectedItemId || null);
+                  submitAnswer(index, selectedItemId ?? null);
                 }}
                 isSelected={selectedAnswerIndex === index}
               />

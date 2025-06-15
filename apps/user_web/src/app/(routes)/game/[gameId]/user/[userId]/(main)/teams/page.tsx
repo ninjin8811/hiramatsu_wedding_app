@@ -17,9 +17,6 @@ type Props = {
 export default async function UserPage(props: Props) {
   const { gameId, userId } = await props.params;
   const game = await getGame(gameId);
-  // const currentPath = UserTeamsPath(gameId, userId);
-  // const redirectPath = redirectPathByStatus(game, userId, currentPath);
-  // if (redirectPath) return redirect(redirectPath);
 
   const teams = game.users ?? [];
   return (
