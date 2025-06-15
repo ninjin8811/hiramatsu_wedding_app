@@ -53,6 +53,9 @@ const RankingCart: React.FC<RankingCartProps> = ({
   const laneIndex = Math.min(index, 5);
   const animationSettings = getAnimationSettings(user);
 
+  // チーム名の表示位置を決定（右端から見切れる場合は左側に表示）
+  const shouldShowTeamNameOnLeft = xPosition > 70; // 70%を超えたら左側に表示
+
   return (
     <motion.div
       key={user.userId}
@@ -109,6 +112,18 @@ const RankingCart: React.FC<RankingCartProps> = ({
 
       {/* カート画像とスコア吹き出し */}
       <div className={styles.cartWithScore}>
+        {/* チーム名表示（左側） */}
+        {shouldShowTeamNameOnLeft && (
+          <div
+            className={`${styles.teamName} ${styles.teamNameLeft}`}
+            style={{
+              color: user.characterColor,
+            }}
+          >
+            {user.teamName}
+          </div>
+        )}
+
         <div className={styles.cartContainer}>
           {isKillerAnimating && user.userId === currentItemEvent?.userId ? (
             <video
@@ -197,6 +212,18 @@ const RankingCart: React.FC<RankingCartProps> = ({
           {user.animatedScore}
           <span>pt</span>
         </motion.div>
+
+        {/* チーム名表示（右側） */}
+        {!shouldShowTeamNameOnLeft && (
+          <div
+            className={styles.teamName}
+            style={{
+              color: user.characterColor,
+            }}
+          >
+            {user.teamName}
+          </div>
+        )}
       </div>
     </motion.div>
   );
