@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import styles from "./CurrentRanking.module.css";
 import Image from "next/image";
@@ -53,6 +53,23 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   const kinokoUserIds = itemEvents
     .filter((event) => event.itemId === "kinoko")
     .map((event) => event.userId);
+
+  // 再生完了したアイテムを追跡
+  const [playedItems, setPlayedItems] = useState<Set<string>>(new Set());
+
+  // kinokoの動画が再生完了したかチェック
+  const hasKinokoMoviePlayed = playedItems.has("kinoko");
+
+  // 動画再生完了後にのみ表示するkinokoユーザーのID
+  const playedKinokoUserIds = hasKinokoMoviePlayed ? kinokoUserIds : [];
+
+  // moviePlayerの動画終了を監視してplayedItemsを更新
+  const handleMovieEnd = () => {
+    if (currentGroupedEvent) {
+      setPlayedItems((prev) => new Set(prev).add(currentGroupedEvent.itemName));
+    }
+    playNextMovie();
+  };
 
   /**
    * アニメーション自動開始（2秒後）
@@ -193,7 +210,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     isGlobalAnimating={isGlobalAnimating}
                     isKillerAnimating={isKillerAnimating}
                     currentItemEvent={currentGroupedEvent?.groupedEvents[0]}
-                    kinokoUserIds={kinokoUserIds}
+                    kinokoUserIds={playedKinokoUserIds}
                   />
                 ))}
             </AnimatePresence>
@@ -214,7 +231,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 user={user}
                 displayRankNumber={displayRankNumber}
                 isGlobalAnimating={isGlobalAnimating}
-                kinokoUserIds={kinokoUserIds}
+                kinokoUserIds={playedKinokoUserIds}
               />
             );
           })}
@@ -243,7 +260,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 isVisible={
                   moviePlaybackState.isPlayingMovies && !isGlobalAnimating
                 }
-                onMovieEnd={playNextMovie}
+                onMovieEnd={handleMovieEnd}
                 itemUserNames={itemUserNames}
                 itemEvent={firstEvent}
               />
