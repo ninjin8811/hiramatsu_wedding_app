@@ -52,18 +52,18 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   } = useRankingAnimation({ users, itemEvents });
 
   const getThumbnail = (user: AnimatedUser): string => {
-    if (!user.isAnimating) {
+    if (!isGlobalAnimating) {
       return user.thumbnail;
     }
 
     if (
-      user.prevScore < user.currentScore ||
+      user.animatedScore <= user.currentScore ||
       user.isRankUp ||
       user.isPromotionFromBottom
     ) {
       return user.smileThumbnail;
     } else if (
-      user.prevScore > user.currentScore ||
+      user.animatedScore > user.currentScore ||
       user.isRankDown ||
       user.isDemotionToBottom
     ) {

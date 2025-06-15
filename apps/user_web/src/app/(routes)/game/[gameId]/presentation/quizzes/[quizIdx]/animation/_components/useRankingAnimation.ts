@@ -632,7 +632,7 @@ export const useRankingAnimation = ({
 
       // スコアカウントアップアニメーション
       await new Promise<void>((resolve) => {
-        const duration = 3000; // 倍に延長
+        const duration = 3000;
         const startTime = Date.now();
 
         const animate = () => {
@@ -686,19 +686,18 @@ export const useRankingAnimation = ({
         setTireTrails((prev) =>
           prev.filter((trail) => trail.userId !== userToAnimate.userId)
         );
-      }, 4000); // 倍に延長
+      }, 2000);
     });
 
     // 全てのアニメーションが完了するまで待機
     await Promise.all(animationPromises);
 
     // 全アニメーション完了
-    setIsGlobalAnimating(false);
-
     // アニメーション完了後に動画再生を開始
     setTimeout(() => {
+      setIsGlobalAnimating(false);
       startMoviePlayback();
-    }, 2000); // 1秒後に動画開始
+    }, 3000);
   }, [users, animationCompleted, startMoviePlayback, getRankByScore]);
 
   return {
