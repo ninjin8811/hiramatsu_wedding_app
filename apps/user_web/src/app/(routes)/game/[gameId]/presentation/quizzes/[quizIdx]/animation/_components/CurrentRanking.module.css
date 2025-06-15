@@ -720,6 +720,11 @@
 .bottomCartImageContainer {
   height: 100%;
   position: relative;
+
+  &.cartMoving {
+    animation: cartVibration 0.1s ease-in-out infinite;
+    filter: brightness(1.1);
+  }
 }
 
 .bottomCartImage {
@@ -729,11 +734,6 @@
   position: relative;
   z-index: 2;
   transition: filter 0.3s ease;
-}
-
-.bottomCartImage.cartMoving {
-  animation: cartVibration 0.1s ease-in-out infinite;
-  filter: brightness(1.1);
 }
 
 .bottomScoreBubble {
@@ -976,10 +976,10 @@
   top: 0%;
   left: 0%;
   z-index: 1;
-  transform: translate(3%, 36.5%);
+  transform: translate(3%, 38%);
   border-radius: 50%;
   overflow: hidden;
-  height: 6.3vh;
+  width: 76%; /* カートの高さに対する相対値に変更 */
   aspect-ratio: 1/1;
 }
 

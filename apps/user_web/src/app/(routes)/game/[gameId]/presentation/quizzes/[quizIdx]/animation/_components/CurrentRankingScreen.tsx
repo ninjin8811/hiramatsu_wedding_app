@@ -6,7 +6,7 @@ import styles from "./CurrentRanking.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { navigateToNextStep } from "../actions";
-import { User, ItemEvent } from "./types";
+import { User, ItemEvent, AnimatedUser } from "./types";
 import {
   ExhaustParticles,
   DarkSmokeParticles,
@@ -50,6 +50,27 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     moviePlaybackState,
     playNextMovie,
   } = useRankingAnimation({ users, itemEvents });
+
+  const getThumbnail = (user: AnimatedUser): string => {
+    if (!user.isAnimating) {
+      return user.thumbnail;
+    }
+
+    if (
+      user.prevScore < user.currentScore ||
+      user.isRankUp ||
+      user.isPromotionFromBottom
+    ) {
+      return user.smileThumbnail;
+    } else if (
+      user.prevScore > user.currentScore ||
+      user.isRankDown ||
+      user.isDemotionToBottom
+    ) {
+      return user.sadThumbnail;
+    }
+    return user.thumbnail;
+  };
 
   /**
    * アニメーション自動開始（2秒後）
@@ -265,13 +286,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                           />
                           <div className={styles.userThumbnailContainer}>
                             <Image
-                              src={
-                                user.currentScore < user.prevScore ||
-                                user.isRankDown ||
-                                user.isDemotionToBottom
-                                  ? user.sadThumbnail
-                                  : user.thumbnail
-                              }
+                              src={getThumbnail(user)}
                               alt={user.teamName}
                               width={150}
                               height={150}
@@ -351,25 +366,21 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 </div>
 
                 <div className={styles.bottomCartImageContainer}>
-                  <div className={styles.bottomCartContainer}>
+                  <div
+                    className={`${styles.bottomCartContainer} ${
+                      user.isAnimating ? styles.cartMoving : ""
+                    }`}
+                  >
                     <Image
                       src={user.cartImage}
                       alt={`${displayRankNumber}位`}
                       width={130}
                       height={139}
-                      className={`${styles.bottomCartImage} ${
-                        user.isAnimating ? styles.cartMoving : ""
-                      }`}
+                      className={styles.bottomCartImage}
                     />
                     <div className={styles.bottomUserThumbnailContainer}>
                       <Image
-                        src={
-                          user.currentScore < user.prevScore ||
-                          user.isRankDown ||
-                          user.isDemotionToBottom
-                            ? user.sadThumbnail
-                            : user.thumbnail
-                        }
+                        src={getThumbnail(user)}
                         alt={user.teamName}
                         width={30}
                         height={30}
