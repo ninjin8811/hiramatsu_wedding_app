@@ -208,14 +208,27 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
 
       {/* 動画プレイヤー */}
       <AnimatePresence>
-        {currentMovie && (
-          <MoviePlayer
-            key={currentMovie.userId}
-            movieUrl={currentMovie.itemMovie}
-            isVisible={moviePlaybackState.isPlayingMovies && !isGlobalAnimating}
-            onMovieEnd={playNextMovie}
-          />
-        )}
+        {currentMovie &&
+          (() => {
+            // アイテムを使用したユーザーの情報を取得
+            const itemUser = animatedUsers.find(
+              (user) => user.userId === currentMovie.userId
+            );
+            const itemUserName = itemUser?.teamName;
+
+            return (
+              <MoviePlayer
+                key={currentMovie.userId}
+                movieUrl={currentMovie.itemMovie}
+                isVisible={
+                  moviePlaybackState.isPlayingMovies && !isGlobalAnimating
+                }
+                onMovieEnd={playNextMovie}
+                itemUser={itemUser}
+                itemUserName={itemUserName}
+              />
+            );
+          })()}
       </AnimatePresence>
     </main>
   );
