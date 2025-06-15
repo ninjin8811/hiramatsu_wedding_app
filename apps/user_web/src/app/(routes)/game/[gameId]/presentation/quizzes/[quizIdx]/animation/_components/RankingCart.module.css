@@ -257,7 +257,7 @@
   transform: translate(4.2%, 24%);
   border-radius: 50%;
   overflow: hidden;
-  height: 10.2vh;
+  height: 9vh;
   aspect-ratio: 1/1;
 }
 
@@ -270,7 +270,7 @@
 
 .cartImage {
   position: relative;
-  height: 15vh;
+  height: 13vh;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
@@ -285,13 +285,13 @@
 }
 
 .scoreBubble {
-  min-width: 10vw;
+  min-width: 9vw;
   margin-top: -2vh;
-  margin-left: -4.5vw; /* カートと重なるように密着 */
-  padding: 1.4vh 2vw 1.4vh 3.5vw;
+  margin-left: -4vw; /* カートと重なるように密着 */
+  padding: 1.2vh 1.8vw 1.2vh 3.2vw;
   border-radius: 0 15em 15em 0;
   color: white;
-  font-size: 2.6vw;
+  font-size: 2.2vw;
   font-weight: bold;
   text-align: center;
   z-index: 0;
@@ -301,7 +301,7 @@
 
 .scoreBubble span {
   padding-left: 0.25vw;
-  font-size: 2vw;
+  font-size: 1.8vw;
 }
 
 .animatingScore {
