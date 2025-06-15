@@ -28,6 +28,9 @@ export const useRankingAnimation = ({
     allMoviesCompleted: false,
   });
 
+  const currentItemEvent: ItemEvent | undefined =
+    itemEvents[moviePlaybackState.currentMovieIndex];
+
   /**
    * 初期表示用のアニメーションデータを作成
    * prevScoreを基準にした順位で初期配置
@@ -102,9 +105,9 @@ export const useRankingAnimation = ({
               targetUsers = [currentRanking[rankPosition]];
             }
             break;
-          case "specific_user":
+          case "item_used_user":
             const targetUser = currentUsers.find(
-              (u) => u.userId === effect.targetValue
+              (u) => u.userId === currentItemEvent?.userId
             );
             if (targetUser) {
               targetUsers = [targetUser];
@@ -172,7 +175,7 @@ export const useRankingAnimation = ({
         return user;
       });
     },
-    []
+    [currentItemEvent]
   );
 
   /**
@@ -709,5 +712,6 @@ export const useRankingAnimation = ({
     startAnimation,
     moviePlaybackState,
     playNextMovie,
+    currentItemEvent,
   };
 };

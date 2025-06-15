@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import styles from "./RankingCart.module.css";
-import { AnimatedUser } from "./types";
+import { AnimatedUser, ItemEvent } from "./types";
 import { ExhaustParticles, DarkSmokeParticles } from "./RankingEffects";
 import {
   getXPosition,
@@ -15,12 +15,16 @@ interface RankingCartProps {
   user: AnimatedUser;
   index: number;
   isGlobalAnimating: boolean;
+  isKillerAnimating: boolean;
+  currentItemEvent: ItemEvent | undefined;
 }
 
 const RankingCart: React.FC<RankingCartProps> = ({
   user,
   index,
   isGlobalAnimating,
+  isKillerAnimating,
+  currentItemEvent,
 }) => {
   const getThumbnail = (user: AnimatedUser): string => {
     if (!isGlobalAnimating) {
@@ -104,28 +108,48 @@ const RankingCart: React.FC<RankingCartProps> = ({
       {/* カート画像とスコア吹き出し */}
       <div className={styles.cartWithScore}>
         <div className={styles.cartContainer}>
-          <Image
-            src={user.cartImage}
-            alt={`${index + 1}位`}
-            width={180}
-            height={100}
-            className={`${styles.cartImage} ${
-              user.isAnimating ? styles.cartMoving : ""
-            } ${user.isPromotionFromBottom ? styles.cartPromotion : ""} ${
-              user.isDemotionToBottom ? styles.cartDemotion : ""
-            } ${user.isRankUp ? styles.cartRankUp : ""} ${
-              user.isRankDown ? styles.cartRankDown : ""
-            }`}
-          />
-          <div className={styles.userThumbnailContainer}>
-            <Image
-              src={getThumbnail(user)}
-              alt={user.teamName}
-              width={150}
-              height={150}
-              className={styles.userThumbnail}
+          {isKillerAnimating && user.userId === currentItemEvent?.userId ? (
+            <video
+              src="/images/carts/cart_killer.webm"
+              autoPlay
+              muted={false}
+              loop
+              width={280}
+              height={200}
+              className={`${styles.killerImage} ${
+                user.isAnimating ? styles.cartMoving : ""
+              } ${user.isPromotionFromBottom ? styles.cartPromotion : ""} ${
+                user.isDemotionToBottom ? styles.cartDemotion : ""
+              } ${user.isRankUp ? styles.cartRankUp : ""} ${
+                user.isRankDown ? styles.cartRankDown : ""
+              }`}
             />
-          </div>
+          ) : (
+            <>
+              <Image
+                src={user.cartImage}
+                alt={`${index + 1}位`}
+                width={180}
+                height={100}
+                className={`${styles.cartImage} ${
+                  user.isAnimating ? styles.cartMoving : ""
+                } ${user.isPromotionFromBottom ? styles.cartPromotion : ""} ${
+                  user.isDemotionToBottom ? styles.cartDemotion : ""
+                } ${user.isRankUp ? styles.cartRankUp : ""} ${
+                  user.isRankDown ? styles.cartRankDown : ""
+                }`}
+              />
+              <div className={styles.userThumbnailContainer}>
+                <Image
+                  src={getThumbnail(user)}
+                  alt={user.teamName}
+                  width={150}
+                  height={150}
+                  className={styles.userThumbnail}
+                />
+              </div>
+            </>
+          )}
         </div>
         <motion.div
           className={`${styles.scoreBubble} ${
@@ -134,6 +158,10 @@ const RankingCart: React.FC<RankingCartProps> = ({
             user.isDemotionToBottom ? styles.demotionScore : ""
           } ${user.isRankUp ? styles.rankUpScore : ""} ${
             user.isRankDown ? styles.rankDownScore : ""
+          } ${
+            isKillerAnimating && user.userId === currentItemEvent?.userId
+              ? styles.killerScore
+              : ""
           }`}
           style={{
             backgroundColor: `rgba(${parseInt(

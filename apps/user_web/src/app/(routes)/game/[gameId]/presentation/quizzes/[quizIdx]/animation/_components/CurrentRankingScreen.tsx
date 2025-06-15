@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import styles from "./CurrentRanking.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { navigateToNextStep } from "../actions";
-import { User, ItemEvent, AnimatedUser } from "./types";
+import { User, ItemEvent } from "./types";
 import { TireTrail, SpeedLines } from "./RankingEffects";
 import { useRankingAnimation } from "./useRankingAnimation";
 import { MoviePlayer } from "./MoviePlayer";
@@ -41,7 +41,13 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     startAnimation,
     moviePlaybackState,
     playNextMovie,
+    currentItemEvent,
   } = useRankingAnimation({ users, itemEvents });
+
+  const isKillerAnimating =
+    animationCompleted &&
+    isGlobalAnimating &&
+    currentItemEvent?.effect.effectType === "copy_rank_score";
 
   /**
    * アニメーション自動開始（2秒後）
@@ -180,6 +186,8 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     user={user}
                     index={index}
                     isGlobalAnimating={isGlobalAnimating}
+                    isKillerAnimating={isKillerAnimating}
+                    currentItemEvent={currentItemEvent}
                   />
                 ))}
             </AnimatePresence>
@@ -224,7 +232,6 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                   moviePlaybackState.isPlayingMovies && !isGlobalAnimating
                 }
                 onMovieEnd={playNextMovie}
-                itemUser={itemUser}
                 itemUserName={itemUserName}
               />
             );

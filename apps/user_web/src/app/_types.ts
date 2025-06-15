@@ -101,7 +101,7 @@ export const GameSchema = z.object({
 
 // アイテムエフェクトのターゲット指定方法
 export const EffectTargetTypeSchema = z
-  .enum(["rank_position", "specific_user", "all_users", "random_users"])
+  .enum(["rank_position", "item_used_user", "all_users", "random_users"])
   .describe("エフェクトのターゲット指定方法");
 
 // 単一のエフェクト定義

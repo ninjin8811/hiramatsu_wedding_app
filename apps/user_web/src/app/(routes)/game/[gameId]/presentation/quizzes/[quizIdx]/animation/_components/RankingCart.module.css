@@ -278,6 +278,16 @@
   transition: filter 0.3s ease;
 }
 
+.killerImage {
+  position: relative;
+  height: 25vh;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  z-index: 2;
+  transition: filter 0.3s ease;
+}
+
 .cartMoving {
   animation: cartVibration 0.1s ease-in-out infinite,
     tireBlur 0.2s ease-in-out infinite;
@@ -297,6 +307,10 @@
   z-index: 0;
   transition: all 0.3s ease;
   flex-shrink: 0;
+}
+
+.killerScore {
+  margin-left: 0;
 }
 
 .scoreBubble span {
