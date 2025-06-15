@@ -233,6 +233,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 }
                 onMovieEnd={playNextMovie}
                 itemUserName={itemUserName}
+                itemEvent={currentMovie}
               />
             );
           })()}

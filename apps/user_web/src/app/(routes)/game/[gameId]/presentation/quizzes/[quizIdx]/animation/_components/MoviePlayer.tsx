@@ -3,12 +3,14 @@
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
 import styles from "./MoviePlayer.module.css";
+import { ItemEvent } from "./types";
 
 interface MoviePlayerProps {
   movieUrl: string;
   isVisible: boolean;
   onMovieEnd: () => void;
   itemUserName?: string;
+  itemEvent?: ItemEvent;
 }
 
 export const MoviePlayer: React.FC<MoviePlayerProps> = ({
@@ -16,9 +18,16 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
   isVisible,
   onMovieEnd,
   itemUserName,
+  itemEvent,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // 動画サイズを変更する条件を判定
+  const shouldUseSpecialSize =
+    itemEvent &&
+    (itemEvent.itemName === "kinoko" ||
+      itemEvent.effect.effectType === "conditional_bonus");
 
   const handleVideoEnd = () => {
     onMovieEnd();
@@ -58,7 +67,9 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
       <video
         ref={videoRef}
         src={movieUrl}
-        className={styles.movieVideo}
+        className={
+          shouldUseSpecialSize ? styles.movieVideoSpecial : styles.movieVideo
+        }
         onEnded={handleVideoEnd}
         onError={handleVideoError}
         onPlay={handlePlay}
