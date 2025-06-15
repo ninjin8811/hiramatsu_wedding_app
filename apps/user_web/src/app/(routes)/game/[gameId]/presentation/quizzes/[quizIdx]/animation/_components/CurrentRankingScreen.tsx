@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import styles from "./CurrentRanking.module.css";
 import Image from "next/image";
@@ -41,13 +41,35 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     startAnimation,
     moviePlaybackState,
     playNextMovie,
-    currentItemEvent,
+    currentGroupedEvent,
   } = useRankingAnimation({ users, itemEvents });
 
   const isKillerAnimating =
     animationCompleted &&
     isGlobalAnimating &&
-    currentItemEvent?.effect.effectType === "copy_rank_score";
+    currentGroupedEvent?.effect.effectType === "copy_rank_score";
+
+  // kinokoアイテムを使ったユーザーのIDを取得
+  const kinokoUserIds = itemEvents
+    .filter((event) => event.itemId === "kinoko")
+    .map((event) => event.userId);
+
+  // 再生完了したアイテムを追跡
+  const [playedItems, setPlayedItems] = useState<Set<string>>(new Set());
+
+  // kinokoの動画が再生完了したかチェック
+  const hasKinokoMoviePlayed = playedItems.has("kinoko");
+
+  // 動画再生完了後にのみ表示するkinokoユーザーのID
+  const playedKinokoUserIds = hasKinokoMoviePlayed ? kinokoUserIds : [];
+
+  // moviePlayerの動画終了を監視してplayedItemsを更新
+  const handleMovieEnd = () => {
+    if (currentGroupedEvent) {
+      setPlayedItems((prev) => new Set(prev).add(currentGroupedEvent.itemName));
+    }
+    playNextMovie();
+  };
 
   /**
    * アニメーション自動開始（2秒後）
@@ -187,7 +209,8 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     index={index}
                     isGlobalAnimating={isGlobalAnimating}
                     isKillerAnimating={isKillerAnimating}
-                    currentItemEvent={currentItemEvent}
+                    currentItemEvent={currentGroupedEvent?.groupedEvents[0]}
+                    kinokoUserIds={playedKinokoUserIds}
                   />
                 ))}
             </AnimatePresence>
@@ -208,6 +231,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 user={user}
                 displayRankNumber={displayRankNumber}
                 isGlobalAnimating={isGlobalAnimating}
+                kinokoUserIds={playedKinokoUserIds}
               />
             );
           })}
@@ -216,24 +240,29 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
 
       {/* 動画プレイヤー */}
       <AnimatePresence>
-        {currentMovie &&
+        {currentGroupedEvent &&
           (() => {
-            // アイテムを使用したユーザーの情報を取得
-            const itemUser = animatedUsers.find(
-              (user) => user.userId === currentMovie.userId
-            );
-            const itemUserNames = itemUser?.teamName ? [itemUser.teamName] : [];
+            // グループ化されたアイテムイベントから複数のユーザー情報を取得
+            const itemUserNames = currentGroupedEvent.userIds
+              .map((userId: string) => {
+                const user = animatedUsers.find((u) => u.userId === userId);
+                return user?.teamName;
+              })
+              .filter(Boolean) as string[];
+
+            // グループ化されたイベントから最初のイベントをitemEventとして渡す
+            const firstEvent = currentGroupedEvent.groupedEvents[0];
 
             return (
               <MoviePlayer
-                key={currentMovie.userId}
-                movieUrl={currentMovie.itemMovie}
+                key={currentGroupedEvent.itemName}
+                movieUrl={currentGroupedEvent.itemMovie}
                 isVisible={
                   moviePlaybackState.isPlayingMovies && !isGlobalAnimating
                 }
-                onMovieEnd={playNextMovie}
+                onMovieEnd={handleMovieEnd}
                 itemUserNames={itemUserNames}
-                itemEvent={currentMovie}
+                itemEvent={firstEvent}
               />
             );
           })()}

@@ -8,6 +8,16 @@ interface UseRankingAnimationProps {
   itemEvents: ItemEvent[];
 }
 
+// アイテムイベントをグループ化するためのタイプ
+interface GroupedItemEvent {
+  itemName: string;
+  itemMovie: string;
+  userIds: string[];
+  isCorrectAnswer: boolean;
+  effect: ItemEffect;
+  groupedEvents: ItemEvent[]; // 元のイベントを保持
+}
+
 export const useRankingAnimation = ({
   users,
   itemEvents,
@@ -21,6 +31,44 @@ export const useRankingAnimation = ({
   /** タイヤ痕の表示データ */
   const [tireTrails, setTireTrails] = useState<TireTrail[]>([]);
 
+  // アイテムイベントをグループ化（kinokoアイテムのみをまとめる）
+  const groupedItemEvents: GroupedItemEvent[] = (() => {
+    const result: GroupedItemEvent[] = [];
+    const kinokoEvents: ItemEvent[] = [];
+
+    // kinokoアイテムとその他のアイテムを分ける
+    itemEvents.forEach((event) => {
+      if (event.itemId === "kinoko") {
+        kinokoEvents.push(event);
+      } else {
+        // kinoko以外は個別のグループとして追加
+        result.push({
+          itemName: event.itemName,
+          itemMovie: event.itemMovie,
+          userIds: [event.userId],
+          isCorrectAnswer: event.isCorrectAnswer,
+          effect: event.effect,
+          groupedEvents: [event],
+        });
+      }
+    });
+
+    // kinokoアイテムがある場合は、一つのグループとしてまとめる
+    if (kinokoEvents.length > 0) {
+      const firstKinokoEvent = kinokoEvents[0];
+      result.push({
+        itemName: "kinoko",
+        itemMovie: firstKinokoEvent.itemMovie,
+        userIds: kinokoEvents.map((e) => e.userId),
+        isCorrectAnswer: firstKinokoEvent.isCorrectAnswer,
+        effect: firstKinokoEvent.effect,
+        groupedEvents: kinokoEvents,
+      });
+    }
+
+    return result;
+  })();
+
   /** 動画再生関連の状態 */
   const [moviePlaybackState, setMoviePlaybackState] = useState({
     isPlayingMovies: false,
@@ -28,8 +76,8 @@ export const useRankingAnimation = ({
     allMoviesCompleted: false,
   });
 
-  const currentItemEvent: ItemEvent | undefined =
-    itemEvents[moviePlaybackState.currentMovieIndex];
+  const currentGroupedEvent: GroupedItemEvent | undefined =
+    groupedItemEvents[moviePlaybackState.currentMovieIndex];
 
   /**
    * 初期表示用のアニメーションデータを作成
@@ -76,7 +124,8 @@ export const useRankingAnimation = ({
     (
       effect: ItemEffect,
       currentUsers: AnimatedUser[],
-      isCorrectAnswer: boolean
+      isCorrectAnswer: boolean,
+      targetUserId?: string
     ): AnimatedUser[] => {
       // 現在のランキングを計算（currentScoreベース）
       const currentRanking = currentUsers.toSorted(
@@ -106,9 +155,9 @@ export const useRankingAnimation = ({
             }
             break;
           case "item_used_user":
-            const targetUser = currentUsers.find(
-              (u) => u.userId === currentItemEvent?.userId
-            );
+            // targetUserIdが指定されている場合はそれを使用、そうでなければグループ化されたイベントの最初のユーザー
+            const userId = targetUserId || currentGroupedEvent?.userIds[0];
+            const targetUser = currentUsers.find((u) => u.userId === userId);
             if (targetUser) {
               targetUsers = [targetUser];
             }
@@ -175,7 +224,7 @@ export const useRankingAnimation = ({
         return user;
       });
     },
-    [currentItemEvent]
+    [currentGroupedEvent?.userIds]
   );
 
   /**
@@ -414,7 +463,7 @@ export const useRankingAnimation = ({
     setMoviePlaybackState((prev) => {
       const nextIndex = prev.currentMovieIndex + 1;
 
-      if (nextIndex >= itemEvents.length) {
+      if (nextIndex >= groupedItemEvents.length) {
         // 全ての動画再生完了
         return {
           ...prev,
@@ -429,25 +478,33 @@ export const useRankingAnimation = ({
         };
       }
     });
-  }, [itemEvents.length]);
+  }, [groupedItemEvents.length]);
 
   /**
    * 動画終了後にエフェクトを実行する
    */
   const playNextMovie = useCallback(() => {
-    const currentEvent = itemEvents[moviePlaybackState.currentMovieIndex];
+    const currentEvent =
+      groupedItemEvents[moviePlaybackState.currentMovieIndex];
 
     // 現在の動画のエフェクトを実行
     if (currentEvent) {
-      console.log(`🎬 Applying effects for item: ${currentEvent.itemName}`);
-
-      // エフェクトを適用（animatedUsersに直接適用）
-      const isCorrectAnswer = currentEvent.isCorrectAnswer;
-      const updatedUsers = applyItemEffect(
-        currentEvent.effect,
-        animatedUsers,
-        isCorrectAnswer
+      console.log(
+        `🎬 Applying effects for item: ${currentEvent.itemName} (users: ${currentEvent.userIds.length})`
       );
+
+      // グループ化されたイベントの場合、各ユーザーに対してエフェクトを適用
+      let updatedUsers = animatedUsers;
+      currentEvent.groupedEvents.forEach((event) => {
+        console.log(`🎯 Applying effect for user: ${event.userId}`);
+        // 個別のイベントに対してエフェクト適用
+        updatedUsers = applyItemEffect(
+          event.effect,
+          updatedUsers,
+          event.isCorrectAnswer,
+          event.userId
+        );
+      });
 
       // エフェクトアニメーションを開始（完了後に次の動画に進む）
       setTimeout(() => {
@@ -458,7 +515,7 @@ export const useRankingAnimation = ({
       proceedToNextMovie();
     }
   }, [
-    itemEvents,
+    groupedItemEvents,
     moviePlaybackState.currentMovieIndex,
     animatedUsers,
     applyItemEffect,
@@ -470,7 +527,7 @@ export const useRankingAnimation = ({
    * 動画再生を開始する
    */
   const startMoviePlayback = useCallback(() => {
-    if (itemEvents.length > 0) {
+    if (groupedItemEvents.length > 0) {
       setMoviePlaybackState({
         isPlayingMovies: true,
         currentMovieIndex: 0,
@@ -484,7 +541,7 @@ export const useRankingAnimation = ({
         allMoviesCompleted: true,
       });
     }
-  }, [itemEvents.length]);
+  }, [groupedItemEvents.length]);
 
   /**
    * 段階的ランキングアニメーションの実行
@@ -712,6 +769,6 @@ export const useRankingAnimation = ({
     startAnimation,
     moviePlaybackState,
     playNextMovie,
-    currentItemEvent,
+    currentGroupedEvent,
   };
 };

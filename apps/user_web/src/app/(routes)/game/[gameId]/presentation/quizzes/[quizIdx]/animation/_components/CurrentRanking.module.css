@@ -693,8 +693,27 @@
 }
 
 .bottomUserThumbnail {
-  height: 100%;
-  width: 100%;
+  width: 3vw;
+  height: 3vw;
+  border-radius: 50%;
+  border: 0.2vw solid white;
   object-fit: cover;
-  object-position: center;
+}
+
+/* きのこアイテム用のスタイル */
+.kinokoIcon {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  z-index: 10;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2px;
+  border: 2px solid #ff6b6b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.kinokoImage {
+  border-radius: 50%;
+  object-fit: cover;
 }
