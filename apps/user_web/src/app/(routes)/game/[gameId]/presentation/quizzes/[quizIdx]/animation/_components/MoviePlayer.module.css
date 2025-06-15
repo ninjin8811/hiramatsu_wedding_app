@@ -54,3 +54,64 @@
 .playbackInfo button:hover {
   background: rgba(0, 0, 0, 0.4);
 }
+
+/* アイテム使用者の情報表示（左上） */
+.itemUserInfo {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 1002;
+  background: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.95),
+    rgba(51, 65, 85, 0.95)
+  );
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2rem;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  min-width: 420px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(15px);
+}
+
+.itemUserHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.itemUserLabel {
+  color: #fbbf24;
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+  background: rgba(251, 191, 36, 0.25);
+  padding: 1rem 1.8rem;
+  border-radius: 2.5rem;
+  border: 2px solid rgba(251, 191, 36, 0.5);
+}
+
+.itemUserCart {
+  transform: scale(1.2);
+  transform-origin: center;
+  position: relative;
+  margin: 0.5rem 0;
+}
+
+.itemUserName {
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1.2rem 2rem;
+  border-radius: 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  min-width: 320px;
+}

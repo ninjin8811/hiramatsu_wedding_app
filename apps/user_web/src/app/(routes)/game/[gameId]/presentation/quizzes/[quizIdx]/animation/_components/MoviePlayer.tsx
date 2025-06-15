@@ -8,12 +8,14 @@ interface MoviePlayerProps {
   movieUrl: string;
   isVisible: boolean;
   onMovieEnd: () => void;
+  itemUserName?: string;
 }
 
 export const MoviePlayer: React.FC<MoviePlayerProps> = ({
   movieUrl,
   isVisible,
   onMovieEnd,
+  itemUserName,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -66,6 +68,13 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
         preload="auto"
         autoPlay
       ></video>
+
+      {/* アイテム使用者の情報表示（左上） */}
+      {itemUserName && (
+        <div className={styles.itemUserInfo}>
+          <div className={styles.itemUserName}>{itemUserName}</div>
+        </div>
+      )}
 
       {/* playが止まった時用 */}
       {!isPlaying && (
