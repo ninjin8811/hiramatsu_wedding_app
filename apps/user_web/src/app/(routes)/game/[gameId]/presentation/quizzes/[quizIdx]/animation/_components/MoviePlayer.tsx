@@ -9,7 +9,7 @@ interface MoviePlayerProps {
   movieUrl: string;
   isVisible: boolean;
   onMovieEnd: () => void;
-  itemUserName?: string;
+  itemUserNames?: string[];
   itemEvent?: ItemEvent;
 }
 
@@ -17,7 +17,7 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
   movieUrl,
   isVisible,
   onMovieEnd,
-  itemUserName,
+  itemUserNames,
   itemEvent,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -81,9 +81,21 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
       ></video>
 
       {/* アイテム使用者の情報表示（左上） */}
-      {itemUserName && (
-        <div className={styles.itemUserInfo}>
-          <div className={styles.itemUserName}>{itemUserName}</div>
+      {itemUserNames && itemUserNames.length > 0 && (
+        <div
+          className={
+            itemUserNames.length === 1
+              ? styles.itemUserInfoSingle
+              : styles.itemUserInfo
+          }
+        >
+          <div className={styles.itemUsersContainer}>
+            {itemUserNames.map((userName, index) => (
+              <div key={index} className={styles.itemUserName}>
+                {userName}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

@@ -222,7 +222,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
             const itemUser = animatedUsers.find(
               (user) => user.userId === currentMovie.userId
             );
-            const itemUserName = itemUser?.teamName;
+            const itemUserNames = itemUser?.teamName ? [itemUser.teamName] : [];
 
             return (
               <MoviePlayer
@@ -232,7 +232,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                   moviePlaybackState.isPlayingMovies && !isGlobalAnimating
                 }
                 onMovieEnd={playNextMovie}
-                itemUserName={itemUserName}
+                itemUserNames={itemUserNames}
                 itemEvent={currentMovie}
               />
             );
