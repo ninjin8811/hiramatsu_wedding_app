@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import styles from "./CurrentRanking.module.css";
+import styles from "./RankingCart.module.css";
 import { AnimatedUser } from "./types";
 import { ExhaustParticles, DarkSmokeParticles } from "./RankingEffects";
 import {

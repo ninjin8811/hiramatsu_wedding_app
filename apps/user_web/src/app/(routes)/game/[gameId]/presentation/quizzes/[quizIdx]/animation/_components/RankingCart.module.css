@@ -1,0 +1,520 @@
+/* RankingCart専用のアニメーション定義 */
+@keyframes scorePopAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cartVibration {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-0.2vh) rotate(-0.5deg);
+  }
+  50% {
+    transform: translateY(0.1vh) rotate(0.5deg);
+  }
+  75% {
+    transform: translateY(-0.1vh) rotate(-0.3deg);
+  }
+}
+
+@keyframes tireBlur {
+  0%,
+  100% {
+    filter: blur(0px);
+  }
+  50% {
+    filter: blur(1px);
+  }
+}
+
+@keyframes exhaustSmoke {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.3) translateX(0);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.8) translateX(-2vw);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2) translateX(-4vw);
+  }
+}
+
+/* 🚀 昇格アニメーションエフェクト */
+@keyframes promotionGlow {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes promotionTrail {
+  0% {
+    height: 0;
+    opacity: 0.8;
+  }
+  50% {
+    height: 60vh;
+    opacity: 0.6;
+  }
+  100% {
+    height: 80vh;
+    opacity: 0;
+  }
+}
+
+@keyframes promotionCartGlow {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    filter: brightness(1.4) drop-shadow(0 0 2vw gold);
+  }
+}
+
+@keyframes promotionScorePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 3vw rgba(255, 215, 0, 0.8);
+  }
+}
+
+/* 📉 降格アニメーションエフェクト */
+@keyframes demotionShadow {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1.5);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(2);
+  }
+}
+
+@keyframes demotionTrail {
+  0% {
+    height: 0;
+    opacity: 0.6;
+  }
+  50% {
+    height: 40vh;
+    opacity: 0.4;
+  }
+  100% {
+    height: 60vh;
+    opacity: 0;
+  }
+}
+
+@keyframes demotionCartDim {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    filter: brightness(0.6) drop-shadow(0 0 1vw rgba(0, 0, 0, 0.5));
+  }
+}
+
+@keyframes demotionScoreFade {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+  50% {
+    transform: scale(0.9);
+    box-shadow: 0 0 2vw rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* 🔺 順位上昇アニメーション（上位6位内） */
+@keyframes rankUpBounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-1vh) scale(1.08);
+  }
+  60% {
+    transform: translateY(-0.5vh) scale(1.05);
+  }
+}
+
+@keyframes rankUpGlow {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    filter: brightness(1.3) drop-shadow(0 0 1vw #00ff88);
+  }
+}
+
+@keyframes rankUpScorePop {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 1.5vw rgba(0, 255, 136, 0.6);
+  }
+}
+
+/* 🔻 順位下降アニメーション（上位6位内） */
+@keyframes rankDownSink {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(1vh) scale(0.96);
+  }
+  70% {
+    transform: translateY(0.5vh) scale(0.98);
+  }
+}
+
+@keyframes rankDownDim {
+  0%,
+  100% {
+    filter: brightness(1) saturate(1);
+  }
+  50% {
+    filter: brightness(0.7) saturate(0.8);
+  }
+}
+
+@keyframes rankDownScoreShrink {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+  50% {
+    transform: scale(0.9);
+    box-shadow: 0 0 1vw rgba(255, 100, 100, 0.5);
+  }
+}
+
+/* メインカートコンテナ */
+.animatedCart {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  padding: 0 2vw;
+  height: calc(100% / 6);
+  width: calc(100% - 4vw);
+  z-index: 10;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* カートとスコアの配置 */
+.cartWithScore {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.cartContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.userThumbnailContainer {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  z-index: 1;
+  transform: translate(4.2%, 24%);
+  border-radius: 50%;
+  overflow: hidden;
+  height: 10.2vh;
+  aspect-ratio: 1/1;
+}
+
+.userThumbnail {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.cartImage {
+  position: relative;
+  height: 15vh;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  z-index: 2;
+  transition: filter 0.3s ease;
+}
+
+.cartMoving {
+  animation: cartVibration 0.1s ease-in-out infinite,
+    tireBlur 0.2s ease-in-out infinite;
+  filter: brightness(1.1);
+}
+
+.scoreBubble {
+  min-width: 10vw;
+  margin-top: -2vh;
+  margin-left: -4.5vw; /* カートと重なるように密着 */
+  padding: 1.4vh 2vw 1.4vh 3.5vw;
+  border-radius: 0 15em 15em 0;
+  color: white;
+  font-size: 2.6vw;
+  font-weight: bold;
+  text-align: center;
+  z-index: 0;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.scoreBubble span {
+  padding-left: 0.25vw;
+  font-size: 2vw;
+}
+
+.animatingScore {
+  animation: scorePopAnimation 0.8s ease-in-out;
+}
+
+/* 💨 排気ガスパーティクル */
+.exhaustContainer {
+  position: absolute;
+  left: -2vw;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6vw;
+  height: 4vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.exhaustParticle {
+  position: absolute;
+  width: 0.8vw;
+  height: 0.8vw;
+  border-radius: 50%;
+  opacity: 0.7;
+  filter: blur(1px);
+}
+
+/* 🌫️ 降格用ダークスモークパーティクル */
+.darkSmokeContainer {
+  position: absolute;
+  left: -1vw;
+  top: -2vh;
+  width: 4vw;
+  height: 6vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.darkSmokeParticle {
+  position: absolute;
+  width: 1.2vw;
+  height: 1.2vw;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(60, 60, 60, 0.8),
+    rgba(0, 0, 0, 0.6)
+  );
+  filter: blur(2px);
+}
+
+.exhaustParticle:nth-child(1) {
+  left: 10%;
+  top: 20%;
+}
+.exhaustParticle:nth-child(2) {
+  left: 20%;
+  top: 60%;
+}
+.exhaustParticle:nth-child(3) {
+  left: 0%;
+  top: 40%;
+}
+.exhaustParticle:nth-child(4) {
+  left: 30%;
+  top: 10%;
+}
+.exhaustParticle:nth-child(5) {
+  left: 15%;
+  top: 70%;
+}
+.exhaustParticle:nth-child(6) {
+  left: 5%;
+  top: 80%;
+}
+.exhaustParticle:nth-child(7) {
+  left: 25%;
+  top: 30%;
+}
+.exhaustParticle:nth-child(8) {
+  left: 35%;
+  top: 50%;
+}
+
+/* 🏎️ 昇格カートスタイル */
+.promotionCart {
+  z-index: 15 !important; /* 他のカートより前面に */
+}
+
+.promotionEffect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.promotionGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20vw;
+  height: 20vw;
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.6) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: promotionGlow 2s ease-in-out infinite;
+}
+
+.promotionTrail {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2vw;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 215, 0, 0.8),
+    rgba(255, 165, 0, 0.6),
+    transparent
+  );
+  border-radius: 1vw;
+  animation: promotionTrail 3.6s ease-out;
+}
+
+.cartPromotion {
+  animation: promotionCartGlow 2s ease-in-out infinite;
+}
+
+.promotionScore {
+  animation: promotionScorePulse 2s ease-in-out infinite;
+}
+
+/* 📉 降格カートスタイル */
+.demotionCart {
+  z-index: 5 !important; /* 他のカートより後ろに */
+}
+
+.demotionEffect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.demotionShadow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 15vw;
+  height: 15vw;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: demotionShadow 2.4s ease-in-out infinite;
+}
+
+.demotionTrail {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5vw;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.6),
+    rgba(60, 60, 60, 0.4),
+    transparent
+  );
+  border-radius: 0.75vw;
+  animation: demotionTrail 3.6s ease-in;
+}
+
+.cartDemotion {
+  animation: demotionCartDim 2.4s ease-in-out infinite;
+}
+
+.demotionScore {
+  animation: demotionScoreFade 2.4s ease-in-out infinite;
+}
+
+/* 🔺 順位上昇スタイル */
+.rankUpCart {
+  z-index: 20;
+}
+
+.cartRankUp {
+  animation: rankUpBounce 2.4s ease-out forwards,
+    rankUpGlow 2s ease-out forwards;
+}
+
+.rankUpScore {
+  animation: rankUpScorePop 1.6s ease-out forwards;
+  border: 0.2vw solid #00ff88;
+}
+
+/* 🔻 順位下降スタイル */
+.rankDownCart {
+  z-index: 10;
+}
+
+.cartRankDown {
+  animation: rankDownSink 3s ease-in forwards, rankDownDim 2.4s ease-in forwards;
+}
+
+.rankDownScore {
+  animation: rankDownScoreShrink 2s ease-in forwards;
+  border: 0.2vw solid #ff6464;
+}
