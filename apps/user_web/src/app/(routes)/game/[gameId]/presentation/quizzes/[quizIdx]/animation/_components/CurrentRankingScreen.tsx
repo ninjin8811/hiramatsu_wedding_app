@@ -224,7 +224,6 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                   moviePlaybackState.isPlayingMovies && !isGlobalAnimating
                 }
                 onMovieEnd={playNextMovie}
-                itemUser={itemUser}
                 itemUserName={itemUserName}
               />
             );

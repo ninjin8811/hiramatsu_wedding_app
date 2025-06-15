@@ -1,5 +1,5 @@
 import PreparePage from "@user/_pages/PreparePage/PreparePage";
-import { getGame, getItems, getUser } from "../../../_repositories/server";
+import { getGame, getItems } from "../../../_repositories/server";
 import { UserPreparePath } from "@/app/_utils/page_link";
 import { redirectPathByStatus } from "../../../_utils/redirectPathByStatus";
 import { redirect } from "next/navigation";
@@ -13,9 +13,14 @@ type Props = {
 
 export default async function Page(props: Props) {
   const { gameId, userId } = await props.params;
-  const user = await getUser(gameId, userId);
   const game = await getGame(gameId);
   const items = await getItems();
+
+  // game.users配列から該当するユーザーを取得
+  const user = game.users.find((u) => u.id === userId);
+  if (!user) {
+    throw new Error(`User with ID ${userId} not found in game ${gameId}`);
+  }
 
   const currentPath = UserPreparePath(gameId, userId);
   const redirectPath = redirectPathByStatus(game, userId, currentPath);
