@@ -17,6 +17,7 @@ interface RankingCartProps {
   isGlobalAnimating: boolean;
   isKillerAnimating: boolean;
   currentItemEvent: ItemEvent | undefined;
+  kinokoUserIds: string[];
 }
 
 const RankingCart: React.FC<RankingCartProps> = ({
@@ -25,6 +26,7 @@ const RankingCart: React.FC<RankingCartProps> = ({
   isGlobalAnimating,
   isKillerAnimating,
   currentItemEvent,
+  kinokoUserIds,
 }) => {
   const getThumbnail = (user: AnimatedUser): string => {
     if (!isGlobalAnimating) {
@@ -139,6 +141,18 @@ const RankingCart: React.FC<RankingCartProps> = ({
                   user.isRankDown ? styles.cartRankDown : ""
                 }`}
               />
+              {/* きのこアイテムを使ったユーザーのカート右上にきのこ画像を表示 */}
+              {kinokoUserIds.includes(user.userId) && (
+                <div className={styles.kinokoIcon}>
+                  <Image
+                    src="https://firebasestorage.googleapis.com/v0/b/fussa-wedding-app-prod/o/items%2Fkinoko.png?alt=media&token=8c042c21-f6fa-4375-b1fc-f4c7aa1d2ad7"
+                    alt="きのこアイテム"
+                    width={40}
+                    height={40}
+                    className={styles.kinokoImage}
+                  />
+                </div>
+              )}
               <div className={styles.userThumbnailContainer}>
                 <Image
                   src={getThumbnail(user)}

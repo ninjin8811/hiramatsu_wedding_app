@@ -9,12 +9,14 @@ interface BottomRankingCartProps {
   user: AnimatedUser;
   displayRankNumber: number;
   isGlobalAnimating: boolean;
+  kinokoUserIds: string[];
 }
 
 const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
   user,
   displayRankNumber,
   isGlobalAnimating,
+  kinokoUserIds,
 }) => {
   const getThumbnail = (user: AnimatedUser): string => {
     if (!isGlobalAnimating) {
@@ -70,6 +72,17 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
             height={139}
             className={styles.bottomCartImage}
           />
+          {kinokoUserIds.includes(user.userId) && (
+            <div className={styles.kinokoIcon}>
+              <Image
+                src="https://firebasestorage.googleapis.com/v0/b/fussa-wedding-app-prod/o/items%2Fkinoko.png?alt=media&token=8c042c21-f6fa-4375-b1fc-f4c7aa1d2ad7"
+                alt="きのこアイテム"
+                width={25}
+                height={25}
+                className={styles.kinokoImage}
+              />
+            </div>
+          )}
           <div className={styles.bottomUserThumbnailContainer}>
             <Image
               src={getThumbnail(user)}

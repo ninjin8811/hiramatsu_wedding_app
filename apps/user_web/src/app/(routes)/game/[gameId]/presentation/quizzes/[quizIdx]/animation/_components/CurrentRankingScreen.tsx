@@ -49,6 +49,11 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     isGlobalAnimating &&
     currentGroupedEvent?.effect.effectType === "copy_rank_score";
 
+  // kinokoアイテムを使ったユーザーのIDを取得
+  const kinokoUserIds = itemEvents
+    .filter((event) => event.itemId === "kinoko")
+    .map((event) => event.userId);
+
   /**
    * アニメーション自動開始（2秒後）
    */
@@ -188,6 +193,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     isGlobalAnimating={isGlobalAnimating}
                     isKillerAnimating={isKillerAnimating}
                     currentItemEvent={currentGroupedEvent?.groupedEvents[0]}
+                    kinokoUserIds={kinokoUserIds}
                   />
                 ))}
             </AnimatePresence>
@@ -208,6 +214,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 user={user}
                 displayRankNumber={displayRankNumber}
                 isGlobalAnimating={isGlobalAnimating}
+                kinokoUserIds={kinokoUserIds}
               />
             );
           })}
