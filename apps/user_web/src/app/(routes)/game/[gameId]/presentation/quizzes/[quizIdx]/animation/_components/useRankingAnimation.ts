@@ -559,8 +559,6 @@ export const useRankingAnimation = ({
       return;
     }
 
-    setAnimationCompleted(true);
-
     // スコア変化したユーザーを特定
     const changedUsers = users.filter(
       (user) => user.prevScore !== user.currentScore
@@ -600,7 +598,7 @@ export const useRankingAnimation = ({
     );
 
     // 各チームのアニメーション情報を準備
-    const animationData = allAnimationUsers.map((userToAnimate, index) => {
+    const animationData = allAnimationUsers.map((userToAnimate) => {
       // スコア変化があるかどうかを判定
       const hasScoreChange = changedUsers.some(
         (c) => c.userId === userToAnimate.userId
@@ -647,7 +645,7 @@ export const useRankingAnimation = ({
     });
 
     // 全てのアニメーションを段階的に同時開始
-    const animationPromises = animationData.map(async (data, index) => {
+    const animationPromises = animationData.map(async (data) => {
       const {
         userToAnimate,
         newRank,
@@ -760,6 +758,7 @@ export const useRankingAnimation = ({
     // 全アニメーション完了
     // アニメーション完了後に動画再生を開始
     setTimeout(() => {
+      setAnimationCompleted(true);
       setIsGlobalAnimating(false);
       startMoviePlayback();
     }, 3000);
