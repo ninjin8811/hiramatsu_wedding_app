@@ -14,7 +14,7 @@ import {
 interface RankingCartProps {
   user: AnimatedUser;
   index: number;
-  isGlobalAnimating: boolean;
+  thumbnail: string;
   isKillerAnimating: boolean;
   currentItemEvent: ItemEvent | undefined;
   kinokoUserIds: string[];
@@ -23,32 +23,11 @@ interface RankingCartProps {
 const RankingCart: React.FC<RankingCartProps> = ({
   user,
   index,
-  isGlobalAnimating,
+  thumbnail,
   isKillerAnimating,
   currentItemEvent,
   kinokoUserIds,
 }) => {
-  const getThumbnail = (user: AnimatedUser): string => {
-    if (!isGlobalAnimating) {
-      return user.thumbnail;
-    }
-
-    if (
-      user.animatedScore <= user.currentScore ||
-      user.isRankUp ||
-      user.isPromotionFromBottom
-    ) {
-      return user.smileThumbnail;
-    } else if (
-      user.animatedScore > user.currentScore ||
-      user.isRankDown ||
-      user.isDemotionToBottom
-    ) {
-      return user.sadThumbnail;
-    }
-    return user.thumbnail;
-  };
-
   const xPosition = getXPosition(user.animatedScore);
   const laneIndex = Math.min(index, 5);
   const animationSettings = getAnimationSettings(user);
@@ -170,7 +149,7 @@ const RankingCart: React.FC<RankingCartProps> = ({
               )}
               <div className={styles.userThumbnailContainer}>
                 <Image
-                  src={getThumbnail(user)}
+                  src={thumbnail}
                   alt={user.teamName}
                   width={150}
                   height={150}

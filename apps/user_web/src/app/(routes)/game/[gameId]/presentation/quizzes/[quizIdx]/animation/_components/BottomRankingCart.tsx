@@ -8,37 +8,16 @@ import { AnimatedUser } from "./types";
 interface BottomRankingCartProps {
   user: AnimatedUser;
   displayRankNumber: number;
-  isGlobalAnimating: boolean;
+  thumbnail: string;
   kinokoUserIds: string[];
 }
 
 const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
   user,
   displayRankNumber,
-  isGlobalAnimating,
+  thumbnail,
   kinokoUserIds,
 }) => {
-  const getThumbnail = (user: AnimatedUser): string => {
-    if (!isGlobalAnimating) {
-      return user.thumbnail;
-    }
-
-    if (
-      user.animatedScore <= user.currentScore ||
-      user.isRankUp ||
-      user.isPromotionFromBottom
-    ) {
-      return user.smileThumbnail;
-    } else if (
-      user.animatedScore > user.currentScore ||
-      user.isRankDown ||
-      user.isDemotionToBottom
-    ) {
-      return user.sadThumbnail;
-    }
-    return user.thumbnail;
-  };
-
   return (
     <motion.div
       key={user.userId}
@@ -85,7 +64,7 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
           )}
           <div className={styles.bottomUserThumbnailContainer}>
             <Image
-              src={getThumbnail(user)}
+              src={thumbnail}
               alt={user.teamName}
               width={30}
               height={30}

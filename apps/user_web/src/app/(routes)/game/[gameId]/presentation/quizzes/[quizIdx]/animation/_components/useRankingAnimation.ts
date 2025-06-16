@@ -79,6 +79,11 @@ export const useRankingAnimation = ({
   const currentGroupedEvent: GroupedItemEvent | undefined =
     groupedItemEvents[moviePlaybackState.currentMovieIndex];
 
+  const isKillerAnimating =
+    animationCompleted &&
+    isGlobalAnimating &&
+    currentGroupedEvent?.effect.effectType === "copy_rank_score";
+
   /**
    * 初期表示用のアニメーションデータを作成
    * prevScoreを基準にした順位で初期配置
@@ -770,5 +775,6 @@ export const useRankingAnimation = ({
     moviePlaybackState,
     playNextMovie,
     currentGroupedEvent,
+    isKillerAnimating,
   };
 };

@@ -6,7 +6,7 @@ import styles from "./CurrentRanking.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { navigateToNextStep } from "../actions";
-import { User, ItemEvent } from "./types";
+import { User, ItemEvent, AnimatedUser } from "./types";
 import { TireTrail, SpeedLines } from "./RankingEffects";
 import { useRankingAnimation } from "./useRankingAnimation";
 import { MoviePlayer } from "./MoviePlayer";
@@ -42,12 +42,8 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     moviePlaybackState,
     playNextMovie,
     currentGroupedEvent,
+    isKillerAnimating,
   } = useRankingAnimation({ users, itemEvents });
-
-  const isKillerAnimating =
-    animationCompleted &&
-    isGlobalAnimating &&
-    currentGroupedEvent?.effect.effectType === "copy_rank_score";
 
   // kinokoアイテムを使ったユーザーのIDを取得
   const kinokoUserIds = itemEvents
@@ -133,12 +129,26 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   // 7位以降の判定
   const otherUsers = sortedUsers.filter((user, index) => index >= 6);
 
-  // 現在再生中の動画
-  const currentMovie =
-    moviePlaybackState.isPlayingMovies &&
-    itemEvents[moviePlaybackState.currentMovieIndex]
-      ? itemEvents[moviePlaybackState.currentMovieIndex]
-      : null;
+  const getThumbnail = (user: AnimatedUser): string => {
+    if (!isGlobalAnimating) {
+      return user.thumbnail;
+    }
+
+    if (
+      user.animatedScore < user.currentScore ||
+      user.isRankUp ||
+      user.isPromotionFromBottom
+    ) {
+      return user.smileThumbnail;
+    } else if (
+      user.animatedScore > user.currentScore ||
+      user.isRankDown ||
+      user.isDemotionToBottom
+    ) {
+      return user.sadThumbnail;
+    }
+    return user.thumbnail;
+  };
 
   return (
     <main className={styles.bg}>
@@ -207,7 +217,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     key={user.userId}
                     user={user}
                     index={index}
-                    isGlobalAnimating={isGlobalAnimating}
+                    thumbnail={getThumbnail(user)}
                     isKillerAnimating={isKillerAnimating}
                     currentItemEvent={currentGroupedEvent?.groupedEvents[0]}
                     kinokoUserIds={playedKinokoUserIds}
@@ -230,7 +240,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 key={user.userId}
                 user={user}
                 displayRankNumber={displayRankNumber}
-                isGlobalAnimating={isGlobalAnimating}
+                thumbnail={getThumbnail(user)}
                 kinokoUserIds={playedKinokoUserIds}
               />
             );
