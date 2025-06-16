@@ -685,16 +685,16 @@
   top: 0%;
   left: 0%;
   z-index: 1;
-  transform: translate(3%, 38%);
+  transform: translate(-1%, 20%);
   border-radius: 50%;
   overflow: hidden;
-  width: 76%; /* カートの高さに対する相対値に変更 */
+  width: 82%; /* カートの高さに対する相対値に変更 */
   aspect-ratio: 1/1;
 }
 
 .bottomUserThumbnail {
-  width: 3vw;
-  height: 3vw;
+  height: 100%;
+  width: 100%;
   border-radius: 50%;
   border: 0.2vw solid white;
   object-fit: cover;
