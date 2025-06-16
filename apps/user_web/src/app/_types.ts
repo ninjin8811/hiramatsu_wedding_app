@@ -81,6 +81,13 @@ export const CurrentProcessSchema = z.object({
   type: z.enum(["question", "answer", "animation"]).describe("現在の進行種別"),
 });
 
+const FinalRankingStatusSchema = z.enum([
+  "awaiting_third_place",
+  "awaiting_second_place",
+  "awaiting_first_place",
+  "announcing_winner",
+]);
+
 // [Game]/{gameId}
 export const GameSchema = z.object({
   gameId: z.string().describe("ゲームID"),
@@ -89,10 +96,9 @@ export const GameSchema = z.object({
   status: z
     .enum(["created", "inProgress", "completed"])
     .describe("ゲームステータス"),
-  finalRankingStatus: z
-    .string()
-    .optional()
-    .describe("最終ランキング発表ステータス（順位発表の進行状況）"),
+  finalRankingStatus: FinalRankingStatusSchema.optional().describe(
+    "最終ランキング発表ステータス（順位発表の進行状況）"
+  ),
   answerTime: z
     .number()
     .int()
