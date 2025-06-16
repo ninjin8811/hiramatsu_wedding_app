@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
 import { firebaseApp } from "@/app/_lib/firebase/FirebaseInitializer";
+import { Game } from "@/app/_types";
 // StaticImageData は string に変更するので不要になります
 // import { StaticImageData } from 'next/image';
 
@@ -55,7 +56,9 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
   }, [teamsData]);
 
   // FirestoreのfinalRankingStatus更新関数
-  const updateGameStatus = async (finalRankingStatus: string) => {
+  const updateGameStatus = async (
+    finalRankingStatus: Game["finalRankingStatus"]
+  ) => {
     if (!gameId) return;
 
     try {
