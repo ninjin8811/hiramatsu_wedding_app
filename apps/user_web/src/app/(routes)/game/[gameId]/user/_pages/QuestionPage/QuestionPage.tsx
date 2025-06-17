@@ -204,7 +204,10 @@ export default function QuestionPage(props: Props) {
         <div className={styles.status}>
           <div className={styles.status_point}>ポイント:{user?.score}</div>
           <div className={styles.status_rate}>
-            正解率:{correctRate() === null ? "-" : correctRate()! * 100 + "%"}
+            正解率:
+            {correctRate() === null
+              ? "-"
+              : Math.round(correctRate()! * 100) + "%"}
           </div>
         </div>
       </div>

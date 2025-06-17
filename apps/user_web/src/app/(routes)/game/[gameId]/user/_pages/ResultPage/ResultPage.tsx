@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Background from "@/app/_images/Background.png";
 import RankingResultTitleContainer from "@/app/_images/RankingResultTitleContainer.png";
@@ -7,14 +7,21 @@ import RankingItemGorgeous from "./RankingItemGorgeous";
 import styles from "./ResultPage.module.scss";
 import { Game } from "@/app/_types";
 import { motion } from "framer-motion";
+import { listenGame } from "@/app/_repositories/game_repository";
 
 type Props = {
   gameId: string;
   game: Game;
 };
 
-export default function ResultPage({ game }: Props) {
-  const teams = game.users;
+export default function ResultPage(props: Props) {
+  const teams = props.game.users;
+  const [game, setGame] = useState(props.game);
+
+  useEffect(() => {
+    const unsubscribe = listenGame(props.gameId, (g) => setGame(g as Game));
+    return unsubscribe;
+  }, [props.gameId]);
 
   const ranking = teams.sort((a, b) => b.score - a.score);
 

@@ -6,7 +6,7 @@ export const listenGame = (
   gameId: string,
   callback: (data: GetAppModelType<Game> | null) => void
 ) => {
-  const gameRef = documentGet(GameSchema, "games", gameId);
+  const gameRef = documentGet(GameSchema, "Games", gameId);
 
   onSnapshot(gameRef, (snapshot) => {
     const data = snapshot.data();
