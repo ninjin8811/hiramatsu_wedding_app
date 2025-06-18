@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import styles from "./CurrentRanking.module.css";
 import { AnimatedUser } from "./types";
+import { CartDamageEffect } from "./CartDamageEffect";
 
 interface BottomRankingCartProps {
   user: AnimatedUser;
   displayRankNumber: number;
   thumbnail: string;
   kinokoUserIds: string[];
+  onDamageEffectEnd?: (userId: string) => void;
 }
 
 const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
@@ -17,7 +19,14 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
   displayRankNumber,
   thumbnail,
   kinokoUserIds,
+  onDamageEffectEnd,
 }) => {
+  // ダメージエフェクト終了ハンドラー
+  const handleDamageEffectEnd = () => {
+    if (onDamageEffectEnd) {
+      onDamageEffectEnd(user.userId);
+    }
+  };
   return (
     <motion.div
       key={user.userId}
@@ -71,6 +80,15 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
               className={styles.bottomUserThumbnail}
             />
           </div>
+
+          {/* ダメージエフェクト */}
+          {user.damageEffect && (
+            <CartDamageEffect
+              isVisible={user.damageEffect.isVisible}
+              itemId={user.damageEffect.itemId}
+              onEffectEnd={handleDamageEffectEnd}
+            />
+          )}
         </div>
       </div>
     </motion.div>

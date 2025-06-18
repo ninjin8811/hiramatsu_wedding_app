@@ -1,0 +1,31 @@
+.effectContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.effectVideo {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* アイテムごとのサイズ調整 */
+.effectVideo[src*="blue.webm"] {
+  width: 350px;
+  height: auto;
+}
+
+.effectVideo[src*="bomb.webm"] {
+  width: 350px;
+  height: auto;
+}
+
+.effectVideo[src*="green.webm"] {
+  width: 320px;
+  height: auto;
+}

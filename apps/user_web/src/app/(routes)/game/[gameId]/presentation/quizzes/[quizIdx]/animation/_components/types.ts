@@ -21,6 +21,10 @@ export interface AnimatedUser extends User {
   isDemotionToBottom?: boolean; // 上位(6位以内)から下位(7位以降)への降格フラグ
   isRankDown?: boolean; // 上位6位内での順位下降フラグ
   isRankUp?: boolean; // 上位6位内での順位上昇フラグ
+  damageEffect?: {
+    isVisible: boolean;
+    itemId: string;
+  }; // ダメージエフェクト情報
 }
 
 /** アイテムイベント情報 */

@@ -98,6 +98,7 @@ export const useRankingAnimation = ({
         isDemotionToBottom: false, // 降格フラグ初期化
         isRankDown: false, // 順位下降フラグ初期化
         isRankUp: false, // 順位上昇フラグ初期化
+        damageEffect: undefined, // ダメージエフェクト初期化
       };
     });
   };
@@ -130,7 +131,8 @@ export const useRankingAnimation = ({
       effect: ItemEffect,
       currentUsers: AnimatedUser[],
       isCorrectAnswer: boolean,
-      targetUserId?: string
+      targetUserId?: string,
+      itemId?: string
     ): AnimatedUser[] => {
       // 現在のランキングを計算（currentScoreベース）
       const currentRanking = currentUsers.toSorted(
@@ -181,7 +183,7 @@ export const useRankingAnimation = ({
             // スコアが0のユーザーは対象外
             const candidateUsers = (
               effect.topRanksOnly
-              ? currentRanking.slice(0, effect.topRanksOnly)
+                ? currentRanking.slice(0, effect.topRanksOnly)
                 : currentUsers
             ).filter((user) => user.currentScore > 0);
             const shuffled = [...candidateUsers].sort(
@@ -198,6 +200,7 @@ export const useRankingAnimation = ({
       // エフェクトを適用
       return currentUsers.map((user) => {
         if (targetUsers.some((target) => target.userId === user.userId)) {
+          const originalScore = user.currentScore;
           let newScore = user.currentScore;
 
           switch (effectType) {
@@ -225,9 +228,24 @@ export const useRankingAnimation = ({
           }
 
           console.log(
-            `🎯 Effect applied to ${user.teamName}: ${user.currentScore} → ${newScore} (${effectType})`
+            `🎯 Effect applied to ${user.teamName}: ${originalScore} → ${newScore} (${effectType})`
           );
-          return { ...user, currentScore: newScore };
+
+          // ダメージを受けた場合（スコアが減少）、ダメージエフェクトを設定
+          const isDamaged = newScore < originalScore;
+          const updatedUser = {
+            ...user,
+            currentScore: newScore,
+            damageEffect: isDamaged && itemId
+              ? { isVisible: true, itemId }
+              : user.damageEffect,
+          };
+
+          if (isDamaged && itemId) {
+            console.log(`🎬 Setting damage effect for ${user.teamName}: itemId=${itemId}`);
+          }
+
+          return updatedUser;
         }
         return user;
       });
@@ -322,22 +340,28 @@ export const useRankingAnimation = ({
         })
         .filter(Boolean);
 
-      // 変化しなかったユーザーのanimatedScoreも同期
+      // 変化しなかったユーザーのanimatedScoreも同期（ダメージエフェクト情報も含む）
       setAnimatedUsers((prev) =>
         prev.map((user) => {
           const updatedUser = updatedUsers.find(
             (u) => u.userId === user.userId
           );
-          if (
-            updatedUser &&
-            !allAnimationUsers.some((c) => c.userId === user.userId)
-          ) {
-            // スコア変化も順位変化もないが、currentScoreとanimatedScoreを同期
-            return {
-              ...user,
-              animatedScore: updatedUser.currentScore,
-              currentScore: updatedUser.currentScore,
-            };
+          if (updatedUser) {
+            if (!allAnimationUsers.some((c) => c.userId === user.userId)) {
+              // スコア変化も順位変化もないが、currentScoreとanimatedScoreを同期
+              return {
+                ...user,
+                animatedScore: updatedUser.currentScore,
+                currentScore: updatedUser.currentScore,
+                damageEffect: updatedUser.damageEffect, // ダメージエフェクト情報も更新
+              };
+            } else {
+              // アニメーション対象ユーザーもダメージエフェクト情報は即座に反映
+              return {
+                ...user,
+                damageEffect: updatedUser.damageEffect,
+              };
+            }
           }
           return user;
         })
@@ -367,19 +391,23 @@ export const useRankingAnimation = ({
 
         // アニメーション開始：フラグ設定
         setAnimatedUsers((prev) => {
-          return prev.map((user) =>
-            user.userId === userToAnimate.userId
-              ? {
-                  ...user,
-                  isAnimating: true,
-                  isPromotionFromBottom,
-                  isDemotionToBottom,
-                  isRankUp,
-                  isRankDown,
-                  currentScore: userToAnimate.currentScore, // currentScoreも更新
-                }
-              : user
-          );
+          return prev.map((user) => {
+            if (user.userId === userToAnimate.userId) {
+              // updatedUsersから最新の情報を取得
+              const latestUser = updatedUsers.find((u) => u.userId === user.userId);
+              return {
+                ...user,
+                isAnimating: true,
+                isPromotionFromBottom,
+                isDemotionToBottom,
+                isRankUp,
+                isRankDown,
+                currentScore: userToAnimate.currentScore, // currentScoreも更新
+                damageEffect: latestUser?.damageEffect, // ダメージエフェクト情報も保持
+              };
+            }
+            return user;
+          });
         });
 
         // タイヤ痕エフェクトを追加
@@ -489,49 +517,6 @@ export const useRankingAnimation = ({
   }, [groupedItemEvents.length]);
 
   /**
-   * 動画終了後にエフェクトを実行する
-   */
-  const playNextMovie = useCallback(() => {
-    const currentEvent =
-      groupedItemEvents[moviePlaybackState.currentMovieIndex];
-
-    // 現在の動画のエフェクトを実行
-    if (currentEvent) {
-      console.log(
-        `🎬 Applying effects for item: ${currentEvent.itemName} (users: ${currentEvent.userIds.length})`
-      );
-
-      // グループ化されたイベントの場合、各ユーザーに対してエフェクトを適用
-      let updatedUsers = animatedUsers;
-      currentEvent.groupedEvents.forEach((event) => {
-        console.log(`🎯 Applying effect for user: ${event.userId}`);
-        // 個別のイベントに対してエフェクト適用
-        updatedUsers = applyItemEffect(
-          event.effect,
-          updatedUsers,
-          event.isCorrectAnswer,
-          event.userId
-        );
-      });
-
-      // エフェクトアニメーションを開始（完了後に次の動画に進む）
-      setTimeout(() => {
-        startEffectAnimation(updatedUsers, proceedToNextMovie);
-      }, 500); // 少し遅延してからアニメーション開始
-    } else {
-      // エフェクトがない場合は直接次の動画に進む
-      proceedToNextMovie();
-    }
-  }, [
-    groupedItemEvents,
-    moviePlaybackState.currentMovieIndex,
-    animatedUsers,
-    applyItemEffect,
-    startEffectAnimation,
-    proceedToNextMovie,
-  ]);
-
-  /**
    * 動画再生を開始する
    */
   const startMoviePlayback = useCallback(() => {
@@ -594,6 +579,7 @@ export const useRankingAnimation = ({
             ...user,
             animatedScore: user.currentScore,
             currentScore: user.currentScore,
+            damageEffect: user.damageEffect, // ダメージエフェクト情報を保持
           };
         }
         return user;
@@ -767,6 +753,63 @@ export const useRankingAnimation = ({
     }, 3000);
   }, [users, animationCompleted, startMoviePlayback, getRankByScore]);
 
+
+  /**
+   * ダメージエフェクトを終了する関数
+   */
+  const handleDamageEffectEnd = useCallback((userId: string) => {
+    setAnimatedUsers((prev) =>
+      prev.map((user) =>
+        user.userId === userId ? { ...user, damageEffect: undefined } : user
+      )
+    );
+    console.log(`✖️ Damage Effect Ended: ${userId}`);
+  }, []);
+
+  /**
+   * 動画終了後にエフェクトを実行する
+   */
+  const playNextMovie = useCallback(() => {
+    const currentEvent =
+      groupedItemEvents[moviePlaybackState.currentMovieIndex];
+
+    // 現在の動画のエフェクトを実行
+    if (currentEvent) {
+      console.log(
+        `🎬 Applying effects for item: ${currentEvent.itemName} (users: ${currentEvent.userIds.length})`
+      );
+
+      // グループ化されたイベントの場合、各ユーザーに対してエフェクトを適用
+      let updatedUsers = animatedUsers;
+      currentEvent.groupedEvents.forEach((event) => {
+        console.log(`🎯 Applying effect for user: ${event.userId}`);
+        // 個別のイベントに対してエフェクト適用（itemIdも渡す）
+        updatedUsers = applyItemEffect(
+          event.effect,
+          updatedUsers,
+          event.isCorrectAnswer,
+          event.userId,
+          event.itemId
+        );
+      });
+
+      // エフェクトアニメーションを開始（完了後に次の動画に進む）
+      setTimeout(() => {
+        startEffectAnimation(updatedUsers, proceedToNextMovie);
+      }, 500); // 少し遅延してからアニメーション開始
+    } else {
+      // エフェクトがない場合は直接次の動画に進む
+      proceedToNextMovie();
+    }
+  }, [
+    groupedItemEvents,
+    moviePlaybackState.currentMovieIndex,
+    animatedUsers,
+    applyItemEffect,
+    startEffectAnimation,
+    proceedToNextMovie,
+  ]);
+
   return {
     isGlobalAnimating,
     setIsGlobalAnimating,
@@ -778,5 +821,6 @@ export const useRankingAnimation = ({
     playNextMovie,
     currentGroupedEvent,
     isKillerAnimating,
+    handleDamageEffectEnd,
   };
 };

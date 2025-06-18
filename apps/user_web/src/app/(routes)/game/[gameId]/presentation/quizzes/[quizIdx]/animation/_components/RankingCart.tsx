@@ -5,6 +5,7 @@ import Image from "next/image";
 import styles from "./RankingCart.module.css";
 import { AnimatedUser, ItemEvent } from "./types";
 import { ExhaustParticles, DarkSmokeParticles } from "./RankingEffects";
+import { CartDamageEffect } from "./CartDamageEffect";
 import {
   getXPosition,
   getLaneYPosition,
@@ -18,6 +19,7 @@ interface RankingCartProps {
   isKillerAnimating: boolean;
   currentItemEvent: ItemEvent | undefined;
   kinokoUserIds: string[];
+  onDamageEffectEnd?: (userId: string) => void;
 }
 
 const RankingCart: React.FC<RankingCartProps> = ({
@@ -27,6 +29,7 @@ const RankingCart: React.FC<RankingCartProps> = ({
   isKillerAnimating,
   currentItemEvent,
   kinokoUserIds,
+  onDamageEffectEnd,
 }) => {
   const xPosition = getXPosition(user.animatedScore);
   const laneIndex = Math.min(index, 5);
@@ -34,6 +37,13 @@ const RankingCart: React.FC<RankingCartProps> = ({
 
   // チーム名の表示位置を決定（右端から見切れる場合は左側に表示）
   const shouldShowTeamNameOnLeft = xPosition > 70; // 70%を超えたら左側に表示
+
+  // ダメージエフェクト終了ハンドラー
+  const handleDamageEffectEnd = () => {
+    if (onDamageEffectEnd) {
+      onDamageEffectEnd(user.userId);
+    }
+  };
 
   return (
     <motion.div
@@ -156,6 +166,15 @@ const RankingCart: React.FC<RankingCartProps> = ({
                   className={styles.userThumbnail}
                 />
               </div>
+
+              {/* ダメージエフェクト */}
+              {user.damageEffect && (
+                <CartDamageEffect
+                  isVisible={user.damageEffect.isVisible}
+                  itemId={user.damageEffect.itemId}
+                  onEffectEnd={handleDamageEffectEnd}
+                />
+              )}
             </>
           )}
         </div>

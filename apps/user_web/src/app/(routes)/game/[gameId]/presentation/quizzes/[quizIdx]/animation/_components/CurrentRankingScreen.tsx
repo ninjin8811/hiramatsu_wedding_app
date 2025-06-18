@@ -43,6 +43,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     playNextMovie,
     currentGroupedEvent,
     isKillerAnimating,
+    handleDamageEffectEnd,
   } = useRankingAnimation({ users, itemEvents });
 
   // kinokoアイテムを使ったユーザーのIDを取得
@@ -221,6 +222,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     isKillerAnimating={isKillerAnimating}
                     currentItemEvent={currentGroupedEvent?.groupedEvents[0]}
                     kinokoUserIds={playedKinokoUserIds}
+                    onDamageEffectEnd={handleDamageEffectEnd}
                   />
                 ))}
             </AnimatePresence>
@@ -242,6 +244,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 displayRankNumber={displayRankNumber}
                 thumbnail={getThumbnail(user)}
                 kinokoUserIds={playedKinokoUserIds}
+                onDamageEffectEnd={handleDamageEffectEnd}
               />
             );
           })}
