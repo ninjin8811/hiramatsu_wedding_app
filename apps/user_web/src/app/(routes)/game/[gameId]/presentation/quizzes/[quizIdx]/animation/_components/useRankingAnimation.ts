@@ -212,7 +212,7 @@ export const useRankingAnimation = ({
                   copyFromIndex >= 0 &&
                   copyFromIndex < currentRanking.length
                 ) {
-                  newScore = currentRanking[copyFromIndex].currentScore;
+                  newScore = currentRanking[copyFromIndex].currentScore + 1; // 1pt加算
                   console.log(
                     `📋 Copying score from rank ${effect.copyFromRank}: ${user.teamName} gets ${newScore}pt`
                   );
