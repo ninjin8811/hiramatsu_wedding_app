@@ -10,10 +10,14 @@ type Props = {
   image: ReactNode;
   name: string;
   description: string;
-  canUse?: boolean;
   isUsed?: boolean;
   onUse?: () => void;
+  onCancel?: () => void;
   onClose: () => void;
+  button?: {
+    text: string;
+    isDisabled?: boolean;
+  };
 };
 
 export default function ItemDetailModal(props: Props) {
@@ -59,22 +63,25 @@ export default function ItemDetailModal(props: Props) {
         <div className={styles.content_image}>{props.image}</div>
         <div className={styles.content_name}>「{props.name}」</div>
         <div className={styles.content_description}>{props.description}</div>
-        {props.canUse && (
+        {props.button && (
           <div className={styles.content_button}>
             <div
               className={`${styles.content_button_item} ${styles.use} ${
-                props.isUsed ? styles.used : ""
+                props.button?.isDisabled ? styles.disabled : ""
               }`}
               onClick={() => {
-                if (props.isUsed) return;
+                if (props.button?.isDisabled) return;
                 props.onUse?.();
               }}
             >
-              {props.isUsed ? "使用済み " : "アイテムを使う"}
+              {props.button.text}
             </div>
             <div
               className={`${styles.content_button_item} ${styles.cancel}`}
-              onClick={props.onClose}
+              onClick={() => {
+                props.onCancel?.();
+                close();
+              }}
             >
               {props.isUsed ? "閉じる" : "やめておく"}
             </div>

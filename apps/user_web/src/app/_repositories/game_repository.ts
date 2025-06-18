@@ -8,7 +8,7 @@ export const listenGame = (
 ) => {
   const gameRef = documentGet(GameSchema, "Games", gameId);
 
-  onSnapshot(gameRef, (snapshot) => {
+  return onSnapshot(gameRef, (snapshot) => {
     const data = snapshot.data();
     if (data) {
       callback(data);

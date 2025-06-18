@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import styles from "./QuestionPage.module.scss";
-import IconTimer from "@/app/_images/IconTimer.png";
 import UserResultCorrectGif from "@/app/_images/UserResultCorrect.gif";
 import UserResultIncorrectGif from "@/app/_images/UserResultIncorrect.gif";
 import ItemDetailModal from "@user/_components/ItemDetailModal/ItemDetailModal";
@@ -14,9 +13,11 @@ import {
   documentSet,
 } from "@/app/_lib/firebase/ClientConverter";
 import StorageImage from "../../_components/StorageImage/StorageImage";
-import Indicator from "./QuestionIndicator";
+// import IconTimer from "@/app/_images/IconTimer.png";
+// import Indicator from "./QuestionIndicator";
 import { useClientReplace } from "../../_utils/useClientReplace";
 import { UserAppItem } from "../../_utils/userappTypes";
+import { listenGame } from "@/app/_repositories/game_repository";
 
 type Props = {
   gameId: string;
@@ -39,19 +40,11 @@ export default function QuestionPage(props: Props) {
     .filter((item) => item !== undefined);
   const [ownAnswers, setOwnAnswers] = useState<Answer[]>([]);
 
-  const [selectedItemId, setSelectedItemId] = useState<string | null>();
   const currentOwnAnswer = ownAnswers.find(
     (answer) => answer.questionIndex === currentQuestionIndex
   );
-
+  const selectedItemId = currentOwnAnswer?.usedItemId;
   const selectedAnswerIndex = currentOwnAnswer?.optionIndex;
-  useEffect(() => {
-    if (currentOwnAnswer) {
-      setSelectedItemId(currentOwnAnswer.usedItemId);
-    } else {
-      setSelectedItemId(null);
-    }
-  }, [currentOwnAnswer]);
 
   const correctRate = useCallback(() => {
     if (
@@ -81,7 +74,7 @@ export default function QuestionPage(props: Props) {
   ]);
 
   useEffect(() => {
-    const unsub = listenGame(props.gameId, (game) => setGame(game));
+    const unsub = listenGame(props.gameId, (game) => setGame(game as Game));
     return () => unsub();
   }, [props.gameId]);
 
@@ -151,10 +144,10 @@ export default function QuestionPage(props: Props) {
               />
             ))}
           </div>
-          <div className={styles.content_timer}>
+          {/* <div className={styles.content_timer}>
             <Image src={IconTimer} alt="time" />
             <Indicator answerTime={game.answerTime} />
-          </div>
+          </div> */}
         </div>
       </div>
       <div className={styles.foot}>
@@ -179,12 +172,24 @@ export default function QuestionPage(props: Props) {
               )}
               isUsing={selectedItemId === item.itemId}
               onUse={() => {
-                setSelectedItemId(item.itemId);
-                if (selectedAnswerIndex) {
-                  submitAnswer(selectedAnswerIndex, item.itemId);
-                }
+                if (!selectedAnswerIndex) return;
+                submitAnswer(selectedAnswerIndex, item.itemId);
               }}
-              canUse={game.currentProcess.type === "question"}
+              onCancel={() => {
+                if (!selectedAnswerIndex) return;
+                if (selectedItemId !== item.itemId) return;
+                submitAnswer(selectedAnswerIndex, null);
+              }}
+              game={game}
+              isAnswerSelected={selectedAnswerIndex !== undefined}
+              overrideButton={
+                currentQuestionIndex === 0
+                  ? {
+                      text: "例題には使えないよ！",
+                      isDisabled: true,
+                    }
+                  : undefined
+              }
             />
           ))}
           {Array.from({ length: 3 - (ownItems?.length || 0) }).map(
@@ -237,9 +242,35 @@ type ItemBoxProps = {
   canUse?: boolean;
   isUsing?: boolean;
   onUse?: () => void;
+  onCancel?: () => void;
+  game?: Game;
+  isAnswerSelected?: boolean;
+  overrideButton?: {
+    text: string;
+    isDisabled?: boolean;
+  };
 };
 
 function ItemBox(props: ItemBoxProps) {
+  const button = useCallback(() => {
+    if (props.overrideButton) {
+      return props.overrideButton;
+    }
+    if (props.game?.currentProcess.type !== "question") {
+      return undefined;
+    }
+
+    if (!props.isAnswerSelected) {
+      return { text: "先に答えを選択しよう！", isDisabled: true };
+    }
+
+    if (props.isUsed) {
+      return { text: "使用済み", isDisabled: true };
+    }
+
+    return { text: "アイテムを使う", isDisabled: false };
+  }, [props.isUsed, props.overrideButton, props.game, props.isAnswerSelected]);
+
   const [isOpen, setIsOpen] = useState(false);
 
   if (!props.image || !props.name || !props.description) {
@@ -262,29 +293,22 @@ function ItemBox(props: ItemBoxProps) {
           image={props.image}
           name={props.name}
           description={props.description}
-          canUse={props.canUse}
           onClose={() => {
             setIsOpen(false);
-            if (props.isUsed) {
-              props.onUse?.();
-            }
           }}
           isUsed={props.isUsed}
           onUse={() => {
             setIsOpen(false);
             props.onUse?.();
           }}
+          onCancel={() => {
+            props.onCancel?.();
+          }}
+          button={button()}
         />
       )}
     </>
   );
-}
-
-function listenGame(gameId: string, callback: (game: Game) => void) {
-  const ref = documentGet(GameSchema, `Games`, gameId);
-  return onSnapshot(ref, (snapshot) => {
-    callback(snapshot.data() as Game);
-  });
 }
 
 async function setAnswer(gameId: string, answer: Answer) {
