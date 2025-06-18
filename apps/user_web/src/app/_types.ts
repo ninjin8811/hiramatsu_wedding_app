@@ -17,7 +17,12 @@ export const QuestionSchema = z.object({
   imagePath: z
     .string()
     .url()
-    .describe("質問に関連する画像パス (Firebase Storage URL)"),
+    .describe("質問時に表示する画像パス (Firebase Storage URL)"),
+  answerImagePath: z
+    .string()
+    .url()
+    .optional()
+    .describe("答え合わせ時に表示する画像パス (Firebase Storage URL)"),
   point: z.number().int().nonnegative().describe("正解時に獲得するポイント"),
 });
 

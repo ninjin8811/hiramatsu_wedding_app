@@ -1,34 +1,41 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
-import styles from './QuizScreen.module.css';
-import { CurrentProcess, Question } from '@/app/_types';
-import { QuizScreenTimer } from './QuizScreenTimer';
-import { useRouter } from 'next/navigation';
-import { navigateToAnimation, showAnswerAction } from '../actions';
+import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
+import styles from "./QuizScreen.module.css";
+import { CurrentProcess, Question } from "@/app/_types";
+import { QuizScreenTimer } from "./QuizScreenTimer";
+import { useRouter } from "next/navigation";
+import { navigateToAnimation, showAnswerAction } from "../actions";
 
-
-const OPTION_LABELS = ['A', 'B', 'C', 'D'];
+const OPTION_LABELS = ["A", "B", "C", "D"];
 
 interface QuizScreenProps {
   gameId: string;
   quizIdx: number;
-  mode: Omit<CurrentProcess['type'], 'animation'>;
+  mode: Omit<CurrentProcess["type"], "animation">;
   totalQuestionLength: number;
   currentQuestionIdx: number;
   currentQuestion: Question;
   timeLimit: number;
 }
 
-const QuizScreen: React.FC<QuizScreenProps> = ({ gameId, quizIdx,mode, totalQuestionLength, currentQuestionIdx, currentQuestion, timeLimit }) => {
+const QuizScreen: React.FC<QuizScreenProps> = ({
+  gameId,
+  quizIdx,
+  mode,
+  totalQuestionLength,
+  currentQuestionIdx,
+  currentQuestion,
+  timeLimit,
+}) => {
   const [canShowAnswer, setCanShowAnswer] = useState(false);
   const router = useRouter();
-  const isModeAnswer = mode === 'answer';
+  const isModeAnswer = mode === "answer";
 
   const showAnswer = useCallback(() => {
     if (!canShowAnswer && !window.confirm("答えを表示しますか?")) {
-      return
+      return;
     }
     showAnswerAction(gameId, quizIdx);
   }, [canShowAnswer, gameId, quizIdx]);
@@ -40,20 +47,20 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ gameId, quizIdx,mode, totalQues
   // キーボード操作 (左右矢印で画面遷移)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') {
+      if (event.key === "ArrowLeft") {
         if (window.confirm("前の画面へ戻りますか?")) {
           router.back();
         }
-      } else if (event.key === 'ArrowRight' || event.key === 'Enter') {
+      } else if (event.key === "ArrowRight" || event.key === "Enter") {
         // 答えを表示したら次の画面へ遷移
         if (isModeAnswer) return navigateToAnimation(gameId, quizIdx);
         showAnswer();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [showAnswer, isModeAnswer, gameId, quizIdx, router]);
 
@@ -61,7 +68,9 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ gameId, quizIdx,mode, totalQues
     <main className={styles.bg}>
       <div className={styles.quizContainer}>
         <div className={styles.header}>
-          <span className={styles.progressText}>{`${currentQuestionIdx + 1}/${totalQuestionLength}`}</span>
+          <span className={styles.progressText}>{`${
+            currentQuestionIdx + 1
+          }/${totalQuestionLength}`}</span>
           <div className={styles.questionTextContainer}>
             <h1 className={styles.questionText}>{currentQuestion.question}</h1>
           </div>
@@ -72,7 +81,12 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ gameId, quizIdx,mode, totalQues
             <div className={styles.imageContainer}>
               {currentQuestion.imagePath && (
                 <Image
-                  src={currentQuestion.imagePath}
+                  src={
+                    isModeAnswer
+                      ? currentQuestion.answerImagePath ||
+                        currentQuestion.imagePath
+                      : currentQuestion.imagePath
+                  }
                   alt="Quiz image"
                   width={600}
                   height={338}
@@ -96,11 +110,10 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ gameId, quizIdx,mode, totalQues
               }
 
               return (
-                <div
-                  key={index}
-                  className={optionClassName}
-                >
-                  <span className={styles.optionLabel}>{OPTION_LABELS[index]}</span>
+                <div key={index} className={optionClassName}>
+                  <span className={styles.optionLabel}>
+                    {OPTION_LABELS[index]}
+                  </span>
                   <span className={styles.optionText}>{option}</span>
                 </div>
               );
@@ -108,7 +121,6 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ gameId, quizIdx,mode, totalQues
           </div>
         </div>
       </div>
-
     </main>
   );
 };
