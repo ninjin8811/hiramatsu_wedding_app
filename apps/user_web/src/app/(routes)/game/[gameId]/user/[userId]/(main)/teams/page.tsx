@@ -1,11 +1,5 @@
 import TeamPage from "../../../_pages/TeamPage/TeamPage";
-import { GameSchema } from "@/app/_types";
-import { documentGet } from "@/app/_lib/firebase/AdminConverter";
-import { initializeAdminSdk } from "@/app/_lib/firebase/FirebaseAdminInitializer";
-import { getGame, getTeams } from "../../../_repositories/server";
-import { UserTeamsPath } from "@/app/_utils/page_link";
-import { redirectPathByStatus } from "../../../_utils/redirectPathByStatus";
-import { redirect } from "next/navigation";
+import { getGame } from "../../../_repositories/server";
 
 type Props = {
   params: Promise<{
@@ -14,7 +8,8 @@ type Props = {
   }>;
 };
 
-export default async function UserPage(props: Props) {
+// チーム一覧ページ. ユーザー側表示はなくす (再利用されるかもなので残してます)
+export default async function Page(props: Props) {
   const { gameId, userId } = await props.params;
   const game = await getGame(gameId);
 

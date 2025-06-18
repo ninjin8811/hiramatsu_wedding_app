@@ -7,17 +7,21 @@ import ItemGetModal from "../../_components/ItemGetModal/ItemGetModal";
 import PrepareBox from "../../_components/PrepareBox/PrepareBox";
 import { Game, Item, GameUser } from "@/app/_types";
 import CapImage from "../../_components/CapImage/CapImage";
+import { useClientReplace } from "../../_utils/useClientReplace";
+import { UserAppItem } from "../../_utils/userappTypes";
 
 type Props = {
   gameId: string;
   userId: string;
   user: GameUser;
   game: Game;
-  items: Item[];
+  items: UserAppItem[];
 };
 
 export default function PreparePage(props: Props) {
   const [showItemGetModal, setShowItemGetModal] = useState(false);
+
+  useClientReplace(props.gameId, props.userId, "created");
 
   const userIndex = props.game.users.findIndex(
     (summary) => summary.id === props.userId

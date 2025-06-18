@@ -2,9 +2,7 @@
 import Image from "next/image";
 import styles from "./QuestionPage.module.scss";
 import IconTimer from "@/app/_images/IconTimer.png";
-import UserResultCorrect from "@/app/_images/UserResultCorrect.png";
 import UserResultCorrectGif from "@/app/_images/UserResultCorrect.gif";
-import UserResultIncorrect from "@/app/_images/UserResultIncorrect.png";
 import UserResultIncorrectGif from "@/app/_images/UserResultIncorrect.gif";
 import ItemDetailModal from "@user/_components/ItemDetailModal/ItemDetailModal";
 import { ReactNode, useCallback, useEffect, useState } from "react";
@@ -17,19 +15,19 @@ import {
 } from "@/app/_lib/firebase/ClientConverter";
 import StorageImage from "../../_components/StorageImage/StorageImage";
 import Indicator from "./QuestionIndicator";
-import { randomUUID } from "crypto";
-import { useRouter } from "next/navigation";
-import { UserResultPath } from "@/app/_utils/page_link";
+import { useClientReplace } from "../../_utils/useClientReplace";
+import { UserAppItem } from "../../_utils/userappTypes";
 
 type Props = {
   gameId: string;
   userId: string;
   game: Game;
-  items: Item[];
+  items: UserAppItem[];
 };
 
 export default function QuestionPage(props: Props) {
   const [game, setGame] = useState<Game>(props.game);
+  useClientReplace(props.gameId, props.userId, "inProgress");
 
   const currentQuestionIndex = game.currentProcess.index;
   const currentQuestion = game.questions[currentQuestionIndex];
@@ -82,8 +80,6 @@ export default function QuestionPage(props: Props) {
     ownAnswers,
   ]);
 
-  const { replace } = useRouter();
-
   useEffect(() => {
     const unsub = listenGame(props.gameId, (game) => setGame(game));
     return () => unsub();
@@ -97,23 +93,19 @@ export default function QuestionPage(props: Props) {
     return () => unsub();
   }, [props.gameId, props.userId]);
 
-  async function submitAnswer(index: number, itemId: string | null) {
-    const answer = {
-      answerId: props.userId + "_" + currentQuestionIndex,
-      questionIndex: currentQuestionIndex,
-      userId: props.userId,
-      optionIndex: index,
-      usedItemId: itemId || null,
-    };
-    console.log(answer);
-    await setAnswer(props.gameId, answer);
-  }
-
-  useEffect(() => {
-    if (game.status === "completed") {
-      replace(UserResultPath(props.gameId, props.userId));
-    }
-  }, [game.status, props.gameId, props.userId, replace]);
+  const submitAnswer = useCallback(
+    async (index: number, itemId: string | null) => {
+      const answer = {
+        answerId: props.userId + "_" + currentQuestionIndex,
+        questionIndex: currentQuestionIndex,
+        userId: props.userId,
+        optionIndex: index,
+        usedItemId: itemId || null,
+      };
+      await setAnswer(props.gameId, answer);
+    },
+    [props.gameId, props.userId, currentQuestionIndex]
+  );
 
   return (
     <div className={styles.questionPage}>
@@ -271,7 +263,12 @@ function ItemBox(props: ItemBoxProps) {
           name={props.name}
           description={props.description}
           canUse={props.canUse}
-          onClose={() => setIsOpen(false)}
+          onClose={() => {
+            setIsOpen(false);
+            if (props.isUsed) {
+              props.onUse?.();
+            }
+          }}
           isUsed={props.isUsed}
           onUse={() => {
             setIsOpen(false);

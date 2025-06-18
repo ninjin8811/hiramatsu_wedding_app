@@ -2,6 +2,7 @@ import { GameSchema, ItemSchema, UserSchema } from "@/app/_types";
 import { documentGet, collectionGet } from "@/app/_lib/firebase/AdminConverter";
 import { initializeAdminSdk } from "@/app/_lib/firebase/FirebaseAdminInitializer";
 import { unstable_cache } from "next/cache";
+import { UserAppItemSchema } from "../_utils/userappTypes";
 
 initializeAdminSdk();
 
@@ -13,8 +14,8 @@ export async function getGame(gameId: string) {
 export async function getItems() {
   const request = unstable_cache(
     async () => {
-      const res = await collectionGet(ItemSchema, "Items").get();
-      return res.docs.map((doc) => ItemSchema.parse(doc.data()));
+      const res = await collectionGet(UserAppItemSchema, "Items").get();
+      return res.docs.map((doc) => UserAppItemSchema.parse(doc.data()));
     },
     ["items"],
     {
