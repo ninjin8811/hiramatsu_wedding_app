@@ -5,19 +5,16 @@ import UserResultCorrectGif from "@/app/_images/UserResultCorrect.gif";
 import UserResultIncorrectGif from "@/app/_images/UserResultIncorrect.gif";
 import ItemDetailModal from "@user/_components/ItemDetailModal/ItemDetailModal";
 import { ReactNode, useCallback, useEffect, useState } from "react";
-import { Answer, AnswerSchema, Game, GameSchema, Item } from "@/app/_types";
-import { onSnapshot, query, setDoc, where } from "firebase/firestore";
-import {
-  collectionGet,
-  documentGet,
-  documentSet,
-} from "@/app/_lib/firebase/ClientConverter";
+import { Answer, AnswerSchema, Game } from "@/app/_types";
+import { setDoc } from "firebase/firestore";
+import { documentSet } from "@/app/_lib/firebase/ClientConverter";
 import StorageImage from "../../_components/StorageImage/StorageImage";
 // import IconTimer from "@/app/_images/IconTimer.png";
 // import Indicator from "./QuestionIndicator";
 import { useClientReplace } from "../../_utils/useClientReplace";
 import { UserAppItem } from "../../_utils/userappTypes";
 import { listenGame } from "@/app/_repositories/game_repository";
+import { listenUserAnswers } from "@/app/_repositories/answer_repository";
 
 type Props = {
   gameId: string;
@@ -79,8 +76,7 @@ export default function QuestionPage(props: Props) {
   }, [props.gameId]);
 
   useEffect(() => {
-    const unsub = listenAnswers(props.gameId, props.userId, (answers) => {
-      console.log(answers);
+    const unsub = listenUserAnswers(props.gameId, props.userId, (answers) => {
       setOwnAnswers(answers);
     });
     return () => unsub();
@@ -318,16 +314,4 @@ async function setAnswer(gameId: string, answer: Answer) {
     answer.answerId
   );
   await setDoc(ref, answer);
-}
-
-function listenAnswers(
-  gameId: string,
-  userId: string,
-  callback: (answers: Answer[]) => void
-) {
-  const ref = collectionGet(AnswerSchema, `Games/${gameId}/Answers`);
-  return onSnapshot(query(ref, where("userId", "==", userId)), (snapshot) => {
-    console.log(snapshot.docs.map((doc) => doc.data()));
-    callback(snapshot.docs.map((doc) => doc.data()));
-  });
 }
