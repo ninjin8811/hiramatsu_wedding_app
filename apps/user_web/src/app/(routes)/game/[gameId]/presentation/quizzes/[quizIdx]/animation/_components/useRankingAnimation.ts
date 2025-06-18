@@ -178,9 +178,12 @@ export const useRankingAnimation = ({
           case "random_users":
             const count = Number(effect.targetValue) || 1;
             // topRanksOnlyが指定されている場合は上位N位からランダム選択
-            const candidateUsers = effect.topRanksOnly
+            // スコアが0のユーザーは対象外
+            const candidateUsers = (
+              effect.topRanksOnly
               ? currentRanking.slice(0, effect.topRanksOnly)
-              : currentUsers;
+                : currentUsers
+            ).filter((user) => user.currentScore > 0);
             const shuffled = [...candidateUsers].sort(
               () => Math.random() - 0.5
             );
