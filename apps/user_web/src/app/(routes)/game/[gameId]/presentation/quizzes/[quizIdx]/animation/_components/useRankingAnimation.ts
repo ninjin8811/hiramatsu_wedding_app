@@ -116,7 +116,7 @@ export const useRankingAnimation = ({
       userId: string
     ): number => {
       const sortedUsers = users.toSorted(
-        (a, b) => b.currentScore - a.currentScore
+        (a, b) => b.currentScore - a.currentScore || a.userId.localeCompare(b.userId)
       );
       return sortedUsers.findIndex((u) => u.userId === userId);
     },
@@ -136,7 +136,7 @@ export const useRankingAnimation = ({
     ): AnimatedUser[] => {
       // 現在のランキングを計算（currentScoreベース）
       const currentRanking = currentUsers.toSorted(
-        (a, b) => b.currentScore - a.currentScore
+        (a, b) => b.currentScore - a.currentScore || a.userId.localeCompare(b.userId)
       );
 
       let targetUsers: AnimatedUser[] = [];
