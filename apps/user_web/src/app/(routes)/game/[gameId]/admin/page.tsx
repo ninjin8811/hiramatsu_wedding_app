@@ -2,13 +2,13 @@ import CurrentRanking from "./_component/CurrentRanking/CurrentRanking";
 import styles from "./page.module.scss";
 
 type Props = {
-  params: {
+  params: Promise<{
     gameId: string;
-  };
+  }>;
 };
 
-export default function AdminPage({ params }: Props) {
-  const { gameId } = params;
+export default async function AdminPage({ params }: Props) {
+  const { gameId } = await params;
 
   return (
     <div className={styles.container}>

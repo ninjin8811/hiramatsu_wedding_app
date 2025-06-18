@@ -18,5 +18,5 @@ export default async function Page({ params }: Props) {
   const redirectPath = redirectPathByStatus(game, userId, currentPath);
   if (redirectPath) return redirect(redirectPath);
 
-  return <ResultPage gameId={gameId} game={game} />;
+  return <ResultPage gameId={gameId} game={game} userId={userId} />;
 }
