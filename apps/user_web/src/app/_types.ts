@@ -164,6 +164,7 @@ export const ItemSchema = z.object({
     .url()
     .describe("アイテム効果動画URL (Firebase Storage Mov)"),
   effect: ItemEffectSchema.describe("アイテムの効果定義"),
+  priority: z.number().int().nonnegative().describe("アイテム使用優先度（数値が小さいほど優先）"),
 });
 
 export type Game = z.infer<typeof GameSchema>;

@@ -99,10 +99,12 @@ export default async function CurrentRankingPage({ params }: Props) {
         itemName: item.name,
         itemImage: item.image,
         itemMovie: item.movie,
+        priority: item.priority,
         isCorrectAnswer: answer.optionIndex === currentQuestion.correctIndex,
         effect: item.effect,
       };
-    });
+    })
+    .toSorted((a, b) => a.priority - b.priority);
 
   return (
     <CurrentRankingScreen
