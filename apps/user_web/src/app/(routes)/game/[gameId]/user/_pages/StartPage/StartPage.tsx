@@ -9,9 +9,10 @@ import FumiyaImage from "@/app/_images/Fumiya.png";
 import AoiImage from "@/app/_images/Aoi.png";
 import CommonButton from "../../_components/CommonButton/CommonButton";
 import Link from "next/link";
-import { UserPreparePath, UserTeamsPath } from "@/app/_utils/page_link";
-import { AnimatePresence, motion } from "framer-motion";
+import { UserPreparePath } from "@/app/_utils/page_link";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useClientReplace } from "../../_utils/useClientReplace";
 
 type Props = {
   gameId: string;
@@ -22,6 +23,8 @@ export default function StartPage(props: Props) {
   const [animationStage, setAnimationStage] = useState<
     "initial" | "moved" | "complete"
   >("initial");
+
+  useClientReplace(props.gameId, props.userId, "created");
 
   useEffect(() => {
     // 段階的アニメーションのタイミング制御
@@ -107,7 +110,7 @@ export default function StartPage(props: Props) {
         </motion.div>
       </div>
       <Link
-        href={UserTeamsPath(props.gameId, props.userId)}
+        href={UserPreparePath(props.gameId, props.userId)}
         className={styles.button}
       >
         <CommonButton color="blue">次へ</CommonButton>

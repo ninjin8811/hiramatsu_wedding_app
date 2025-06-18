@@ -1,30 +1,22 @@
 "use client";
-import Image from "next/image";
 import styles from "./PendingPage.module.scss";
-import SampleTeamImage from "@/app/_images/SampleTeamImage.png";
-import MarioCap from "@/app/_images/MarioCap.png";
-import { ReactNode, useEffect, useState } from "react";
-import ItemAkakora from "@/app/_images/ItemAkakora.png";
+import { ReactNode, useState } from "react";
 import ItemDetailModal from "@user/_components/ItemDetailModal/ItemDetailModal";
 import PrepareBox from "@user/_components/PrepareBox/PrepareBox";
-import { Game, GameSchema, Item } from "@/app/_types";
+import { Game } from "@/app/_types";
 import StorageImage from "../../_components/StorageImage/StorageImage";
-import { documentGet } from "@/app/_lib/firebase/ClientConverter";
-import { onSnapshot } from "firebase/firestore";
-import { useRouter } from "next/navigation";
-import { UserQuestionsPath } from "@/app/_utils/page_link";
 import CapImage from "../../_components/CapImage/CapImage";
-import { motion } from "framer-motion";
+import { useClientReplace } from "../../_utils/useClientReplace";
+import { UserAppItem } from "../../_utils/userappTypes";
 
 type Props = {
   gameId: string;
   userId: string;
-  items: Item[];
+  items: UserAppItem[];
   game: Game;
 };
 
 export default function PendingPage(props: Props) {
-  const [game, setGame] = useState<Game>(props.game);
   const userSummary = props.game.users.find(
     (summary) => summary.id === props.userId
   );
@@ -37,21 +29,7 @@ export default function PendingPage(props: Props) {
     .map((itemId) => props.items.find((item) => item.itemId === itemId))
     .filter((item) => item !== undefined);
 
-  const { replace } = useRouter();
-
-  useEffect(() => {
-    if (game.status === "inProgress") {
-      replace(UserQuestionsPath(props.gameId, props.userId));
-    }
-  }, [game]);
-
-  useEffect(() => {
-    const ref = documentGet(GameSchema, `Games`, props.gameId);
-    onSnapshot(ref, (snapshot) => {
-      const game = snapshot.data() as Game;
-      setGame(game);
-    });
-  }, []);
+  useClientReplace(props.gameId, props.userId, "created");
 
   return (
     <div className={styles.pendingPage}>
@@ -93,21 +71,6 @@ export default function PendingPage(props: Props) {
                   description={item.description}
                 />
               ))}
-              {/* <ItemButton
-                image={<Image src={ItemAkakora} alt="アカこうら" />}
-                name="アカこうら"
-                description="アカこうらはアイテムです。"
-              />
-              <ItemButton
-                image={<Image src={ItemAkakora} alt="アカこうら" />}
-                name="アカこうら"
-                description="アカこうらはアイテムです。"
-              />
-              <ItemButton
-                image={<Image src={ItemAkakora} alt="アカこうら" />}
-                name="アカこうら"
-                description="アカこうらはアイテムです。"
-              /> */}
             </div>
           </PrepareBox>
         </div>

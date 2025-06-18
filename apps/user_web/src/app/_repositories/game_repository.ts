@@ -1,4 +1,4 @@
-import { onSnapshot } from "firebase/firestore";
+import { getDoc, onSnapshot } from "firebase/firestore";
 import { Game, GameSchema } from "../_types";
 import { documentGet, GetAppModelType } from "../_lib/firebase/ClientConverter";
 
@@ -8,7 +8,7 @@ export const listenGame = (
 ) => {
   const gameRef = documentGet(GameSchema, "Games", gameId);
 
-  onSnapshot(gameRef, (snapshot) => {
+  return onSnapshot(gameRef, (snapshot) => {
     const data = snapshot.data();
     if (data) {
       callback(data);
@@ -16,4 +16,10 @@ export const listenGame = (
       callback(null);
     }
   });
+};
+
+export const fetchGame = async (gameId: string) => {
+  const gameRef = documentGet(GameSchema, "Games", gameId);
+  const doc = await getDoc(gameRef);
+  return doc.data();
 };

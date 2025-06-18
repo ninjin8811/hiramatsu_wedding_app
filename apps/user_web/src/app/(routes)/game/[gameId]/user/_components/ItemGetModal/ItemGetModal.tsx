@@ -8,28 +8,17 @@ import Link from "next/link";
 import { UserPendingPath } from "@/app/_utils/page_link";
 import { Item } from "@/app/_types";
 import { motion } from "framer-motion";
+import { UserAppItem } from "../../_utils/userappTypes";
 type Props = {
   gameId: string;
   userId: string;
-  items: Item[];
+  items: UserAppItem[];
   onClose: () => void;
 };
 
 export default function ItemGetModal(props: Props) {
   return (
     <div className={styles.itemGetModal}>
-      {/* <motion.div
-        className={styles.background}
-        animate={{
-          rotate: 360,
-        }}
-        transition={{
-          repeatType: "loop",
-          repeat: Infinity,
-          duration: 1,
-          ease: "linear",
-        }}
-      > */}
       <motion.div
         className={styles.background}
         animate={{

@@ -8,15 +8,19 @@ import styles from "./ResultPage.module.scss";
 import { Game } from "@/app/_types";
 import { motion } from "framer-motion";
 import { listenGame } from "@/app/_repositories/game_repository";
+import { useClientReplace } from "../../_utils/useClientReplace";
 
 type Props = {
   gameId: string;
+  userId: string;
   game: Game;
 };
 
 export default function ResultPage(props: Props) {
   const teams = props.game.users;
   const [game, setGame] = useState(props.game);
+
+  useClientReplace(props.gameId, props.userId, "completed");
 
   useEffect(() => {
     const unsubscribe = listenGame(props.gameId, (g) => setGame(g as Game));
