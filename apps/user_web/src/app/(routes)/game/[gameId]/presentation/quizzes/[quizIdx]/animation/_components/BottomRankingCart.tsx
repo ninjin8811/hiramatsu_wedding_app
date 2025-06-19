@@ -3,14 +3,16 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import styles from "./CurrentRanking.module.css";
-import { AnimatedUser } from "./types";
+import { AnimatedUser, ItemEvent } from "./types";
 import { CartDamageEffect } from "./CartDamageEffect";
+import { KinokoService } from "./KinokoService";
 
 interface BottomRankingCartProps {
   user: AnimatedUser;
   displayRankNumber: number;
   thumbnail: string;
   kinokoUserIds: string[];
+  itemEvents?: ItemEvent[]; // kinoko系アイテムの詳細判定のため追加
   onDamageEffectEnd?: (userId: string) => void;
 }
 
@@ -19,6 +21,7 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
   displayRankNumber,
   thumbnail,
   kinokoUserIds,
+  itemEvents,
   onDamageEffectEnd,
 }) => {
   // ダメージエフェクト終了ハンドラー
@@ -27,6 +30,19 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
       onDamageEffectEnd(user.userId);
     }
   };
+
+  // ユーザーが使用したkinoko系アイテムを特定
+  const getUserKinokoItem = (): string | null => {
+    if (!itemEvents) return null;
+    const userKinokoEvent = itemEvents.find(
+      (event) =>
+        event.userId === user.userId &&
+        KinokoService.isKinokoRelatedItem(event.itemId)
+    );
+    return userKinokoEvent ? userKinokoEvent.itemId : null;
+  };
+
+  const userKinokoItemId = getUserKinokoItem();
   return (
     <motion.div
       key={user.userId}
@@ -60,17 +76,22 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
             height={139}
             className={styles.bottomCartImage}
           />
-          {kinokoUserIds.includes(user.userId) && (
-            <div className={styles.kinokoIcon}>
-              <Image
-                src="https://firebasestorage.googleapis.com/v0/b/fussa-wedding-app-prod/o/items%2Fkinoko.png?alt=media&token=8c042c21-f6fa-4375-b1fc-f4c7aa1d2ad7"
-                alt="きのこアイテム"
-                width={25}
-                height={25}
-                className={styles.kinokoImage}
-              />
-            </div>
-          )}
+          {KinokoService.isKinokoUser(user.userId, kinokoUserIds) &&
+            userKinokoItemId && (
+              <div className={styles.kinokoIcon}>
+                <Image
+                  src={KinokoService.getKinokoImageUrl(userKinokoItemId)}
+                  alt={
+                    userKinokoItemId === KinokoService.getSpecialKinokoItemId()
+                      ? "スペシャルきのこアイテム"
+                      : "きのこアイテム"
+                  }
+                  width={25}
+                  height={25}
+                  className={styles.kinokoImage}
+                />
+              </div>
+            )}
           <div className={styles.bottomUserThumbnailContainer}>
             <Image
               src={thumbnail}

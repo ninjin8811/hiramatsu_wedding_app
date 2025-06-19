@@ -34,6 +34,7 @@ export interface ItemEvent {
   itemName: string;
   itemImage: string;
   itemMovie: string;
+  priority: number;
   effect: ItemEffect;
   isCorrectAnswer: boolean; // アイテム使用者が問題に正解したかどうか
 }

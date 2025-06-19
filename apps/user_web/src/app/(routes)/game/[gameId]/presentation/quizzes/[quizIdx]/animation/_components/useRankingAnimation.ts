@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { User, AnimatedUser, TireTrail, ItemEvent } from "./types";
 import { ItemEffect } from "@/app/_types";
 import { getXPosition } from "./animationUtils";
+import { KinokoService } from "./KinokoService";
 
 interface UseRankingAnimationProps {
   users: User[];
@@ -16,6 +17,7 @@ interface GroupedItemEvent {
   isCorrectAnswer: boolean;
   effect: ItemEffect;
   groupedEvents: ItemEvent[]; // 元のイベントを保持
+  priority: number; // priority情報を保持
 }
 
 export const useRankingAnimation = ({
@@ -31,17 +33,30 @@ export const useRankingAnimation = ({
   /** タイヤ痕の表示データ */
   const [tireTrails, setTireTrails] = useState<TireTrail[]>([]);
 
-  // アイテムイベントをグループ化（kinokoアイテムのみをまとめる）
+  // アイテムイベントをpriority順を維持してグループ化（kinoko系アイテムをそれぞれまとめる）
   const groupedItemEvents: GroupedItemEvent[] = (() => {
     const result: GroupedItemEvent[] = [];
-    const kinokoEvents: ItemEvent[] = [];
+    const kinokoEventsByPriority = new Map<number, ItemEvent[]>();
+    const specialKinokoEventsByPriority = new Map<number, ItemEvent[]>();
 
-    // kinokoアイテムとその他のアイテムを分ける
+    // priority順でアイテムを処理し、kinoko系は優先度ごとにグループ分け
     itemEvents.forEach((event) => {
-      if (event.itemId === "kinoko") {
-        kinokoEvents.push(event);
+      const priority = event.priority;
+
+      if (KinokoService.isRegularKinokoItem(event.itemId)) {
+        // 通常のkinokoイベントをpriority別にグループ分け
+        if (!kinokoEventsByPriority.has(priority)) {
+          kinokoEventsByPriority.set(priority, []);
+        }
+        kinokoEventsByPriority.get(priority)!.push(event);
+      } else if (KinokoService.isSpecialKinokoItem(event.itemId)) {
+        // special_kinokoイベントをpriority別にグループ分け
+        if (!specialKinokoEventsByPriority.has(priority)) {
+          specialKinokoEventsByPriority.set(priority, []);
+        }
+        specialKinokoEventsByPriority.get(priority)!.push(event);
       } else {
-        // kinoko以外は個別のグループとして追加
+        // kinoko系以外は個別のグループとして追加
         result.push({
           itemName: event.itemName,
           itemMovie: event.itemMovie,
@@ -49,24 +64,51 @@ export const useRankingAnimation = ({
           isCorrectAnswer: event.isCorrectAnswer,
           effect: event.effect,
           groupedEvents: [event],
+          priority: priority, // priority情報を保持
         });
       }
     });
 
-    // kinokoアイテムがある場合は、一つのグループとしてまとめる
-    if (kinokoEvents.length > 0) {
-      const firstKinokoEvent = kinokoEvents[0];
-      result.push({
-        itemName: "kinoko",
-        itemMovie: firstKinokoEvent.itemMovie,
-        userIds: kinokoEvents.map((e) => e.userId),
-        isCorrectAnswer: firstKinokoEvent.isCorrectAnswer,
-        effect: firstKinokoEvent.effect,
-        groupedEvents: kinokoEvents,
-      });
-    }
+    // kinoko系アイテムをpriorityごとにグループ化してresultに追加
+    const allKinokoPriorities = [
+      ...Array.from(kinokoEventsByPriority.keys()),
+      ...Array.from(specialKinokoEventsByPriority.keys()),
+    ].sort((a, b) => a - b); // priority順にソート
 
-    return result;
+    allKinokoPriorities.forEach((priority) => {
+      // 通常のkinokoアイテムを処理
+      if (kinokoEventsByPriority.has(priority)) {
+        const events = kinokoEventsByPriority.get(priority)!;
+        const firstEvent = events[0];
+        result.push({
+          itemName: "kinoko",
+          itemMovie: firstEvent.itemMovie,
+          userIds: events.map((e) => e.userId),
+          isCorrectAnswer: firstEvent.isCorrectAnswer,
+          effect: firstEvent.effect,
+          groupedEvents: events,
+          priority: priority,
+        });
+      }
+
+      // special_kinokoアイテムを処理
+      if (specialKinokoEventsByPriority.has(priority)) {
+        const events = specialKinokoEventsByPriority.get(priority)!;
+        const firstEvent = events[0];
+        result.push({
+          itemName: "special_kinoko",
+          itemMovie: firstEvent.itemMovie,
+          userIds: events.map((e) => e.userId),
+          isCorrectAnswer: firstEvent.isCorrectAnswer,
+          effect: firstEvent.effect,
+          groupedEvents: events,
+          priority: priority,
+        });
+      }
+    });
+
+    // 最終的にpriority順でソート
+    return result.sort((a, b) => a.priority - b.priority);
   })();
 
   /** 動画再生関連の状態 */
@@ -116,7 +158,8 @@ export const useRankingAnimation = ({
       userId: string
     ): number => {
       const sortedUsers = users.toSorted(
-        (a, b) => b.currentScore - a.currentScore || a.userId.localeCompare(b.userId)
+        (a, b) =>
+          b.currentScore - a.currentScore || a.userId.localeCompare(b.userId)
       );
       return sortedUsers.findIndex((u) => u.userId === userId);
     },
@@ -136,7 +179,8 @@ export const useRankingAnimation = ({
     ): AnimatedUser[] => {
       // 現在のランキングを計算（currentScoreベース）
       const currentRanking = currentUsers.toSorted(
-        (a, b) => b.currentScore - a.currentScore || a.userId.localeCompare(b.userId)
+        (a, b) =>
+          b.currentScore - a.currentScore || a.userId.localeCompare(b.userId)
       );
 
       let targetUsers: AnimatedUser[] = [];
@@ -236,13 +280,16 @@ export const useRankingAnimation = ({
           const updatedUser = {
             ...user,
             currentScore: newScore,
-            damageEffect: isDamaged && itemId
-              ? { isVisible: true, itemId }
-              : user.damageEffect,
+            damageEffect:
+              isDamaged && itemId
+                ? { isVisible: true, itemId }
+                : user.damageEffect,
           };
 
           if (isDamaged && itemId) {
-            console.log(`🎬 Setting damage effect for ${user.teamName}: itemId=${itemId}`);
+            console.log(
+              `🎬 Setting damage effect for ${user.teamName}: itemId=${itemId}`
+            );
           }
 
           return updatedUser;
@@ -394,7 +441,9 @@ export const useRankingAnimation = ({
           return prev.map((user) => {
             if (user.userId === userToAnimate.userId) {
               // updatedUsersから最新の情報を取得
-              const latestUser = updatedUsers.find((u) => u.userId === user.userId);
+              const latestUser = updatedUsers.find(
+                (u) => u.userId === user.userId
+              );
               return {
                 ...user,
                 isAnimating: true,
@@ -752,7 +801,6 @@ export const useRankingAnimation = ({
       startMoviePlayback();
     }, 3000);
   }, [users, animationCompleted, startMoviePlayback, getRankByScore]);
-
 
   /**
    * ダメージエフェクトを終了する関数

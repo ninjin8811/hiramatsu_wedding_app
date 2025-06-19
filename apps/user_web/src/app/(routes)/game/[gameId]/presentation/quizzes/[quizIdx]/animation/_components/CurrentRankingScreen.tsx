@@ -12,6 +12,7 @@ import { useRankingAnimation } from "./useRankingAnimation";
 import { MoviePlayer } from "./MoviePlayer";
 import RankingCart from "./RankingCart";
 import BottomRankingCart from "./BottomRankingCart";
+import { KinokoService } from "./KinokoService";
 
 export type { User } from "./types";
 
@@ -47,23 +48,23 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   } = useRankingAnimation({ users, itemEvents });
 
   // kinokoアイテムを使ったユーザーのIDを取得
-  const kinokoUserIds = itemEvents
-    .filter((event) => event.itemId === "kinoko")
-    .map((event) => event.userId);
+  const kinokoUserIds = KinokoService.getKinokoUserIds(itemEvents);
 
   // 再生完了したアイテムを追跡
   const [playedItems, setPlayedItems] = useState<Set<string>>(new Set());
 
-  // kinokoの動画が再生完了したかチェック
-  const hasKinokoMoviePlayed = playedItems.has("kinoko");
-
   // 動画再生完了後にのみ表示するkinokoユーザーのID
-  const playedKinokoUserIds = hasKinokoMoviePlayed ? kinokoUserIds : [];
+  const playedKinokoUserIds = KinokoService.getPlayedKinokoUserIds(
+    kinokoUserIds,
+    playedItems
+  );
 
   // moviePlayerの動画終了を監視してplayedItemsを更新
   const handleMovieEnd = () => {
     if (currentGroupedEvent) {
-      setPlayedItems((prev) => new Set(prev).add(currentGroupedEvent.itemName));
+      setPlayedItems((prev: Set<string>) =>
+        new Set(prev).add(currentGroupedEvent.itemName)
+      );
     }
     playNextMovie();
   };
@@ -102,7 +103,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
           playNextMovie();
         } else if (moviePlaybackState.allMoviesCompleted) {
           // 現在のスコア情報を抽出してナビゲート
-          const usersScores = animatedUsers.map((user) => ({
+          const usersScores = animatedUsers.map((user: AnimatedUser) => ({
             userId: user.userId,
             score: user.currentScore,
           }));
@@ -124,11 +125,13 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
 
   // animatedScoreベースで並び順を決定（prev→currentへの変化をアニメーションで表現）
   const sortedUsers = animatedUsers.toSorted(
-    (a, b) => b.animatedScore - a.animatedScore
+    (a: AnimatedUser, b: AnimatedUser) => b.animatedScore - a.animatedScore
   );
 
   // 7位以降の判定
-  const otherUsers = sortedUsers.filter((user, index) => index >= 6);
+  const otherUsers = sortedUsers.filter(
+    (user: AnimatedUser, index: number) => index >= 6
+  );
 
   const getThumbnail = (user: AnimatedUser): string => {
     if (!isGlobalAnimating) {
@@ -222,6 +225,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     isKillerAnimating={isKillerAnimating}
                     currentItemEvent={currentGroupedEvent?.groupedEvents[0]}
                     kinokoUserIds={playedKinokoUserIds}
+                    itemEvents={itemEvents}
                     onDamageEffectEnd={handleDamageEffectEnd}
                   />
                 ))}
@@ -244,6 +248,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 displayRankNumber={displayRankNumber}
                 thumbnail={getThumbnail(user)}
                 kinokoUserIds={playedKinokoUserIds}
+                itemEvents={itemEvents}
                 onDamageEffectEnd={handleDamageEffectEnd}
               />
             );

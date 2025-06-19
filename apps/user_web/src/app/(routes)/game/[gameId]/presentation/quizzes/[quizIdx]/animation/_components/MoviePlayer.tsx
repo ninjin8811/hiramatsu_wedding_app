@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./MoviePlayer.module.css";
 import { ItemEvent } from "./types";
+import { KinokoService } from "./KinokoService";
 
 interface MoviePlayerProps {
   movieUrl: string;
@@ -22,15 +23,23 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 動画サイズを変更する条件を判定
-  const shouldUseSpecialSize =
-    itemEvent &&
-    (itemEvent.itemName === "kinoko" ||
-      itemEvent.effect.effectType === "conditional_bonus");
+  // kinoko系アイテムかどうかを判定
+  const isKinokoItem =
+    itemEvent && KinokoService.isKinokoRelatedItem(itemEvent.itemId);
+
+  // kinoko系アイテムの場合の表示時間を計算（ユーザー数 × 1 + 2秒）
+  const kinokoDisplayDuration =
+    isKinokoItem && itemUserNames
+      ? (itemUserNames.length * 1 + 2) * 1000 // ミリ秒に変換
+      : 0;
 
   const handleVideoEnd = () => {
-    onMovieEnd();
+    // kinoko系アイテムの場合はタイマーで制御するため、ここでは何もしない
+    if (!isKinokoItem) {
+      onMovieEnd();
+    }
   };
 
   const handleVideoError = (
@@ -54,6 +63,37 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
     console.log("動画再生停止");
   };
 
+  // kinoko系アイテムの時間制御
+  useEffect(() => {
+    if (isVisible && isKinokoItem && kinokoDisplayDuration > 0) {
+      console.log(
+        `🍄 kinoko系アイテム動画表示時間: ${
+          kinokoDisplayDuration / 1000
+        }秒 (ユーザー数: ${itemUserNames?.length})`
+      );
+
+      // 指定時間後に動画を終了
+      timeoutRef.current = setTimeout(() => {
+        console.log("🍄 kinoko系動画表示時間完了");
+        onMovieEnd();
+      }, kinokoDisplayDuration);
+    }
+
+    // クリーンアップ
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [
+    isVisible,
+    isKinokoItem,
+    kinokoDisplayDuration,
+    onMovieEnd,
+    itemUserNames?.length,
+  ]);
+
   if (!isVisible) return null;
 
   return (
@@ -67,9 +107,7 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
       <video
         ref={videoRef}
         src={movieUrl}
-        className={
-          shouldUseSpecialSize ? styles.movieVideoSpecial : styles.movieVideo
-        }
+        className={styles.movieVideo}
         onEnded={handleVideoEnd}
         onError={handleVideoError}
         onPlay={handlePlay}
@@ -78,6 +116,7 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
         playsInline
         preload="auto"
         autoPlay
+        loop={isKinokoItem} // kinoko系アイテムの場合はループ再生
       ></video>
 
       {/* アイテム使用者の情報表示（左上） */}
