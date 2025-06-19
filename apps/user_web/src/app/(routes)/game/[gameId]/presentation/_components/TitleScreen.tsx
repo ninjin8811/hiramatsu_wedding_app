@@ -4,6 +4,7 @@ import styles from "./TitleScreen.module.css";
 import { GameScreen } from "../page";
 import HomeItemBoxImg from "../../../../../_images/HomeItemBox.png";
 import HomeLogoImg from "../../../../../_images/HomeLogo.png";
+import BackgroundImg from "../../../../../_images/Background.png";
 import MainCharactersBox from "../../../../../_components/MainCharactersBox/MainCharactersBox";
 import FumiyaImg from "../../../../../_images/Fumiya.png";
 import AoiImg from "../../../../../_images/Aoi.png";
@@ -52,7 +53,77 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
   );
 
   return (
-    <main className={styles.bg}>
+    <main className={styles.main}>
+      <div className={styles.background}>
+        <motion.div
+          className={styles.background_main}
+          animate={{
+            x: ["-50%", "0%"],
+            y: ["-50%", "0%"],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          {/* 画像サイズ750x1624px（縦長）を考慮した3x3グリッド配置 */}
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: 0, left: 0 }}
+          />
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: 0, left: "33.33%" }}
+          />
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: 0, left: "66.66%" }}
+          />
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "33.33%", left: 0 }}
+          />
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "33.33%", left: "33.33%" }}
+          />
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "33.33%", left: "66.66%" }}
+          />
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "66.66%", left: 0 }}
+          />
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "66.66%", left: "33.33%" }}
+          />
+          <Image
+            src={BackgroundImg}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "66.66%", left: "66.66%" }}
+          />
+        </motion.div>
+      </div>
       <div className={styles.container}>
         <AnimatePresence>
           <motion.div

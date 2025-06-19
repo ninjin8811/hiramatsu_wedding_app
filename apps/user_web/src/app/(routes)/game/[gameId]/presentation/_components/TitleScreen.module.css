@@ -1,20 +1,34 @@
-@keyframes backgroundDrift {
-  0% {
-    background-position: -50% 0%;
-  }
-  100% {
-    background-position: 150% 50%;
-  }
-}
-
-.bg {
-  background-image: url(../../../../../_images/Background.png);
-  background-size: 120%;
-  background-position: 0% 0%;
-  background-repeat: no-repeat;
+.main {
   height: 100vh;
   width: 100vw;
-  animation: backgroundDrift 60s linear infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.background {
+  z-index: -1;
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  bottom: -20px;
+  right: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+}
+
+.background_main {
+  width: 200%;
+  height: 200%;
+  position: relative;
+  overflow: hidden;
+}
+
+.background_image {
+  width: 33.33%;
+  height: 33.33%;
+  object-fit: cover;
+  min-width: 80vw;
+  min-height: 150vh;
 }
 
 .container {
@@ -23,6 +37,8 @@
   align-items: center;
   justify-content: center;
   padding-top: 2.6vw;
+  position: relative;
+  z-index: 1;
 }
 
 .mainCharactersContainer {
