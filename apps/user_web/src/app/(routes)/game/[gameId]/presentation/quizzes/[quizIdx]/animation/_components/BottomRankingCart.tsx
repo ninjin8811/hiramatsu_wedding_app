@@ -11,7 +11,8 @@ interface BottomRankingCartProps {
   user: AnimatedUser;
   displayRankNumber: number;
   thumbnail: string;
-  kinokoUserIds: string[];
+  playedRegularKinokoUserIds: string[]; // 演出完了した通常kinokoユーザー
+  playedSpecialKinokoUserIds: string[]; // 演出完了したspecial_kinokoユーザー
   itemEvents?: ItemEvent[]; // kinoko系アイテムの詳細判定のため追加
   onDamageEffectEnd?: (userId: string) => void;
 }
@@ -20,7 +21,8 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
   user,
   displayRankNumber,
   thumbnail,
-  kinokoUserIds,
+  playedRegularKinokoUserIds,
+  playedSpecialKinokoUserIds,
   itemEvents,
   onDamageEffectEnd,
 }) => {
@@ -76,8 +78,11 @@ const BottomRankingCart: React.FC<BottomRankingCartProps> = ({
             height={139}
             className={styles.bottomCartImage}
           />
-          {KinokoService.isKinokoUser(user.userId, kinokoUserIds) &&
-            userKinokoItemId && (
+          {userKinokoItemId &&
+            ((KinokoService.isRegularKinokoItem(userKinokoItemId) &&
+              playedRegularKinokoUserIds.includes(user.userId)) ||
+              (KinokoService.isSpecialKinokoItem(userKinokoItemId) &&
+                playedSpecialKinokoUserIds.includes(user.userId))) && (
               <div className={styles.kinokoIcon}>
                 <Image
                   src={KinokoService.getKinokoImageUrl(userKinokoItemId)}

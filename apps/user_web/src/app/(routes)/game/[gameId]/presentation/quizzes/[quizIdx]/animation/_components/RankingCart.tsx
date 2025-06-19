@@ -19,7 +19,8 @@ interface RankingCartProps {
   thumbnail: string;
   isKillerAnimating: boolean;
   currentItemEvent: ItemEvent | undefined;
-  kinokoUserIds: string[];
+  playedRegularKinokoUserIds: string[]; // 演出完了した通常kinokoユーザー
+  playedSpecialKinokoUserIds: string[]; // 演出完了したspecial_kinokoユーザー
   itemEvents?: ItemEvent[]; // kinoko系アイテムの詳細判定のため追加
   onDamageEffectEnd?: (userId: string) => void;
 }
@@ -30,7 +31,8 @@ const RankingCart: React.FC<RankingCartProps> = ({
   thumbnail,
   isKillerAnimating,
   currentItemEvent,
-  kinokoUserIds,
+  playedRegularKinokoUserIds,
+  playedSpecialKinokoUserIds,
   itemEvents,
   onDamageEffectEnd,
 }) => {
@@ -161,9 +163,12 @@ const RankingCart: React.FC<RankingCartProps> = ({
                   user.isRankDown ? styles.cartRankDown : ""
                 }`}
               />
-              {/* きのこ系アイテムを使ったユーザーのカート右上にアイテム画像を表示（演出完了後のみ） */}
-              {KinokoService.isKinokoUser(user.userId, kinokoUserIds) &&
-                userKinokoItemId && (
+              {/* きのこ系アイテムを使ったユーザーのカート右上にアイテム画像を表示（個別演出完了後のみ） */}
+              {userKinokoItemId &&
+                ((KinokoService.isRegularKinokoItem(userKinokoItemId) &&
+                  playedRegularKinokoUserIds.includes(user.userId)) ||
+                  (KinokoService.isSpecialKinokoItem(userKinokoItemId) &&
+                    playedSpecialKinokoUserIds.includes(user.userId))) && (
                   <div className={styles.kinokoIcon}>
                     <Image
                       src={KinokoService.getKinokoImageUrl(userKinokoItemId)}

@@ -47,17 +47,26 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     handleDamageEffectEnd,
   } = useRankingAnimation({ users, itemEvents });
 
-  // kinokoアイテムを使ったユーザーのIDを取得
-  const kinokoUserIds = KinokoService.getKinokoUserIds(itemEvents);
+  // kinoko系アイテムを使ったユーザーのIDを個別に取得
+  const regularKinokoUserIds =
+    KinokoService.getRegularKinokoUserIds(itemEvents);
+  const specialKinokoUserIds =
+    KinokoService.getSpecialKinokoUserIds(itemEvents);
 
   // 再生完了したアイテムを追跡
   const [playedItems, setPlayedItems] = useState<Set<string>>(new Set());
 
-  // 動画再生完了後にのみ表示するkinokoユーザーのID
-  const playedKinokoUserIds = KinokoService.getPlayedKinokoUserIds(
-    kinokoUserIds,
+  // 演出完了後にのみ表示するkinokoユーザーのID（個別管理）
+  const playedRegularKinokoUserIds = KinokoService.hasRegularKinokoMoviePlayed(
     playedItems
-  );
+  )
+    ? regularKinokoUserIds
+    : [];
+  const playedSpecialKinokoUserIds = KinokoService.hasSpecialKinokoMoviePlayed(
+    playedItems
+  )
+    ? specialKinokoUserIds
+    : [];
 
   // moviePlayerの動画終了を監視してplayedItemsを更新
   const handleMovieEnd = () => {
@@ -224,7 +233,8 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                     thumbnail={getThumbnail(user)}
                     isKillerAnimating={isKillerAnimating}
                     currentItemEvent={currentGroupedEvent?.groupedEvents[0]}
-                    kinokoUserIds={playedKinokoUserIds}
+                    playedRegularKinokoUserIds={playedRegularKinokoUserIds}
+                    playedSpecialKinokoUserIds={playedSpecialKinokoUserIds}
                     itemEvents={itemEvents}
                     onDamageEffectEnd={handleDamageEffectEnd}
                   />
@@ -247,7 +257,8 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 user={user}
                 displayRankNumber={displayRankNumber}
                 thumbnail={getThumbnail(user)}
-                kinokoUserIds={playedKinokoUserIds}
+                playedRegularKinokoUserIds={playedRegularKinokoUserIds}
+                playedSpecialKinokoUserIds={playedSpecialKinokoUserIds}
                 itemEvents={itemEvents}
                 onDamageEffectEnd={handleDamageEffectEnd}
               />
