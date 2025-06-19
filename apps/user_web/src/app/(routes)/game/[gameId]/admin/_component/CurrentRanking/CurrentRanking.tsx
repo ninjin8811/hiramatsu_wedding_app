@@ -100,6 +100,52 @@ export default function CurrentRanking(props: Props) {
     );
   };
 
+  // 過去の問題の解答状況を取得
+  const getUserAnswerHistory = (userId: string) => {
+    if (!game?.questions) return [];
+
+    return game.questions.map((question, index) => {
+      const answer = answers.find(
+        (a) => a.userId === userId && a.questionIndex === index
+      );
+
+      if (!answer)
+        return { questionIndex: index, answered: false, correct: false };
+
+      return {
+        questionIndex: index,
+        answered: true,
+        correct: answer.optionIndex === question.correctIndex,
+      };
+    });
+  };
+
+  // 現在の問題の解答状況サマリーを取得
+  const getCurrentQuestionSummary = () => {
+    if (
+      !game?.users ||
+      currentQuestionIndex === null ||
+      currentQuestionIndex === undefined
+    ) {
+      return { answered: 0, total: 0, correct: 0 };
+    }
+
+    const totalUsers = game.users.length;
+    const currentAnswers = answers.filter(
+      (answer) => answer.questionIndex === currentQuestionIndex
+    );
+    const answeredUsers = currentAnswers.length;
+    const correctAnswers = currentAnswers.filter(
+      (answer) => answer.optionIndex === currentQuestionCorrectAnswer
+    ).length;
+
+    return {
+      answered: answeredUsers,
+      total: totalUsers,
+      correct: correctAnswers,
+    };
+  };
+
   const giveItemToUser = async (userId: string, itemId: string) => {
     if (!game) return;
 
@@ -183,80 +229,144 @@ export default function CurrentRanking(props: Props) {
       return DISPLAY_ITEMS.indexOf(a.itemId) - DISPLAY_ITEMS.indexOf(b.itemId);
     });
 
+  const currentQuestionSummary = getCurrentQuestionSummary();
+
   return (
     <div className={styles.container}>
-      <div className={styles.ranking_list}>
-        {ranking?.map((user, index) => (
-          <div className={styles.rankingItem} key={user.id}>
-            <div className={styles.rank}>{index + 1}</div>
-            <div className={styles.userInfo}>
-              <div className={styles.thumbnail}>
-                <StorageImage
-                  path={user.thumbnail}
-                  alt={user.name}
-                  width={40}
-                  height={40}
-                  className={styles.userThumbnail}
-                  fit="cover"
-                />
-              </div>
-              <div className={styles.name}>{user.name}</div>
-            </div>
-            <div className={styles.score}>{user.score}</div>
-            <div className={styles.userItems}>
-              {user.itemIds.map((itemId, index) => {
-                const item = getItem(itemId);
-                const status = checkItemStatus(user.id, itemId);
-
-                return (
-                  <div
-                    className={`${styles.item} ${
-                      styles[`status_${status}`]
-                    } ${getItemBackgroundClass(itemId)}`}
-                    key={index}
-                  >
-                    {item?.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        width={25}
-                        height={25}
-                        className={styles.itemThumbnail}
-                      />
-                    ) : (
-                      <div className={styles.itemPlaceholder} />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            <div className={styles.answerState}>
-              {getAnswerStateDisplay(user.id)}
-            </div>
-            <div className={styles.itemSelection}>
-              {displayItems.map((item) => (
-                <div
-                  key={item.itemId}
-                  className={`${styles.selectableItem} ${getItemBackgroundClass(
-                    item.itemId
-                  )}`}
-                  onClick={() =>
-                    handleItemClick(user.id, item.itemId, item.name, user.name)
-                  }
-                  title={`${user.name}に${item.name}を付与`}
-                >
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    width={25}
-                    height={25}
-                    className={styles.selectableItemImage}
-                  />
-                </div>
-              ))}
+      {/* 現在の問題の解答状況サマリー */}
+      {game?.status === "inProgress" &&
+        currentQuestionIndex !== null &&
+        currentQuestionIndex !== undefined && (
+          <div className={styles.currentQuestionSummary}>
+            <h3>現在の問題 ({currentQuestionIndex + 1}問目)</h3>
+            <div className={styles.summaryStats}>
+              <span>
+                回答済み: {currentQuestionSummary.answered}/
+                {currentQuestionSummary.total}人
+              </span>
+              <span>正解: {currentQuestionSummary.correct}人</span>
+              <span>
+                正答率:{" "}
+                {currentQuestionSummary.total > 0
+                  ? Math.round(
+                      (currentQuestionSummary.correct /
+                        currentQuestionSummary.total) *
+                        100
+                    )
+                  : 0}
+                %
+              </span>
             </div>
           </div>
-        ))}
+        )}
+
+      <div className={styles.ranking_list}>
+        {ranking?.map((user, index) => {
+          const answerHistory = getUserAnswerHistory(user.id);
+
+          return (
+            <div className={styles.rankingItem} key={user.id}>
+              <div className={styles.rank}>{index + 1}</div>
+              <div className={styles.userInfo}>
+                <div className={styles.thumbnail}>
+                  <StorageImage
+                    path={user.thumbnail}
+                    alt={user.name}
+                    width={40}
+                    height={40}
+                    className={styles.userThumbnail}
+                    fit="cover"
+                  />
+                </div>
+                <div className={styles.name}>{user.name}</div>
+              </div>
+              <div className={styles.score}>{user.score}</div>
+              <div className={styles.userItems}>
+                {user.itemIds.map((itemId, index) => {
+                  const item = getItem(itemId);
+                  const status = checkItemStatus(user.id, itemId);
+
+                  return (
+                    <div
+                      className={`${styles.item} ${
+                        styles[`status_${status}`]
+                      } ${getItemBackgroundClass(itemId)}`}
+                      key={index}
+                    >
+                      {item?.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={25}
+                          height={25}
+                          className={styles.itemThumbnail}
+                        />
+                      ) : (
+                        <div className={styles.itemPlaceholder} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className={styles.answerState}>
+                {getAnswerStateDisplay(user.id)}
+              </div>
+
+              {/* 過去の問題の解答状況 */}
+              <div className={styles.answerHistory}>
+                {answerHistory.map((history, qIndex) => (
+                  <div
+                    key={qIndex}
+                    className={`${styles.historyItem} ${
+                      history.answered
+                        ? history.correct
+                          ? styles.correct
+                          : styles.incorrect
+                        : styles.notAnswered
+                    }`}
+                    title={`問題${qIndex + 1}: ${
+                      history.answered
+                        ? history.correct
+                          ? "正解"
+                          : "不正解"
+                        : "未回答"
+                    }`}
+                  >
+                    {history.answered ? (history.correct ? "○" : "×") : "-"}
+                  </div>
+                ))}
+              </div>
+
+              <div className={styles.itemSelection}>
+                {displayItems.map((item) => (
+                  <div
+                    key={item.itemId}
+                    className={`${
+                      styles.selectableItem
+                    } ${getItemBackgroundClass(item.itemId)}`}
+                    onClick={() =>
+                      handleItemClick(
+                        user.id,
+                        item.itemId,
+                        item.name,
+                        user.name
+                      )
+                    }
+                    title={`${user.name}に${item.name}を付与`}
+                  >
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      width={25}
+                      height={25}
+                      className={styles.selectableItemImage}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -8,6 +8,37 @@
   flex: 1;
 }
 
+// 現在の問題サマリー
+.currentQuestionSummary {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.currentQuestionSummary h3 {
+  margin: 0 0 0.5rem 0;
+  color: #1e40af;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.summaryStats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.summaryStats span {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #374151;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
 .ranking_list {
   display: flex;
   flex-direction: column;
@@ -16,7 +47,7 @@
 
 .rankingItem {
   display: grid;
-  grid-template-columns: 50px 1fr 70px 1fr 50px 1fr;
+  grid-template-columns: 50px 1fr 70px 1fr 50px 1fr 1fr 1fr;
   align-items: center;
   padding: 0.75rem;
   background: rgba(255, 255, 255, 0.7);
@@ -167,6 +198,45 @@
   font-weight: bold;
 }
 
+// 過去の問題の解答状況
+.answerHistory {
+  display: flex;
+  gap: 0.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.historyItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.historyItem.correct {
+  background: rgba(34, 197, 94, 0.2);
+  color: #16a34a;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.historyItem.incorrect {
+  background: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.historyItem.notAnswered {
+  background: rgba(156, 163, 175, 0.2);
+  color: #6b7280;
+  border-color: rgba(156, 163, 175, 0.4);
+}
+
 /* アイテム選択エリア */
 .itemSelection {
   display: flex;
@@ -274,15 +344,22 @@
 
 @media (max-width: 1024px) {
   .rankingItem {
-    grid-template-columns: 40px 1fr 60px 1fr 40px;
-    grid-template-rows: auto auto;
+    grid-template-columns: 40px 1fr 60px 1fr 40px 1fr;
+    grid-template-rows: auto auto auto;
     gap: 0.4rem;
     padding: 0.6rem;
   }
 
-  .itemSelection {
+  .answerHistory {
     grid-column: 1 / -1;
     grid-row: 2;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .itemSelection {
+    grid-column: 1 / -1;
+    grid-row: 3;
     justify-content: center;
     margin-top: 0.5rem;
   }
@@ -293,9 +370,27 @@
     padding: 1rem;
   }
 
+  .currentQuestionSummary {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .currentQuestionSummary h3 {
+    font-size: 1rem;
+  }
+
+  .summaryStats {
+    gap: 0.75rem;
+  }
+
+  .summaryStats span {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
   .rankingItem {
     grid-template-columns: 35px 1fr 50px;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto auto auto;
     gap: 0.3rem;
     padding: 0.5rem;
   }
@@ -347,9 +442,22 @@
     font-size: 0.8rem;
   }
 
-  .itemSelection {
+  .answerHistory {
     grid-column: 1 / -1;
     grid-row: 3;
+    justify-content: center;
+    gap: 0.15rem;
+  }
+
+  .historyItem {
+    width: 16px;
+    height: 16px;
+    font-size: 0.7rem;
+  }
+
+  .itemSelection {
+    grid-column: 1 / -1;
+    grid-row: 4;
     justify-content: center;
     gap: 0.3rem;
   }
