@@ -26,7 +26,7 @@ export default function DevicesPage() {
           <div key={user.id} style={{ border: "1px solid #ccc", margin: 4 }}>
             <div style={{ textAlign: "center", fontSize: 32 }}>{user.name}</div>
             <iframe
-              src={`/game/${gameId}/user/${user.id}/pending`}
+              src={`/game/${gameId}/user/${user.id}/`}
               width={480}
               height={900}
               style={{ border: "none" }}
