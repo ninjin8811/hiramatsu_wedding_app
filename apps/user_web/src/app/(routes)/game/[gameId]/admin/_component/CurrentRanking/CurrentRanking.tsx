@@ -177,9 +177,11 @@ export default function CurrentRanking(props: Props) {
   };
 
   // 表示するアイテムのみをフィルタリング
-  const displayItems = DISPLAY_ITEMS.map((itemId) => {
-    return items.find((item) => item.itemId === itemId);
-  });
+  const displayItems = items
+    .filter((item) => DISPLAY_ITEMS.includes(item.itemId))
+    .sort((a, b) => {
+      return DISPLAY_ITEMS.indexOf(a.itemId) - DISPLAY_ITEMS.indexOf(b.itemId);
+    });
 
   return (
     <div className={styles.container}>
