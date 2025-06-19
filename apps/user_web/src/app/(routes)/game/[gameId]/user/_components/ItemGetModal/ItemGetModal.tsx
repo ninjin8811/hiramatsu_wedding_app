@@ -19,15 +19,41 @@ type Props = {
 export default function ItemGetModal(props: Props) {
   return (
     <div className={styles.itemGetModal}>
+      {/* 白背景を一瞬で表示 */}
+      <motion.div
+        className={styles.whiteBackground}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{
+          duration: 0.1,
+          ease: "easeInOut",
+        }}
+      />
       <motion.div
         className={styles.background}
+        initial={{ scale: 0, opacity: 0 }}
         animate={{
-          scale: [0, 1],
+          scale: [0, 1.1],
           opacity: [0, 1],
+          rotate: 360,
         }}
         transition={{
-          duration: 0.2,
-          ease: "easeInOut",
+          scale: {
+            duration: 0.2,
+            ease: "easeInOut",
+            delay: 0.1,
+          },
+          opacity: {
+            duration: 2,
+            ease: "easeInOut",
+            delay: 0.1,
+          },
+          rotate: {
+            duration: 15,
+            ease: "linear",
+            repeat: Infinity,
+            delay: 0.1,
+          },
         }}
       >
         <Image
@@ -40,6 +66,7 @@ export default function ItemGetModal(props: Props) {
       {/* bounce */}
       <motion.div
         className={styles.main}
+        initial={{ scale: 1.2, opacity: 0 }}
         animate={{
           scale: [1.2, 1],
           opacity: [0, 1],
@@ -47,7 +74,7 @@ export default function ItemGetModal(props: Props) {
         transition={{
           duration: 1,
           ease: "easeInOut",
-          delay: 0.2,
+          delay: 0.3,
         }}
       >
         <Image className={styles.logo} src={ItemGetLogo} alt="アイテム獲得" />
