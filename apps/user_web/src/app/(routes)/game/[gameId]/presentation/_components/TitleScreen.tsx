@@ -94,8 +94,26 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
             opacity: animationStage === "complete" ? 1 : 0,
             scale: animationStage === "complete" ? 1 : 0,
             rotate: animationStage === "complete" ? 0 : -180,
+            y: animationStage === "complete" ? [0, -15, 0] : 0,
+            x: animationStage === "complete" ? [0, 10, 0] : 0,
           }}
-          transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+          transition={{
+            duration: 0.5,
+            delay: 0.2,
+            ease: "easeOut",
+            y: {
+              duration: 1.2,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            },
+            x: {
+              duration: 1.5,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            },
+          }}
         >
           <Image
             src={HomeItemBoxImg}
@@ -115,8 +133,26 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
             opacity: animationStage === "complete" ? 1 : 0,
             scale: animationStage === "complete" ? 1 : 0,
             rotate: animationStage === "complete" ? 30 : 180,
+            y: animationStage === "complete" ? [0, -15, 0] : 0,
+            x: animationStage === "complete" ? [0, -8, 0] : 0,
           }}
-          transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
+          transition={{
+            duration: 0.5,
+            delay: 0.4,
+            ease: "easeOut",
+            y: {
+              duration: 1.0,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            },
+            x: {
+              duration: 1.4,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            },
+          }}
         >
           <Image
             src={HomeItemBoxImg}
@@ -136,8 +172,26 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
             opacity: animationStage === "complete" ? 1 : 0,
             scale: animationStage === "complete" ? 1 : 0,
             rotate: animationStage === "complete" ? 0 : -90,
+            y: animationStage === "complete" ? [0, -12, 0] : 0,
+            x: animationStage === "complete" ? [0, 6, 0] : 0,
           }}
-          transition={{ duration: 0.5, delay: 0.6, ease: "easeOut" }}
+          transition={{
+            duration: 0.5,
+            delay: 0.6,
+            ease: "easeOut",
+            y: {
+              duration: 1.1,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            },
+            x: {
+              duration: 1.3,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            },
+          }}
         >
           <Image
             src={HomeItemBoxImg}
