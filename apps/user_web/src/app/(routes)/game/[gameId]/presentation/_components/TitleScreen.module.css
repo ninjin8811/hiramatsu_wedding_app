@@ -1,10 +1,20 @@
+@keyframes backgroundDrift {
+  0% {
+    background-position: -50% 0%;
+  }
+  100% {
+    background-position: 150% 50%;
+  }
+}
+
 .bg {
   background-image: url(../../../../../_images/Background.png);
-  background-size: cover;
-  background-position: center;
+  background-size: 120%;
+  background-position: 0% 0%;
   background-repeat: no-repeat;
   height: 100vh;
   width: 100vw;
+  animation: backgroundDrift 60s linear infinite;
 }
 
 .container {
