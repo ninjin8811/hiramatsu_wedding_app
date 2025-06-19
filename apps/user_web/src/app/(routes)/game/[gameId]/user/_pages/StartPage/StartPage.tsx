@@ -40,11 +40,74 @@ export default function StartPage(props: Props) {
   return (
     <div className={styles.startPage}>
       <div className={styles.background}>
-        <Image
-          src={Background}
-          alt="start"
+        <motion.div
           className={styles.background_main}
-        />
+          animate={{
+            x: ["-50%", "0%"],
+            y: ["-50%", "0%"],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          {/* 画像サイズ750x1624px（縦長）を考慮した3x3グリッド配置 */}
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: 0, left: 0 }}
+          />
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: 0, left: "33.33%" }}
+          />
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: 0, left: "66.66%" }}
+          />
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "33.33%", left: 0 }}
+          />
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "33.33%", left: "33.33%" }}
+          />
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "33.33%", left: "66.66%" }}
+          />
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "66.66%", left: 0 }}
+          />
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "66.66%", left: "33.33%" }}
+          />
+          <Image
+            src={Background}
+            alt="background"
+            className={styles.background_image}
+            style={{ position: "absolute", top: "66.66%", left: "66.66%" }}
+          />
+        </motion.div>
         {Array.from({ length: 3 }).map((_, index) => (
           <motion.div
             key={index}
@@ -61,8 +124,40 @@ export default function StartPage(props: Props) {
                 animationStage === "complete"
                   ? Math.random() * 720 - 540
                   : Math.random() * 720 - 540,
+              y:
+                animationStage === "complete"
+                  ? index === 0
+                    ? [0, -15, 0]
+                    : index === 1
+                    ? [0, -12, 0]
+                    : [0, -18, 0]
+                  : 0,
+              x:
+                animationStage === "complete"
+                  ? index === 0
+                    ? [0, 8, 0]
+                    : index === 1
+                    ? [0, -6, 0]
+                    : [0, 10, 0]
+                  : 0,
             }}
-            transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+            transition={{
+              duration: 0.5,
+              delay: 0.2,
+              ease: "easeOut",
+              y: {
+                duration: index === 0 ? 1.2 : index === 1 ? 1.0 : 1.1,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut",
+              },
+              x: {
+                duration: index === 0 ? 1.5 : index === 1 ? 1.4 : 1.3,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut",
+              },
+            }}
           >
             <Image src={HomeItemBox} alt="start" />
           </motion.div>
