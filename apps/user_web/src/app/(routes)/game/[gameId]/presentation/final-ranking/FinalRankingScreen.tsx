@@ -13,18 +13,6 @@ import styles from "./FinalRankingScreen.module.scss";
 import { useRankingAnimation, Team } from "./useRankingAnimation"; // Team型をインポート
 import { GameUser } from "@/app/_types"; // GameUser型をインポート
 
-// サムネイル画像のインポートは不要になるため削除
-// import ThumbnailTeamA from '@/app/_images/ThumbnailTeamA.jpg';
-// ... (他のサムネイルインポートも削除)
-// import ThumbnailTeamO from '@/app/_images/ThumbnailTeamO.jpg';
-
-// モックデータは削除
-// const mockTeams = [
-//   { name: "チームA", score: 1000, thumbnail: ThumbnailTeamA },
-//   ... (他のモックチームデータも削除)
-//   { name: "チームO", score: 100, thumbnail: ThumbnailTeamO },
-// ];
-
 interface FinalRankingScreenProps {
   gameId: string;
 }
