@@ -101,7 +101,7 @@ export default function QuestionPage(props: Props) {
       <div className={styles.contentWrapper}>
         <div className={styles.content}>
           <div className={styles.content_tag}>
-            {currentQuestionIndex + 1}/{game.questions.length}
+            {currentQuestionIndex}/{game.questions.length - 1}
           </div>
           <div className={styles.content_title}>{currentQuestion.question}</div>
           {showAnswer ? (

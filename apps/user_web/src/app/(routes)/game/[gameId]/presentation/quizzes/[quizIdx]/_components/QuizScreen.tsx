@@ -68,9 +68,9 @@ const QuizScreen: React.FC<QuizScreenProps> = ({
     <main className={styles.bg}>
       <div className={styles.quizContainer}>
         <div className={styles.header}>
-          <span className={styles.progressText}>{`${
-            currentQuestionIdx + 1
-          }/${totalQuestionLength}`}</span>
+          <span className={styles.progressText}>{`${currentQuestionIdx}/${
+            totalQuestionLength - 1
+          }`}</span>
           <div className={styles.questionTextContainer}>
             <h1 className={styles.questionText}>{currentQuestion.question}</h1>
           </div>
