@@ -21,7 +21,14 @@ type Props = {
 type ItemStatus = "notUsed" | "using" | "used";
 
 // 表示するアイテムの順序
-const DISPLAY_ITEMS = ["kinoko", "green", "blue", "bomb", "killer"];
+const DISPLAY_ITEMS = [
+  "kinoko",
+  "green",
+  "blue",
+  "bomb",
+  "killer",
+  "special_kinoko",
+];
 
 // アイテムの背景色設定
 const ITEM_BACKGROUND_COLORS: Record<string, string> = {
@@ -170,9 +177,9 @@ export default function CurrentRanking(props: Props) {
   };
 
   // 表示するアイテムのみをフィルタリング
-  const displayItems = items.filter((item) =>
-    DISPLAY_ITEMS.includes(item.itemId)
-  );
+  const displayItems = DISPLAY_ITEMS.map((itemId) => {
+    return items.find((item) => item.itemId === itemId);
+  });
 
   return (
     <div className={styles.container}>
