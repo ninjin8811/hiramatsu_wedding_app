@@ -42,13 +42,22 @@ export default function DevicesPage() {
             >
               {user.id}
             </div>
-            <iframe
-              src={`/game/${gameId}/user/${user.id}/`}
-              width={480}
-              height={900}
-              style={{ border: "none" }}
-              title={user.name}
-            />
+            <div
+              style={{
+                transform: "scale(0.5)",
+                width: "240px",
+                height: "450px",
+                transformOrigin: "top left",
+              }}
+            >
+              <iframe
+                src={`/game/${gameId}/user/${user.id}/`}
+                width={480}
+                height={900}
+                style={{ border: "none" }}
+                title={user.name}
+              />
+            </div>
           </div>
         ))}
       </div>
