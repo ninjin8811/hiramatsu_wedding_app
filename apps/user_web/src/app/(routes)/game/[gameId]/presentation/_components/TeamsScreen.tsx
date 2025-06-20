@@ -9,6 +9,26 @@ import BackgroundImg from "../../../../../_images/Background.png";
 import TeamsTitleImg from "../../../../../_images/TeamsTitle.png";
 import CapImage from "../../user/_components/CapImage/CapImage";
 
+// チームカラーの定義
+const characterColors = new Map<number, string>([
+  [0, "#FB0025"],
+  [1, "#DE6100"],
+  [2, "#EDDD00"],
+  [3, "#0CD600"],
+  [4, "#00A337"],
+  [5, "#00D3F4"],
+  [6, "#0062D2"],
+  [7, "#6F00CA"],
+  [8, "#ED009B"],
+  [9, "#BD8527"],
+  [10, "#705126"],
+  [11, "#313131"],
+  [12, "#676767"],
+  [13, "#CFCFCF"],
+  [14, "#B779EC"],
+  [15, "#FA7AE6"],
+]);
+
 interface TeamsScreenProps {
   gameId: string;
   onNavigate: (screen: GameScreen) => void;
@@ -52,6 +72,10 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ gameId, onNavigate }) => {
     const lastChar = teamId.toLowerCase().slice(-1);
     const index = lastChar.charCodeAt(0) - "a".charCodeAt(0);
     return index >= 0 ? index : 0;
+  };
+
+  const getTeamColor = (index: number) => {
+    return characterColors.get(index % characterColors.size) || "#FB0025";
   };
 
   return (
@@ -151,7 +175,12 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ gameId, onNavigate }) => {
                     exit={{ scale: 0, opacity: 0, y: 0 }}
                     className={styles.teamItem}
                   >
-                    <div className={styles.imageContainer}>
+                    <div
+                      className={styles.imageContainer}
+                      style={{
+                        borderColor: getTeamColor(index),
+                      }}
+                    >
                       <Image
                         src={user.thumbnail}
                         alt={user.name}
