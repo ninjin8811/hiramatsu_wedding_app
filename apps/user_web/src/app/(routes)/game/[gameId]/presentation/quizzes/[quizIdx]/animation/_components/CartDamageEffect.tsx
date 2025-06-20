@@ -32,6 +32,7 @@ export const CartDamageEffect: React.FC<CartDamageEffectProps> = ({
   };
 
   const handleVideoEnd = () => {
+    console.log("動画終了、エフェクト終了");
     onEffectEnd();
   };
 
@@ -43,12 +44,34 @@ export const CartDamageEffect: React.FC<CartDamageEffectProps> = ({
   };
 
   useEffect(() => {
+    let isEffectActive = true;
+
     if (isVisible && videoRef.current) {
-      videoRef.current.play().catch((error) => {
-        console.error("カートダメージエフェクト動画再生開始エラー:", error);
-        onEffectEnd();
-      });
+      const video = videoRef.current;
+
+      // コンポーネントがまだアクティブな場合のみ再生開始
+      const playVideo = async () => {
+        try {
+          if (isEffectActive && video) {
+            console.log("動画再生開始");
+            await video.play();
+          }
+        } catch (error) {
+          // コンポーネントがアンマウントされた場合はエラーを無視
+          if (isEffectActive) {
+            console.error("カートダメージエフェクト動画再生開始エラー:", error);
+            onEffectEnd();
+          }
+        }
+      };
+
+      playVideo();
     }
+
+    // クリーンアップ関数：コンポーネントがアンマウントされる際にフラグを無効化
+    return () => {
+      isEffectActive = false;
+    };
   }, [isVisible, onEffectEnd]);
 
   if (!isVisible) return null;
@@ -60,7 +83,10 @@ export const CartDamageEffect: React.FC<CartDamageEffectProps> = ({
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.5 }}
-        transition={{ duration: 0.3 }}
+        transition={{
+          duration: 0.3,
+          ease: "easeInOut",
+        }}
       >
         <video
           ref={videoRef}
