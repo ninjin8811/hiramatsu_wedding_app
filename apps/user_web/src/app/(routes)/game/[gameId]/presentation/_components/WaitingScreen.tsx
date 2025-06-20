@@ -31,28 +31,28 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
   const items = [
     {
-      name: "ダッシュキノコ",
-      description: "クイズ正解時に得点ブースト",
+      name: "キノコ",
+      description: "クイズに正解すると、追加でスコア獲得！",
       image: "/images/dash-kinoko.png",
-      alt: "ダッシュキノコ",
+      alt: "キノコ",
     },
     {
-      name: "ボム兵",
-      description: "上位チームに爆発ダメージ",
+      name: "ボムへい",
+      description: "ド派手な爆発で「何か」を吹き飛ばす！",
       image: "/images/bomb.png",
       alt: "ボム兵",
     },
     {
       name: "キラー",
-      description: "キラーに変身し、ものすごい追い上げができる",
+      description: "キラーに変身、ランキングを駆け上がれ！",
       image: "/images/killer.png",
       alt: "キラー",
     },
     {
       name: "ランダムこうら",
-      description: "謎の力が秘められた甲羅",
+      description: "何が起こるかは、使ってからのお楽しみ",
       image: "/images/koura.png",
-      alt: "ランダム甲羅",
+      alt: "ランダムこうら",
     },
   ];
 
