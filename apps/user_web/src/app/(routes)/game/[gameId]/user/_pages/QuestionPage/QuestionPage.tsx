@@ -15,6 +15,7 @@ import { useClientReplace } from "../../_utils/useClientReplace";
 import { UserAppItem } from "../../_utils/userappTypes";
 import { listenGame } from "@/app/_repositories/game_repository";
 import { listenUserAnswers } from "@/app/_repositories/answer_repository";
+import { calculateUserCorrectRate } from "../../../_utils/correctRateCalculator";
 
 type Props = {
   gameId: string;
@@ -44,31 +45,13 @@ export default function QuestionPage(props: Props) {
   const selectedAnswerIndex = currentOwnAnswer?.optionIndex;
 
   const correctRate = useCallback(() => {
-    if (
-      game.currentProcess.index === 0 &&
-      game.currentProcess.type === "question"
-    ) {
-      return null;
-    }
-    const finishedLength =
-      game.currentProcess.type !== "question"
-        ? game.currentProcess.index + 1
-        : game.currentProcess.index;
-    return (
-      ownAnswers.filter((answer, i) => {
-        return (
-          answer.optionIndex ===
-            game.questions[answer.questionIndex].correctIndex &&
-          answer.questionIndex <= finishedLength - 1
-        );
-      }).length / finishedLength
+    return calculateUserCorrectRate(
+      props.userId,
+      currentQuestionIndex,
+      game,
+      ownAnswers
     );
-  }, [
-    game.currentProcess.index,
-    game.currentProcess.type,
-    game.questions,
-    ownAnswers,
-  ]);
+  }, [props.userId, currentQuestionIndex, game, ownAnswers]);
 
   useEffect(() => {
     const unsub = listenGame(props.gameId, (game) => setGame(game as Game));

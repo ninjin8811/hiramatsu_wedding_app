@@ -22,6 +22,7 @@ interface CurrentRankingScreenProps {
   currentQuizIdx: number;
   users: Array<User>;
   itemEvents: Array<ItemEvent>;
+  totalQuestions: number; // 総問題数を追加
 }
 
 const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
@@ -29,6 +30,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   currentQuizIdx,
   users,
   itemEvents,
+  totalQuestions,
 }) => {
   const router = useRouter();
 
@@ -45,7 +47,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     currentGroupedEvent,
     isKillerAnimating,
     handleDamageEffectEnd,
-  } = useRankingAnimation({ users, itemEvents });
+  } = useRankingAnimation({ users, itemEvents, totalQuestions });
 
   // kinoko系アイテムを使ったユーザーのIDを個別に取得
   const regularKinokoUserIds =

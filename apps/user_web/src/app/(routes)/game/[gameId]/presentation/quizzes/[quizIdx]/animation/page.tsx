@@ -3,6 +3,7 @@ import { Game, Answer, Item } from "@/app/_types";
 import { getDoc, doc, collection, getDocs } from "firebase/firestore";
 import { notFound } from "next/navigation";
 import CurrentRankingScreen from "./_components/CurrentRankingScreen";
+import { calculateUserCorrectRateForBomb } from "../../../../_utils/correctRateCalculator";
 
 type Props = {
   params: Promise<{
@@ -74,6 +75,14 @@ export default async function CurrentRankingPage({ params }: Props) {
       }
     }
 
+    // そのユーザーの正答率を計算
+    const correctRate = calculateUserCorrectRateForBomb(
+      gameUser.id,
+      currentQuizIdx,
+      game,
+      allAnswers
+    );
+
     return {
       userId: gameUser.id,
       teamName: gameUser.name,
@@ -85,6 +94,7 @@ export default async function CurrentRankingPage({ params }: Props) {
         characterColors.get(index % characterColors.size) || "#FFFFFF",
       prevScore: prevScore,
       currentScore: currentScore,
+      correctRate: correctRate, // 正答率を追加
     };
   });
 
@@ -93,6 +103,15 @@ export default async function CurrentRankingPage({ params }: Props) {
     .flatMap((answer) => {
       const item = allItems.find((item) => item.itemId === answer.usedItemId);
       if (!item) return [];
+
+      // アイテム使用者の正答率を計算
+      const userCorrectRate = calculateUserCorrectRateForBomb(
+        answer.userId,
+        currentQuizIdx,
+        game,
+        allAnswers
+      );
+
       return {
         userId: answer.userId,
         itemId: item.itemId,
@@ -102,6 +121,7 @@ export default async function CurrentRankingPage({ params }: Props) {
         priority: item.priority,
         isCorrectAnswer: answer.optionIndex === currentQuestion.correctIndex,
         effect: item.effect,
+        userCorrectRate: userCorrectRate, // 正答率を追加
       };
     })
     .sort((a, b) => a.priority - b.priority);
@@ -112,6 +132,7 @@ export default async function CurrentRankingPage({ params }: Props) {
       currentQuizIdx={currentQuizIdx}
       users={usersData}
       itemEvents={itemEvents}
+      totalQuestions={game.questions.length}
     />
   );
 }

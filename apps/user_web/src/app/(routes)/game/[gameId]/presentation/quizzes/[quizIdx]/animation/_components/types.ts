@@ -11,6 +11,7 @@ export interface User {
   characterColor: string;
   prevScore: number;
   currentScore: number;
+  correctRate: number; // ユーザーの正答率（0-1の範囲）
 }
 
 /** アニメーション用に拡張されたユーザー情報 */
@@ -37,6 +38,7 @@ export interface ItemEvent {
   priority: number;
   effect: ItemEffect;
   isCorrectAnswer: boolean; // アイテム使用者が問題に正解したかどうか
+  userCorrectRate?: number; // アイテム使用者の正解率（0-1の範囲）
 }
 
 /** タイヤ痕の表示データ */
