@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import styles from "./CurrentRanking.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { navigateToNextStep } from "../actions";
+import { navigateToNextStep, updateUsersScore } from "../actions";
 import { User, ItemEvent, AnimatedUser } from "./types";
 import { TireTrail, SpeedLines } from "./RankingEffects";
 import { useRankingAnimation } from "./useRankingAnimation";
@@ -97,6 +97,17 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     setIsGlobalAnimating,
   ]);
 
+  useEffect(() => {
+    // 現在のスコア情報を抽出して更新
+    if (moviePlaybackState.allMoviesCompleted) {
+      const usersScores = animatedUsers.map((user: AnimatedUser) => ({
+        userId: user.userId,
+        score: user.currentScore,
+      }));
+      updateUsersScore(gameId, usersScores);
+    }
+  }, [moviePlaybackState, animatedUsers, gameId]);
+
   /**
    * キーボードナビゲーション
    */
@@ -111,12 +122,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
         if (moviePlaybackState.isPlayingMovies) {
           playNextMovie();
         } else if (moviePlaybackState.allMoviesCompleted) {
-          // 現在のスコア情報を抽出してナビゲート
-          const usersScores = animatedUsers.map((user: AnimatedUser) => ({
-            userId: user.userId,
-            score: user.currentScore,
-          }));
-          navigateToNextStep(gameId, currentQuizIdx, usersScores);
+          navigateToNextStep(gameId, currentQuizIdx);
         }
       }
     };

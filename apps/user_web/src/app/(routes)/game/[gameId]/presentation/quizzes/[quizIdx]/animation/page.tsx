@@ -104,7 +104,7 @@ export default async function CurrentRankingPage({ params }: Props) {
         effect: item.effect,
       };
     })
-    .toSorted((a, b) => a.priority - b.priority);
+    .sort((a, b) => a.priority - b.priority);
 
   return (
     <CurrentRankingScreen
