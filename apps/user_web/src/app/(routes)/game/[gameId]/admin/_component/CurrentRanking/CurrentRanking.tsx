@@ -18,7 +18,7 @@ type Props = {
   gameId: string;
 };
 
-type ItemStatus = "notUsed" | "using" | "used";
+type ItemStatus = "notUsed" | "using" | "used" | "failed";
 
 // 表示するアイテムの順序
 const DISPLAY_ITEMS = [
@@ -54,10 +54,14 @@ export default function CurrentRanking(props: Props) {
   const ranking = game?.users.sort((a, b) => b.score - a.score);
 
   useEffect(() => {
-    const gameUnsub = listenGame(props.gameId, (game) => setGame(game));
-    const answersUnsub = listenGameAnswers(props.gameId, (answers) =>
-      setAnswers(answers)
-    );
+    const gameUnsub = listenGame(props.gameId, (game) => {
+      console.log(`🎮 Game updated:`, game);
+      setGame(game);
+    });
+    const answersUnsub = listenGameAnswers(props.gameId, (answers) => {
+      console.log(`📝 Answers updated:`, answers);
+      setAnswers(answers);
+    });
     const itemsUnsub = listenItems((items) => setItems(items));
 
     return () => {
@@ -75,20 +79,68 @@ export default function CurrentRanking(props: Props) {
   );
 
   const checkItemStatus = (userId: string, itemId: string): ItemStatus => {
+    // 詳細なデバッグ情報を追加
+    console.log(`🔍 DEBUG checkItemStatus: userId=${userId}, itemId=${itemId}`);
+    console.log(`🔍 Current question index: ${currentQuestionIndex}`);
+
     if (currentQuestionIndex === null) {
+      console.log(`🔍 No current question, returning notUsed`);
       return "notUsed";
     }
 
     const userAnswers = answers.filter((answer) => answer.userId === userId);
+    console.log(`🔍 User answers:`, userAnswers);
 
     const useItemAnswer = userAnswers.find(
       (answer) => answer.usedItemId === itemId
     );
+    console.log(`🔍 Use item answer:`, useItemAnswer);
 
-    if (!useItemAnswer) return "notUsed";
+    if (!useItemAnswer) {
+      console.log(`🔍 No item usage found, returning notUsed`);
+      return "notUsed";
+    }
+
+    // キノコ系アイテム（kinoko、special_kinoko）を使用した場合の特別な処理
+    if (itemId === "kinoko" || itemId === "special_kinoko") {
+      console.log(`🍄 Processing kinoko logic for ${itemId}...`);
+
+      // キノコを使用した問題での回答を確認
+      const kinokoQuestionAnswer = userAnswers.find(
+        (answer) => answer.questionIndex === useItemAnswer.questionIndex
+      );
+      console.log(`🍄 Kinoko question answer:`, kinokoQuestionAnswer);
+
+      // 正解の番号を取得
+      const correctAnswer =
+        game?.questions?.[useItemAnswer.questionIndex]?.correctIndex;
+      console.log(
+        `🍄 Correct answer for question ${useItemAnswer.questionIndex}:`,
+        correctAnswer
+      );
+
+      // キノコを使用したが問題を間違えた場合
+      if (
+        kinokoQuestionAnswer &&
+        correctAnswer !== null &&
+        correctAnswer !== undefined &&
+        kinokoQuestionAnswer.optionIndex !== correctAnswer
+      ) {
+        console.log(
+          `🍄 FAILED: User ${userId}, itemId ${itemId}, question ${useItemAnswer.questionIndex}, userAnswer: ${kinokoQuestionAnswer.optionIndex}, correctAnswer: ${correctAnswer}`
+        );
+        return "failed";
+      } else {
+        console.log(`🍄 Kinoko usage was successful or no answer found`);
+      }
+    }
+
     if (useItemAnswer.questionIndex === currentQuestionIndex) {
+      console.log(`🔍 Item is currently being used`);
       return "using";
     }
+
+    console.log(`🔍 Item was used in past question`);
     return "used";
   };
 
@@ -335,12 +387,28 @@ export default function CurrentRanking(props: Props) {
                   const item = getItem(itemId);
                   const status = checkItemStatus(user.id, itemId);
 
+                  console.log(
+                    `👤 User ${user.name} (${user.id}), Item ${itemId}, Status: ${status}`
+                  );
+
+                  // デバッグ情報
+                  if (status === "failed") {
+                    console.log(
+                      `🔴 RENDERING FAILED ITEM: User ${user.name}, itemId ${itemId}, status ${status}`
+                    );
+                  }
+
+                  const itemClasses = `${styles.item} ${
+                    styles[`status_${status}`]
+                  } ${getItemBackgroundClass(itemId)}`;
+
+                  console.log(`🎨 CSS Classes for ${itemId}:`, itemClasses);
+
                   return (
                     <div
-                      className={`${styles.item} ${
-                        styles[`status_${status}`]
-                      } ${getItemBackgroundClass(itemId)}`}
+                      className={itemClasses}
                       key={index}
+                      title={`${item?.name || itemId} - Status: ${status}`}
                     >
                       {item?.image ? (
                         <Image

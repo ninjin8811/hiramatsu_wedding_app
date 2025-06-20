@@ -178,4 +178,21 @@ export class KinokoService {
   static isKinokoItem(itemId: string): boolean {
     return this.isKinokoRelatedItem(itemId);
   }
+
+  /**
+   * 指定されたユーザーがkinokoアイテムを使って不正解だったかをチェック
+   * @param userId チェック対象のユーザーID
+   * @param itemEvents アイテムイベントの配列
+   * @returns ユーザーがkinokoアイテムで不正解だったかどうか
+   */
+  static isKinokoIncorrectUser(
+    userId: string,
+    itemEvents: ItemEvent[]
+  ): boolean {
+    const userKinokoEvent = itemEvents.find(
+      (event) =>
+        event.userId === userId && this.isKinokoRelatedItem(event.itemId)
+    );
+    return userKinokoEvent ? !userKinokoEvent.isCorrectAnswer : false;
+  }
 }

@@ -221,6 +221,54 @@
   pointer-events: none;
 }
 
+/* キノコを使用して問題を間違えた場合のグレーアウト */
+.item.status_failed {
+  background: rgba(156, 163, 175, 0.3) !important;
+  border-color: rgba(156, 163, 175, 0.5) !important;
+  opacity: 0.5;
+  position: relative;
+}
+
+.item.status_failed::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(75, 85, 99, 0.6);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* キノコ失敗時の赤いバツ印を右上に表示 */
+.item.status_failed::after {
+  content: "✕" !important;
+  position: absolute !important;
+  top: -3px !important;
+  right: -3px !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #dc2626 !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid #dc2626 !important;
+  border-radius: 50% !important;
+  z-index: 999 !important;
+  pointer-events: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+.item.status_failed .itemThumbnail {
+  filter: grayscale(100%) brightness(0.7);
+  z-index: 0;
+}
+
 /* アイテム背景色 */
 .itemBg_green {
   background: rgba(34, 197, 94, 0.2) !important;

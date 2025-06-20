@@ -182,6 +182,16 @@ const RankingCart: React.FC<RankingCartProps> = ({
                       height={40}
                       className={styles.kinokoImage}
                     />
+                    {/* kinoko不正解の場合、赤バツを表示 */}
+                    {itemEvents &&
+                      KinokoService.isKinokoIncorrectUser(
+                        user.userId,
+                        itemEvents
+                      ) && (
+                        <div className={styles.kinokoFailureBadge}>
+                          <span className={styles.kinokoFailureX}>×</span>
+                        </div>
+                      )}
                   </div>
                 )}
               <div className={styles.userThumbnailContainer}>
