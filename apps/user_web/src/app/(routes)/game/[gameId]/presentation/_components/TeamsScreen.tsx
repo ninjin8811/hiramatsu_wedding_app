@@ -75,7 +75,38 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ gameId, onNavigate }) => {
   };
 
   const getTeamColor = (index: number) => {
-    return characterColors.get(index % characterColors.size) || "#FB0025";
+    const color =
+      characterColors.get(index % characterColors.size) || "#FB0025";
+    return color;
+  };
+
+  const getStableTeamColor = (hexColor: string) => {
+    // HEXカラーをRGBに変換
+    const r = parseInt(hexColor.slice(1, 3), 16);
+    const g = parseInt(hexColor.slice(3, 5), 16);
+    const b = parseInt(hexColor.slice(5, 7), 16);
+
+    // 彩度を少し下げて安定させる
+    const factor = 0.85;
+    const newR = Math.floor(r * factor + (255 - 255 * factor));
+    const newG = Math.floor(g * factor + (255 - 255 * factor));
+    const newB = Math.floor(b * factor + (255 - 255 * factor));
+
+    // 透明度を追加（80%の不透明度）
+    return `rgba(${newR}, ${newG}, ${newB}, 0.5)`;
+  };
+
+  const getContrastTextColor = (hexColor: string) => {
+    // HEXカラーをRGBに変換
+    const r = parseInt(hexColor.slice(1, 3), 16);
+    const g = parseInt(hexColor.slice(3, 5), 16);
+    const b = parseInt(hexColor.slice(5, 7), 16);
+
+    // 相対輝度を計算（WCAG基準）
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // 輝度が0.5以上の場合は黒、それ以外は白
+    return luminance > 0.5 ? "#000000" : "#FFFFFF";
   };
 
   return (
@@ -174,6 +205,13 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ gameId, onNavigate }) => {
                     }}
                     exit={{ scale: 0, opacity: 0, y: 0 }}
                     className={styles.teamItem}
+                    style={{
+                      background: `linear-gradient(to bottom, ${getStableTeamColor(
+                        getTeamColor(index)
+                      )} 70%, ${getStableTeamColor(
+                        getTeamColor(index)
+                      )} 75%, rgba(255, 255, 255, 0.9) 80%, rgba(255, 255, 255, 0.9) 100%)`,
+                    }}
                   >
                     <div
                       className={styles.imageContainer}
@@ -206,7 +244,14 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ gameId, onNavigate }) => {
                         />
                       </motion.div>
                     </div>
-                    <div className={styles.teamName}>チーム{user.name}</div>
+                    <div
+                      className={styles.teamName}
+                      style={{
+                        color: "#333333",
+                      }}
+                    >
+                      {user.name}
+                    </div>
                   </motion.div>
                 </AnimatePresence>
               ))}
