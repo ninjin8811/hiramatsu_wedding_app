@@ -16,7 +16,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight" || event.key === "Enter") {
-        onNavigate("quiz");
+        onNavigate("teams");
       } else if (event.key === "ArrowLeft") {
         onNavigate("title");
       }
