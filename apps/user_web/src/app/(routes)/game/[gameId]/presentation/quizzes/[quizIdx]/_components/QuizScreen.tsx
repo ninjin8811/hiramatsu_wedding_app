@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import styles from "./QuizScreen.module.css";
-import { CurrentProcess, Question } from "@/app/_types";
+import { CurrentProcess, Question, GameUser, Answer } from "@/app/_types";
 import { QuizScreenTimer } from "./QuizScreenTimer";
 import { useRouter } from "next/navigation";
 import { navigateToAnimation, showAnswerAction } from "../actions";
@@ -18,6 +18,8 @@ interface QuizScreenProps {
   currentQuestionIdx: number;
   currentQuestion: Question;
   timeLimit: number;
+  gameUsers: GameUser[];
+  answers: Answer[];
 }
 
 const QuizScreen: React.FC<QuizScreenProps> = ({
@@ -28,10 +30,29 @@ const QuizScreen: React.FC<QuizScreenProps> = ({
   currentQuestionIdx,
   currentQuestion,
   timeLimit,
+  gameUsers,
+  answers,
 }) => {
   const [canShowAnswer, setCanShowAnswer] = useState(false);
   const router = useRouter();
   const isModeAnswer = mode === "answer";
+
+  // 各選択肢を選択したユーザーを取得する関数
+  const getUsersForOption = useCallback(
+    (optionIndex: number) => {
+      const optionAnswers = answers.filter(
+        (answer) =>
+          answer.questionIndex === currentQuestionIdx &&
+          answer.optionIndex === optionIndex
+      );
+      return optionAnswers
+        .map((answer) => {
+          return gameUsers.find((user) => user.id === answer.userId);
+        })
+        .filter((user) => user !== undefined);
+    },
+    [answers, currentQuestionIdx, gameUsers]
+  );
 
   const showAnswer = useCallback(() => {
     if (!canShowAnswer && !window.confirm("答えを表示しますか?")) {
@@ -109,12 +130,34 @@ const QuizScreen: React.FC<QuizScreenProps> = ({
                 }
               }
 
+              const usersForOption = getUsersForOption(index);
+
               return (
                 <div key={index} className={optionClassName}>
                   <span className={styles.optionLabel}>
                     {OPTION_LABELS[index]}
                   </span>
-                  <span className={styles.optionText}>{option}</span>
+                  <div className={styles.optionContent}>
+                    <span className={styles.optionText}>{option}</span>
+                    {isModeAnswer && usersForOption.length > 0 && (
+                      <div className={styles.userThumbnails}>
+                        {usersForOption.map((user) => (
+                          <div
+                            key={user.id}
+                            className={styles.userThumbnailWrapper}
+                          >
+                            <Image
+                              src={user.thumbnail}
+                              alt={user.name}
+                              width={40}
+                              height={40}
+                              className={styles.userThumbnail}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}

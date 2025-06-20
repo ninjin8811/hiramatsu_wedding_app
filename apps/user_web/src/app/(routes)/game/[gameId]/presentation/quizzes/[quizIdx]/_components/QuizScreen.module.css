@@ -121,6 +121,14 @@
 .optionButton.incorrect .optionLabel {
   background-color: #646464;
 }
+
+.optionContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3vw;
+}
+
 .optionLabel {
   font-size: 2.7vw; /* 少し調整 */
   background-color: #e60013; /* 背景を赤 */
@@ -135,11 +143,52 @@
   width: 4.7vw; /* 幅を指定してaspect-ratioの基準とする */
   aspect-ratio: 1; /* これで高さも4.7vwになるはず */
   box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 .optionText {
   font-size: 2.3vw;
   font-weight: bold;
+}
+
+.userThumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3vw;
+  margin-top: 0.2vw;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.userThumbnailWrapper {
+  flex: 0 0 auto;
+  max-width: 2.5vw;
+  min-width: 1.2vw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0.1vw 0.3vw rgba(0, 0, 0, 0.2);
+  border: 0.1vw solid white;
+}
+
+.userThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* レスポンシブ対応：ユーザーが多い場合のサイズ調整 */
+.userThumbnails:has(.userThumbnailWrapper:nth-child(5)) .userThumbnailWrapper {
+  max-width: 2vw;
+}
+
+.userThumbnails:has(.userThumbnailWrapper:nth-child(8)) .userThumbnailWrapper {
+  max-width: 1.7vw;
+}
+
+.userThumbnails:has(.userThumbnailWrapper:nth-child(12)) .userThumbnailWrapper {
+  max-width: 1.3vw;
 }
 
 .timerContainer {
