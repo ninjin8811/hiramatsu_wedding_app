@@ -21,6 +21,7 @@ export interface Team {
   name: string;
   score: number;
   thumbnail: string; // StaticImageData から string に変更
+  itemAffectedScore?: number; // アイテム効果適用前のスコア（ボムアイテム用）
 }
 
 interface RankedTeam extends Team {
@@ -43,9 +44,19 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
     // mockTeamsData を props の teamsData に変更
     const teams = teamsData
       .sort((a, b) => {
+        // 1. 最終スコア（score）で比較
         if (b.score !== a.score) {
           return b.score - a.score;
         }
+
+        // 2. スコアが同じ場合、itemAffectedScoreで比較
+        const aItemScore = a.itemAffectedScore ?? a.score;
+        const bItemScore = b.itemAffectedScore ?? b.score;
+        if (bItemScore !== aItemScore) {
+          return bItemScore - aItemScore;
+        }
+
+        // 3. それでも同じ場合、名前順で比較
         return a.name.localeCompare(b.name);
       })
       .map((team, index) => ({

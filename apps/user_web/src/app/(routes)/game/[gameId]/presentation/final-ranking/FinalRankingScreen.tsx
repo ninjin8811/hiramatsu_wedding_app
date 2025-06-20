@@ -54,10 +54,11 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
           name: user.name,
           score: user.score,
           thumbnail: user.thumbnail,
+          itemAffectedScore: user.itemAffectedScore, // アイテム効果適用前のスコアを追加
         }));
 
-        // スコア順でソート
-        fetchedTeams.sort((a, b) => b.score - a.score);
+        // スコア順でソート（ソート処理はuseRankingAnimationフックで行われるため、ここでは削除）
+        // fetchedTeams.sort((a, b) => b.score - a.score);
 
         setTeams(fetchedTeams);
       } catch (e) {
