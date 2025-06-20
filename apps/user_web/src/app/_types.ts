@@ -136,7 +136,12 @@ export const ItemEffectSchema = z.object({
     .optional()
     .describe("スコア変動量（負の値で減点、正の値で加点）"),
   effectType: z
-    .enum(["score_change", "copy_rank_score", "conditional_bonus"])
+    .enum([
+      "score_change",
+      "copy_rank_score",
+      "conditional_bonus",
+      "set_score_by_correct_rate",
+    ])
     .optional()
     .describe("エフェクトの種類"),
   copyFromRank: z
@@ -164,7 +169,11 @@ export const ItemSchema = z.object({
     .url()
     .describe("アイテム効果動画URL (Firebase Storage Mov)"),
   effect: ItemEffectSchema.describe("アイテムの効果定義"),
-  priority: z.number().int().nonnegative().describe("アイテム使用優先度（数値が小さいほど優先）"),
+  priority: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe("アイテム使用優先度（数値が小さいほど優先）"),
 });
 
 export type Game = z.infer<typeof GameSchema>;

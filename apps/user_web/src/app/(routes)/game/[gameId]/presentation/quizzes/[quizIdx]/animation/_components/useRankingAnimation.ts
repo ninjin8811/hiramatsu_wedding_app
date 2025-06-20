@@ -7,6 +7,7 @@ import { KinokoService } from "./KinokoService";
 interface UseRankingAnimationProps {
   users: User[];
   itemEvents: ItemEvent[];
+  totalQuestions: number; // 総問題数
 }
 
 // アイテムイベントをグループ化するためのタイプ
@@ -23,6 +24,7 @@ interface GroupedItemEvent {
 export const useRankingAnimation = ({
   users,
   itemEvents,
+  totalQuestions,
 }: UseRankingAnimationProps) => {
   /** 初手アニメーションの完了フラグ（重複実行防止） */
   const [animationCompleted, setAnimationCompleted] = useState(false);
@@ -197,7 +199,10 @@ export const useRankingAnimation = ({
       }
 
       // ターゲットユーザーを特定
-      if (effect.targetType) {
+      if (effectType === "set_score_by_correct_rate") {
+        // ボム効果は全ユーザーに適用
+        targetUsers = [...currentUsers];
+      } else if (effect.targetType) {
         switch (effect.targetType) {
           case "rank_position":
             const rankPosition = Number(effect.targetValue) - 1; // 1-basedから0-basedに変換
@@ -243,7 +248,10 @@ export const useRankingAnimation = ({
 
       // エフェクトを適用
       return currentUsers.map((user) => {
-        if (targetUsers.some((target) => target.userId === user.userId)) {
+        const isTargetUser = targetUsers.some(
+          (target) => target.userId === user.userId
+        );
+        if (isTargetUser) {
           const originalScore = user.currentScore;
           let newScore = user.currentScore;
 
@@ -269,26 +277,43 @@ export const useRankingAnimation = ({
                 }
               }
               break;
+            case "set_score_by_correct_rate":
+              // ボム効果：各ユーザーの正解率×(問題数-1)×100でスコアを設定
+              const multiplier = Math.max(1, totalQuestions - 1); // 問題数-1、最小値は1
+              const userCorrectRate = user.correctRate; // そのユーザー自身の正答率を使用
+
+              newScore = Math.round(userCorrectRate * multiplier * 100);
+              console.log(
+                `💣 Bomb effect: Setting ${
+                  user.teamName
+                }'s score to ${newScore} (user's correct rate: ${Math.round(
+                  userCorrectRate * 100
+                )}%, multiplier: ${multiplier}, totalQuestions: ${totalQuestions})`
+              );
+              break;
           }
 
           console.log(
             `🎯 Effect applied to ${user.teamName}: ${originalScore} → ${newScore} (${effectType})`
           );
 
-          // ダメージを受けた場合（スコアが減少）、ダメージエフェクトを設定
+          // ダメージを受けた場合（スコアが減少）、またはボム効果の場合、エフェクトを設定
           const isDamaged = newScore < originalScore;
+          const isBombEffect = effectType === "set_score_by_correct_rate";
           const updatedUser = {
             ...user,
             currentScore: newScore,
             damageEffect:
-              isDamaged && itemId
+              (isDamaged || isBombEffect) && itemId
                 ? { isVisible: true, itemId }
                 : user.damageEffect,
           };
 
-          if (isDamaged && itemId) {
+          if ((isDamaged || isBombEffect) && itemId) {
             console.log(
-              `🎬 Setting damage effect for ${user.teamName}: itemId=${itemId}`
+              `🎬 Setting ${isBombEffect ? "bomb" : "damage"} effect for ${
+                user.teamName
+              }: itemId=${itemId}`
             );
           }
 
