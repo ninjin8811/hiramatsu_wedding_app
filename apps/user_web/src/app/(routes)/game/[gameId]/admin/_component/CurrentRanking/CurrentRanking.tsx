@@ -198,33 +198,6 @@ export default function CurrentRanking(props: Props) {
     };
   };
 
-  // アイテム不足の警告を取得
-  const getItemShortageWarning = () => {
-    if (
-      !game?.questions ||
-      currentQuestionIndex === null ||
-      currentQuestionIndex === undefined
-    ) {
-      return null;
-    }
-
-    const remainingQuestions =
-      game.questions.length - (currentQuestionIndex + 1);
-    const usersWithInsufficientItems = game.users.filter((user) => {
-      return user.itemIds.length < remainingQuestions;
-    });
-
-    if (usersWithInsufficientItems.length === 0) {
-      return null;
-    }
-
-    return {
-      users: usersWithInsufficientItems,
-      remainingQuestions,
-      message: `${usersWithInsufficientItems.length}人のアイテムが不足しています（残り${remainingQuestions}問）`,
-    };
-  };
-
   const giveItemToUser = async (userId: string, itemId: string) => {
     if (!game) return;
 
@@ -309,31 +282,9 @@ export default function CurrentRanking(props: Props) {
     });
 
   const currentQuestionSummary = getCurrentQuestionSummary();
-  const itemShortageWarning = getItemShortageWarning();
 
   return (
     <div className={styles.container}>
-      {/* アイテム不足警告 */}
-      {itemShortageWarning && (
-        <div className={styles.itemShortageWarning}>
-          <div className={styles.warningIcon}>⚠️</div>
-          <div className={styles.warningContent}>
-            <div className={styles.warningMessage}>
-              {itemShortageWarning.message}
-            </div>
-            <div className={styles.warningUsers}>
-              {itemShortageWarning.users
-                .map((user) => (
-                  <span key={user.id} className={styles.warningUser}>
-                    {user.name}（アイテム{user.itemIds.length}個）
-                  </span>
-                ))
-                .join(", ")}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 現在の問題の解答状況サマリー */}
       {game?.status === "inProgress" &&
         currentQuestionIndex !== null &&
