@@ -74,6 +74,12 @@ export const GameUserSchema = z.object({
     .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
   itemIds: z.array(z.string()).describe("所持しているアイテムIDの配列"),
   score: z.number().int().nonnegative().describe("現在のスコア"),
+  itemAffectedScore: z
+    .number()
+    .int()
+    .nonnegative()
+    .optional()
+    .describe("アイテム効果適用前のスコア（ボムアイテム用）"),
 });
 
 // [Game]/{gameId}/currentProcess/ （現在の進行状態）

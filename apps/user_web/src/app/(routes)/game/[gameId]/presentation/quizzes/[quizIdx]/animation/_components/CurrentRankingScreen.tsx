@@ -47,7 +47,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     currentGroupedEvent,
     isKillerAnimating,
     handleDamageEffectEnd,
-  } = useRankingAnimation({ users, itemEvents, totalQuestions });
+  } = useRankingAnimation({ users, itemEvents, totalQuestions, gameId });
 
   // kinoko系アイテムを使ったユーザーのIDを個別に取得
   const regularKinokoUserIds =

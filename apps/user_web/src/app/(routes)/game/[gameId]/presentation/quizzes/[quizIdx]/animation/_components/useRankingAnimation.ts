@@ -1,13 +1,22 @@
 import { useState, useCallback } from "react";
 import { User, AnimatedUser, TireTrail, ItemEvent } from "./types";
-import { ItemEffect } from "@/app/_types";
+import { ItemEffect, GameUser } from "@/app/_types";
 import { getXPosition } from "./animationUtils";
 import { KinokoService } from "./KinokoService";
+import {
+  doc,
+  setDoc,
+  getFirestore,
+  serverTimestamp,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
 
 interface UseRankingAnimationProps {
   users: User[];
   itemEvents: ItemEvent[];
   totalQuestions: number; // 総問題数
+  gameId: string; // Firestore保存用のゲームID
 }
 
 // アイテムイベントをグループ化するためのタイプ
@@ -25,6 +34,7 @@ export const useRankingAnimation = ({
   users,
   itemEvents,
   totalQuestions,
+  gameId,
 }: UseRankingAnimationProps) => {
   /** 初手アニメーションの完了フラグ（重複実行防止） */
   const [animationCompleted, setAnimationCompleted] = useState(false);
@@ -34,6 +44,51 @@ export const useRankingAnimation = ({
 
   /** タイヤ痕の表示データ */
   const [tireTrails, setTireTrails] = useState<TireTrail[]>([]);
+
+  /**
+   * ボム効果前のスコアをFirestoreのusersフィールドに保存する
+   */
+  const saveBombPreScoresToUsers = useCallback(
+    async (users: AnimatedUser[]) => {
+      try {
+        const db = getFirestore();
+        const gameRef = doc(db, `Games/${gameId}`);
+
+        // 現在のゲームドキュメントを取得
+        const gameDoc = await getDoc(gameRef);
+        if (!gameDoc.exists()) {
+          console.error("Game document not found");
+          return;
+        }
+
+        const gameData = gameDoc.data();
+        const currentUsers = gameData.users || [];
+
+        // 各ユーザーのitemAffectedScoreを更新
+        const updatedUsers = currentUsers.map((gameUser: GameUser) => {
+          const matchingUser = users.find(
+            (user) => user.userId === gameUser.id
+          );
+          if (matchingUser) {
+            return {
+              ...gameUser,
+              itemAffectedScore: matchingUser.currentScore,
+            };
+          }
+          return gameUser;
+        });
+
+        await updateDoc(gameRef, { users: updatedUsers });
+
+        console.log(
+          `💾 Bomb pre-scores saved to users.itemAffectedScore for ${users.length} users`
+        );
+      } catch (error) {
+        console.error("❌ Failed to save bomb pre-scores to users:", error);
+      }
+    },
+    [gameId]
+  );
 
   // アイテムイベントをpriority順を維持してグループ化（kinoko系アイテムをそれぞれまとめる）
   const groupedItemEvents: GroupedItemEvent[] = (() => {
@@ -198,6 +253,14 @@ export const useRankingAnimation = ({
         return currentUsers;
       }
 
+      // ボム効果の場合、スコア変更前にFirestoreに保存
+      if (effectType === "set_score_by_correct_rate") {
+        console.log("💣 Bomb effect detected - saving pre-scores to Firestore");
+        saveBombPreScoresToUsers(currentUsers).catch((error: Error) => {
+          console.error("Failed to save bomb pre-scores:", error);
+        });
+      }
+
       // ターゲットユーザーを特定
       if (effectType === "set_score_by_correct_rate") {
         // ボム効果は全ユーザーに適用
@@ -322,7 +385,7 @@ export const useRankingAnimation = ({
         return user;
       });
     },
-    [currentGroupedEvent?.userIds]
+    [currentGroupedEvent?.userIds, saveBombPreScoresToUsers]
   );
 
   /**
