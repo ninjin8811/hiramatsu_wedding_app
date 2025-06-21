@@ -22,6 +22,8 @@ export interface Team {
   name: string;
   score: number;
   thumbnail: string; // StaticImageData から string に変更
+  smileThumbnail: string;
+  sadThumbnail: string;
   itemAffectedScore?: number; // アイテム効果適用前のスコア（ボムアイテム用）
 }
 

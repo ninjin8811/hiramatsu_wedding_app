@@ -11,7 +11,6 @@ import RankingItemGorgeous from "./RankingItemGorgeous";
 import styles from "./FinalRankingScreen.module.scss";
 import { useRankingAnimation, Team } from "./useRankingAnimation"; // Team型をインポート
 import { GameUser } from "@/app/_types"; // GameUser型をインポート
-import { motion } from "framer-motion";
 import AnimatedBackground from "../_components/AnimatedBackground";
 
 interface FinalRankingScreenProps {
@@ -55,6 +54,8 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
           name: user.name,
           score: user.score,
           thumbnail: user.thumbnail,
+          smileThumbnail: user.smileThumbnail,
+          sadThumbnail: user.sadThumbnail,
           itemAffectedScore: user.itemAffectedScore, // アイテム効果適用前のスコアを追加
         }));
 
@@ -130,7 +131,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
                           rank={team.rank}
                           name={team.name}
                           score={team.score}
-                          thumbnail={team.thumbnail} // thumbnail は string URL
+                          thumbnail={team.smileThumbnail} // thumbnail は string URL
                         />
                       ) : null}
                     </div>
