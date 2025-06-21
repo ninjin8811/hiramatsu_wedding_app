@@ -97,15 +97,11 @@ export const useRankingAnimation = (teamsData: Team[]) => { // teamsData を pro
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight') {
         // DEBUG LOG
-        console.log(`[KeyDown] ArrowRight pressed. currentTopThreeIndex: ${currentTopThreeIndex}, isDrumrollPlaying: ${isDrumrollPlaying}`);
         if (currentTopThreeIndex === 4) {      
-          console.log("[KeyDown] Setting currentTopThreeIndex from 4 to 3");
           setCurrentTopThreeIndex(3);          
         } else if (currentTopThreeIndex === 3) { 
-          console.log("[KeyDown] Setting currentTopThreeIndex from 3 to 2");
           setCurrentTopThreeIndex(2);          
         } else if (currentTopThreeIndex === 2) { 
-          console.log("[KeyDown] Handling ArrowRight for currentTopThreeIndex 2. isDrumrollPlaying: " + isDrumrollPlaying);
           if (isDrumrollPlaying) {
             // If drumroll is playing, stop it and show 1st place immediately
             const audioElements = document.getElementsByTagName('audio');

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
 import { firebaseApp } from "@/app/_lib/firebase/FirebaseInitializer";
 import { Game } from "@/app/_types";
+import { useRouter } from "next/navigation";
 // StaticImageData は string に変更するので不要になります
 // import { StaticImageData } from 'next/image';
 
@@ -34,6 +35,7 @@ interface TeamWithVisibility extends RankedTeam {
 
 export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
   // gameIdパラメータを追加
+  const router = useRouter();
   const [visibleTeams, setVisibleTeams] = useState<number[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentTopThreeIndex, setCurrentTopThreeIndex] = useState(-1);
@@ -159,67 +161,74 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
     return () => clearInterval(interval);
   }, [ranksToAnimate, sortedTeams, visibleTeams, currentTopThreeIndex]);
 
+  // ヘルパー関数: ドラムロールを停止
+  const stopDrumroll = () => {
+    const audioElements = document.getElementsByTagName("audio");
+    for (let i = 0; i < audioElements.length; i++) {
+      if (audioElements[i].src.includes("drumroll.mp3")) {
+        audioElements[i].pause();
+        audioElements[i].currentTime = 0;
+      }
+    }
+    setIsDrumrollPlaying(false);
+  };
+
+  // ヘルパー関数: 初期状態にリセット
+  const resetToInitial = () => {
+    setCurrentTopThreeIndex(-1);
+    setVisibleTeams([]);
+    const initialRanks = sortedTeams
+      .filter((team) => team.rank >= 4 && team.rank <= 15)
+      .map((team) => team.rank)
+      .sort((a, b) => b - a);
+    setRanksToAnimate(initialRanks);
+  };
+
+  // ヘルパー関数: ドラムロールを開始
+  const startDrumroll = () => {
+    setIsDrumrollPlaying(true);
+    const audio = new Audio("/sounds/drumroll.mp3");
+    audio.play().catch((e) => {
+      console.error("Error playing drumroll:", e);
+      setCurrentTopThreeIndex(1);
+      setIsDrumrollPlaying(false);
+    });
+    audio.onended = () => {
+      if (currentTopThreeIndex === 2) {
+        setCurrentTopThreeIndex(1);
+      }
+      setIsDrumrollPlaying(false);
+    };
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") {
-        // DEBUG LOG
-        console.log(
-          `[KeyDown] ArrowRight pressed. currentTopThreeIndex: ${currentTopThreeIndex}, isDrumrollPlaying: ${isDrumrollPlaying}`
-        );
-        if (currentTopThreeIndex === 4) {
-          console.log("[KeyDown] Setting currentTopThreeIndex from 4 to 3");
-          setCurrentTopThreeIndex(3);
-        } else if (currentTopThreeIndex === 3) {
-          console.log("[KeyDown] Setting currentTopThreeIndex from 3 to 2");
+      if (event.key === "ArrowLeft") {
+        // 左矢印でランキング表示indexを前に戻す
+        if (isDrumrollPlaying) {
+          stopDrumroll();
           setCurrentTopThreeIndex(2);
-        } else if (currentTopThreeIndex === 2) {
-          console.log(
-            "[KeyDown] Handling ArrowRight for currentTopThreeIndex 2. isDrumrollPlaying: " +
-              isDrumrollPlaying
-          );
-          if (isDrumrollPlaying) {
-            // If drumroll is playing, stop it and show 1st place immediately
-            const audioElements = document.getElementsByTagName("audio");
-            for (let i = 0; i < audioElements.length; i++) {
-              if (audioElements[i].src.includes("drumroll.mp3")) {
-                audioElements[i].pause();
-                audioElements[i].currentTime = 0; // Reset audio
-              }
-            }
-            setCurrentTopThreeIndex(1);
-            setIsDrumrollPlaying(false);
-            console.log(
-              "[KeyDown] Skipped drumroll, set currentTopThreeIndex to 1"
-            );
-          } else {
-            // Start drumroll, as it's not playing yet for the 2 -> 1 transition
-            setIsDrumrollPlaying(true);
-            const audio = new Audio("/sounds/drumroll.mp3");
-            audio.play().catch((e) => {
-              console.error("Error playing drumroll:", e);
-              // Fallback: if audio fails, still proceed to show 1st place and reset drumroll state.
-              setCurrentTopThreeIndex(1);
-              setIsDrumrollPlaying(false);
-            });
-            audio.onended = () => {
-              // console.log("[Audio] Drumroll ended. currentTopThreeIndex before setting: " + currentTopThreeIndex);
-              // Only set to 1 if the state is still 2 (i.e., not skipped by another key press)
-              // and drumroll was playing (which it should be if onended is called)
-              if (currentTopThreeIndex === 2) {
-                setCurrentTopThreeIndex(1);
-              }
-              setIsDrumrollPlaying(false);
-            };
-          }
         } else if (currentTopThreeIndex === 1) {
-          console.log(
-            "[KeyDown] currentTopThreeIndex is 1. Checking confetti."
-          );
-          if (!showConfetti) {
-            setTimeout(() => {
-              setShowConfetti(true);
-            }, 1000);
+          setCurrentTopThreeIndex(2);
+          setShowConfetti(false);
+        } else if (currentTopThreeIndex >= 2 && currentTopThreeIndex <= 3) {
+          setCurrentTopThreeIndex(currentTopThreeIndex + 1);
+        } else if (currentTopThreeIndex === 4) {
+          resetToInitial();
+        }
+      } else if (event.key === "ArrowRight" || event.key === "Enter") {
+        // 右矢印またはEnterキーで次のフェーズへ進む
+        if (currentTopThreeIndex >= 3 && currentTopThreeIndex <= 4) {
+          setCurrentTopThreeIndex(currentTopThreeIndex - 1);
+        } else if (currentTopThreeIndex === 2) {
+          if (isDrumrollPlaying) {
+            stopDrumroll();
+            setCurrentTopThreeIndex(1);
+          } else {
+            startDrumroll();
           }
+        } else if (currentTopThreeIndex === 1 && !showConfetti) {
+          setTimeout(() => setShowConfetti(true), 1000);
         }
       }
     };
@@ -241,7 +250,13 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
       );
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [currentTopThreeIndex, showConfetti, isDrumrollPlaying]);
+  }, [
+    currentTopThreeIndex,
+    showConfetti,
+    isDrumrollPlaying,
+    router,
+    sortedTeams,
+  ]);
 
   const rankingColumns: TeamWithVisibility[][] = useMemo(() => {
     const visibleTeamsSet = new Set(visibleTeams);
