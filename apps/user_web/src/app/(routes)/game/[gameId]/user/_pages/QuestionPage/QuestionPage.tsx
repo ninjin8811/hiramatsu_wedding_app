@@ -45,6 +45,7 @@ export default function QuestionPage(props: Props) {
   const selectedAnswerIndex = currentOwnAnswer?.optionIndex;
 
   const correctRate = useCallback(() => {
+    if (currentQuestionIndex === 0) return null;
     return calculateUserCorrectRate(
       props.userId,
       currentQuestionIndex,
