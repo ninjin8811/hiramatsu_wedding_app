@@ -41,6 +41,7 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
   const [currentTopThreeIndex, setCurrentTopThreeIndex] = useState(-1);
   const [ranksToAnimate, setRanksToAnimate] = useState<number[]>([]);
   const [isDrumrollPlaying, setIsDrumrollPlaying] = useState(false);
+  const [isRankAnimationStarted, setIsRankAnimationStarted] = useState(false);
 
   const sortedTeams: RankedTeam[] = useMemo(() => {
     // mockTeamsData を props の teamsData に変更
@@ -123,18 +124,14 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
     setRanksToAnimate(initialRanks);
   }, [sortedTeams]);
 
-  useEffect(() => {
-    if (ranksToAnimate.length === 0) {
-      const isAnimationDone =
-        sortedTeams.length > 0 &&
-        (sortedTeams.length < 4 ||
-          visibleTeams.includes(
-            sortedTeams.find((t) => t.rank === 4)?.rank ?? -1000
-          ));
+  // ヘルパー関数: ランクアニメーションを開始
+  const startRankAnimation = () => {
+    setIsRankAnimationStarted(true);
+  };
 
-      if (isAnimationDone && currentTopThreeIndex === -1) {
-        setCurrentTopThreeIndex(4);
-      }
+  // ランクアニメーション（自動表示）
+  useEffect(() => {
+    if (!isRankAnimationStarted || ranksToAnimate.length === 0) {
       return;
     }
 
@@ -154,12 +151,30 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
       });
     }, 500);
 
-    if (ranksToAnimate.length === 0) {
-      clearInterval(interval);
-    }
-
     return () => clearInterval(interval);
-  }, [ranksToAnimate, sortedTeams, visibleTeams, currentTopThreeIndex]);
+  }, [isRankAnimationStarted, ranksToAnimate]);
+
+  // ランクアニメーション完了チェック
+  useEffect(() => {
+    if (isRankAnimationStarted && ranksToAnimate.length === 0) {
+      const isAnimationDone =
+        sortedTeams.length > 0 &&
+        (sortedTeams.length < 4 ||
+          visibleTeams.includes(
+            sortedTeams.find((t) => t.rank === 4)?.rank ?? -1000
+          ));
+
+      if (isAnimationDone && currentTopThreeIndex === -1) {
+        setCurrentTopThreeIndex(4);
+      }
+    }
+  }, [
+    isRankAnimationStarted,
+    ranksToAnimate,
+    sortedTeams,
+    visibleTeams,
+    currentTopThreeIndex,
+  ]);
 
   // ヘルパー関数: ドラムロールを停止
   const stopDrumroll = () => {
@@ -177,6 +192,7 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
   const resetToInitial = () => {
     setCurrentTopThreeIndex(-1);
     setVisibleTeams([]);
+    setIsRankAnimationStarted(false);
     const initialRanks = sortedTeams
       .filter((team) => team.rank >= 4 && team.rank <= 15)
       .map((team) => team.rank)
@@ -220,7 +236,10 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
         }
       } else if (event.key === "ArrowRight" || event.key === "Enter") {
         // 右矢印またはEnterキーで次のフェーズへ進む
-        if (currentTopThreeIndex >= 3 && currentTopThreeIndex <= 4) {
+        if (currentTopThreeIndex === -1) {
+          // 4~15位のアニメーションを開始
+          startRankAnimation();
+        } else if (currentTopThreeIndex >= 3 && currentTopThreeIndex <= 4) {
           setCurrentTopThreeIndex(currentTopThreeIndex - 1);
         } else if (currentTopThreeIndex === 2) {
           if (isDrumrollPlaying) {
@@ -234,7 +253,7 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
       }
     };
 
-    if (currentTopThreeIndex >= 1 && currentTopThreeIndex <= 4) {
+    if (currentTopThreeIndex >= -1 && currentTopThreeIndex <= 4) {
       console.log(
         `[Effect KeyDownListener] Adding keydown listener. currentTopThreeIndex: ${currentTopThreeIndex}`
       );
