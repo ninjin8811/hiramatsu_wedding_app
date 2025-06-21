@@ -146,7 +146,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
                         rank={team.rank}
                         name={team.name}
                         score={team.score}
-                        // thumbnail={team.thumbnail} // RankingItemNormal には thumbnail props がない想定だったが、もし必要なら渡す
+                        thumbnail={team.sadThumbnail} // RankingItemNormal には thumbnail props がない想定だったが、もし必要なら渡す
                       />
                     </div>
                   )
