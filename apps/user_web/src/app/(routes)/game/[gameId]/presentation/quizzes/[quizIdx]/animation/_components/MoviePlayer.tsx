@@ -34,10 +34,10 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
   const isKinokoItem =
     itemEvent && KinokoService.isKinokoRelatedItem(itemEvent.itemId);
 
-  // kinoko系アイテムの場合の表示時間を計算（ユーザー数 × 1 + 2秒）
+  // kinoko系アイテムの場合の表示時間を計算（ユーザー数 × 0.5 + 1.5秒）
   const kinokoDisplayDuration =
     isKinokoItem && itemUsers
-      ? (itemUsers.length * 1 + 2) * 1000 // ミリ秒に変換
+      ? (itemUsers.length * 0.3 + 2) * 1000 // 秒に変換
       : 0;
 
   const handleVideoEnd = () => {
