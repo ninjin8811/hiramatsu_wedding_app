@@ -5,10 +5,12 @@ import BackgroundImg from "../../../../../_images/Background.png";
 
 interface AnimatedBackgroundProps {
   className?: string;
+  animationDuration?: number; // アニメーション持続時間（秒単位）、デフォルトは30秒
 }
 
 const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
   className,
+  animationDuration = 30,
 }) => {
   return (
     <div className={className}>
@@ -28,7 +30,7 @@ const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
           y: ["-50%", "0%"],
         }}
         transition={{
-          duration: 30,
+          duration: animationDuration,
           repeat: Infinity,
           ease: "linear",
         }}
