@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { firebaseApp } from "@/app/_lib/firebase/FirebaseInitializer";
-import BackgroundImg from "@/app/_images/Background.png"; // BackgroundWideGrayから変更
 import Confetti from "@/app/_images/Confetti.png";
 import RankingResultTitleContainer from "@/app/_images/RankingResultTitleContainer.png";
 import RankingItemNormal from "./RankingItemNormal";
@@ -13,6 +12,7 @@ import styles from "./FinalRankingScreen.module.scss";
 import { useRankingAnimation, Team } from "./useRankingAnimation"; // Team型をインポート
 import { GameUser } from "@/app/_types"; // GameUser型をインポート
 import { motion } from "framer-motion";
+import AnimatedBackground from "../_components/AnimatedBackground";
 
 interface FinalRankingScreenProps {
   gameId: string;
@@ -85,77 +85,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
 
   return (
     <div className={styles.container}>
-      {/* アニメーション背景の追加 */}
-      <div className={styles.background}>
-        <motion.div
-          className={styles.background_main}
-          animate={{
-            x: ["-50%", "0%"],
-            y: ["-50%", "0%"],
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        >
-          {/* 画像サイズ750x1624px（縦長）を考慮した3x3グリッド配置 */}
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: 0, left: 0 }}
-          />
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: 0, left: "33.33%" }}
-          />
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: 0, left: "66.66%" }}
-          />
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: "33.33%", left: 0 }}
-          />
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: "33.33%", left: "33.33%" }}
-          />
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: "33.33%", left: "66.66%" }}
-          />
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: "66.66%", left: 0 }}
-          />
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: "66.66%", left: "33.33%" }}
-          />
-          <Image
-            src={BackgroundImg}
-            alt="background"
-            className={styles.background_image}
-            style={{ position: "absolute", top: "66.66%", left: "66.66%" }}
-          />
-        </motion.div>
-      </div>
+      <AnimatedBackground className={styles.background} />
 
       {/* 既存の固定背景を削除またはコメントアウト */}
       {/* <Image

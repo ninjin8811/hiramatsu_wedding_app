@@ -3,6 +3,7 @@ import Image from "next/image";
 import styles from "./WaitingScreen.module.css";
 import { GameScreen } from "../page";
 import { AnimatePresence, motion } from "framer-motion";
+import AnimatedBackground from "./AnimatedBackground";
 
 interface WaitingScreenProps {
   gameId: string;
@@ -58,6 +59,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
   return (
     <main className={styles.bg}>
+      <AnimatedBackground className={styles.background} />
       <div className={styles.modal}>
         <div className={styles.headingImageContainer}>
           <Image
