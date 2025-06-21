@@ -151,11 +151,11 @@ export default function QuestionPage(props: Props) {
               )}
               isUsing={selectedItemId === item.itemId}
               onUse={() => {
-                if (!selectedAnswerIndex) return;
+                if (selectedAnswerIndex === undefined) return;
                 submitAnswer(selectedAnswerIndex, item.itemId);
               }}
               onCancel={() => {
-                if (!selectedAnswerIndex) return;
+                if (selectedAnswerIndex === undefined) return;
                 if (selectedItemId !== item.itemId) return;
                 submitAnswer(selectedAnswerIndex, null);
               }}
