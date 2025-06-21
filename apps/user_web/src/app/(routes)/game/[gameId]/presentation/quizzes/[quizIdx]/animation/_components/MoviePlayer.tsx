@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import styles from "./MoviePlayer.module.css";
 import { ItemEvent } from "./types";
 import { KinokoService } from "./KinokoService";
@@ -10,7 +11,11 @@ interface MoviePlayerProps {
   movieUrl: string;
   isVisible: boolean;
   onMovieEnd: () => void;
-  itemUserNames?: string[];
+  itemUsers?: Array<{
+    userId: string;
+    teamName: string;
+    thumbnail: string;
+  }>;
   itemEvent?: ItemEvent;
 }
 
@@ -18,7 +23,7 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
   movieUrl,
   isVisible,
   onMovieEnd,
-  itemUserNames,
+  itemUsers,
   itemEvent,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -31,8 +36,8 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
 
   // kinoko系アイテムの場合の表示時間を計算（ユーザー数 × 1 + 2秒）
   const kinokoDisplayDuration =
-    isKinokoItem && itemUserNames
-      ? (itemUserNames.length * 1 + 2) * 1000 // ミリ秒に変換
+    isKinokoItem && itemUsers
+      ? (itemUsers.length * 1 + 2) * 1000 // ミリ秒に変換
       : 0;
 
   const handleVideoEnd = () => {
@@ -69,7 +74,7 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
       console.log(
         `🍄 kinoko系アイテム動画表示時間: ${
           kinokoDisplayDuration / 1000
-        }秒 (ユーザー数: ${itemUserNames?.length})`
+        }秒 (ユーザー数: ${itemUsers?.length})`
       );
 
       // 指定時間後に動画を終了
@@ -91,7 +96,7 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
     isKinokoItem,
     kinokoDisplayDuration,
     onMovieEnd,
-    itemUserNames?.length,
+    itemUsers?.length,
   ]);
 
   if (!isVisible) return null;
@@ -120,18 +125,31 @@ export const MoviePlayer: React.FC<MoviePlayerProps> = ({
       ></video>
 
       {/* アイテム使用者の情報表示（左上） */}
-      {itemUserNames && itemUserNames.length > 0 && (
+      {itemUsers && itemUsers.length > 0 && (
         <div
           className={
-            itemUserNames.length === 1
+            itemUsers.length === 1
               ? styles.itemUserInfoSingle
               : styles.itemUserInfo
           }
         >
-          <div className={styles.itemUsersContainer}>
-            {itemUserNames.map((userName, index) => (
-              <div key={index} className={styles.itemUserName}>
-                {userName}
+          <div
+            className={styles.itemUsersContainer}
+            data-user-count={
+              itemUsers.length <= 12 ? itemUsers.length : undefined
+            }
+            data-user-count-many={itemUsers.length > 12 ? "true" : undefined}
+          >
+            {itemUsers.map((user, index) => (
+              <div key={user.userId} className={styles.itemUserName}>
+                <Image
+                  src={user.thumbnail}
+                  alt={user.teamName}
+                  width={40}
+                  height={40}
+                  className={styles.itemUserThumbnail}
+                />
+                <span className={styles.itemUserTeamName}>{user.teamName}</span>
               </div>
             ))}
           </div>

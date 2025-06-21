@@ -88,8 +88,11 @@
   align-items: center;
   gap: 1.5rem;
   min-width: 420px;
+  max-width: 90vw;
+  max-height: 80vh;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(15px);
+  overflow: hidden;
 }
 
 /* アイテム使用者の情報表示（左上） - 1人用（縮小版） */
@@ -125,6 +128,9 @@
   gap: 1rem;
   flex-wrap: wrap;
   width: 100%;
+  max-height: 65vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .itemUserHeader {
@@ -164,4 +170,98 @@
   border: 2px solid rgba(255, 255, 255, 0.3);
   min-width: 120px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.itemUserThumbnail {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+/* ユーザー数に応じてサムネイルサイズを動的調整 */
+.itemUsersContainer[data-user-count="1"] .itemUserThumbnail,
+.itemUsersContainer[data-user-count="2"] .itemUserThumbnail,
+.itemUsersContainer[data-user-count="3"] .itemUserThumbnail {
+  width: 160px;
+  height: 160px;
+}
+
+.itemUsersContainer[data-user-count="4"] .itemUserThumbnail,
+.itemUsersContainer[data-user-count="5"] .itemUserThumbnail,
+.itemUsersContainer[data-user-count="6"] .itemUserThumbnail {
+  width: 120px;
+  height: 120px;
+}
+
+.itemUsersContainer[data-user-count="7"] .itemUserThumbnail,
+.itemUsersContainer[data-user-count="8"] .itemUserThumbnail,
+.itemUsersContainer[data-user-count="9"] .itemUserThumbnail {
+  width: 100px;
+  height: 100px;
+}
+
+.itemUsersContainer[data-user-count="10"] .itemUserThumbnail,
+.itemUsersContainer[data-user-count="11"] .itemUserThumbnail,
+.itemUsersContainer[data-user-count="12"] .itemUserThumbnail {
+  width: 80px;
+  height: 80px;
+}
+
+/* 13人以上の場合は最小サイズ */
+.itemUsersContainer[data-user-count-many="true"] .itemUserThumbnail {
+  width: 60px;
+  height: 60px;
+}
+
+.itemUserTeamName {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* ユーザー数に応じてフォントサイズも調整 */
+.itemUsersContainer[data-user-count="4"] .itemUserTeamName,
+.itemUsersContainer[data-user-count="5"] .itemUserTeamName,
+.itemUsersContainer[data-user-count="6"] .itemUserTeamName {
+  font-size: 1.3rem;
+}
+
+.itemUsersContainer[data-user-count="7"] .itemUserTeamName,
+.itemUsersContainer[data-user-count="8"] .itemUserTeamName,
+.itemUsersContainer[data-user-count="9"] .itemUserTeamName {
+  font-size: 1.1rem;
+}
+
+.itemUsersContainer[data-user-count="10"] .itemUserTeamName,
+.itemUsersContainer[data-user-count="11"] .itemUserTeamName,
+.itemUsersContainer[data-user-count="12"] .itemUserTeamName {
+  font-size: 1rem;
+}
+
+.itemUsersContainer[data-user-count-many="true"] .itemUserTeamName {
+  font-size: 0.9rem;
+}
+
+/* ユーザー数に応じてgap（間隔）も調整 */
+.itemUsersContainer[data-user-count="7"],
+.itemUsersContainer[data-user-count="8"],
+.itemUsersContainer[data-user-count="9"] {
+  gap: 0.8rem;
+}
+
+.itemUsersContainer[data-user-count="10"],
+.itemUsersContainer[data-user-count="11"],
+.itemUsersContainer[data-user-count="12"] {
+  gap: 0.6rem;
+}
+
+.itemUsersContainer[data-user-count-many="true"] {
+  gap: 0.5rem;
 }

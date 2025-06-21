@@ -280,12 +280,22 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
         {currentGroupedEvent &&
           (() => {
             // グループ化されたアイテムイベントから複数のユーザー情報を取得
-            const itemUserNames = currentGroupedEvent.userIds
+            const itemUsers = currentGroupedEvent.userIds
               .map((userId: string) => {
                 const user = animatedUsers.find((u) => u.userId === userId);
-                return user?.teamName;
+                return user
+                  ? {
+                      userId: user.userId,
+                      teamName: user.teamName,
+                      thumbnail: user.thumbnail,
+                    }
+                  : null;
               })
-              .filter(Boolean) as string[];
+              .filter(Boolean) as Array<{
+              userId: string;
+              teamName: string;
+              thumbnail: string;
+            }>;
 
             // グループ化されたイベントから最初のイベントをitemEventとして渡す
             const firstEvent = currentGroupedEvent.groupedEvents[0];
@@ -298,7 +308,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                   moviePlaybackState.isPlayingMovies && !isGlobalAnimating
                 }
                 onMovieEnd={handleMovieEnd}
-                itemUserNames={itemUserNames}
+                itemUsers={itemUsers}
                 itemEvent={firstEvent}
               />
             );
