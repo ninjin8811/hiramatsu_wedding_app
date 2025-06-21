@@ -71,7 +71,13 @@ const RankingCart: React.FC<RankingCartProps> = ({
       } ${user.isDemotionToBottom ? styles.demotionCart : ""} ${
         user.isRankUp ? styles.rankUpCart : ""
       } ${user.isRankDown ? styles.rankDownCart : ""}`}
-      initial={animationSettings.initial}
+      initial={{
+        marginLeft: `${xPosition}%`,
+        top: user.isPromotionFromBottom && user.isAnimating 
+          ? "100vh" 
+          : `${getLaneYPosition(laneIndex) - 4}%`,
+        ...animationSettings.initial,
+      }}
       animate={{
         marginLeft: `${xPosition}%`,
         top: `${getLaneYPosition(laneIndex) - 4}%`,

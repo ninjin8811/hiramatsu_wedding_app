@@ -145,9 +145,10 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     (a: AnimatedUser, b: AnimatedUser) => b.animatedScore - a.animatedScore
   );
 
-  // 7位以降の判定
+  // 7位以降の判定（昇格アニメーション中のユーザーは除外）
   const otherUsers = sortedUsers.filter(
-    (user: AnimatedUser, index: number) => index >= 6
+    (user: AnimatedUser, index: number) => 
+      index >= 6 && !(user.isPromotionFromBottom && user.isAnimating)
   );
 
   const getThumbnail = (user: AnimatedUser): string => {
@@ -230,8 +231,10 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
               {sortedUsers
                 .filter(
                   (user, index) =>
-                    // 上位6位または降格アニメーション中
-                    index < 6 || (user.isDemotionToBottom && user.isAnimating)
+                    // 上位6位または降格・昇格アニメーション中
+                    index < 6 || 
+                    (user.isDemotionToBottom && user.isAnimating) ||
+                    (user.isPromotionFromBottom && user.isAnimating)
                 )
                 .map((user, index) => (
                   <RankingCart

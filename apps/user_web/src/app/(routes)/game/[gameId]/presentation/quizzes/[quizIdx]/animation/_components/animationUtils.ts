@@ -36,17 +36,15 @@ export const getAnimationSettings = (user: {
   if (user.isPromotionFromBottom && user.isAnimating) {
     return {
       initial: {
-        y: "60vh", // 下部エリアから開始
         opacity: 0.8,
         scale: 0.8
       },
       animate: {
-        y: 0, // 通常位置へ
         opacity: 1,
         scale: 1.05
       },
       transition: {
-        y: { duration: 3.6, ease: "easeOut" },
+        top: { duration: 3.6, ease: "easeOut" },
         opacity: { duration: 1.2, ease: "easeOut" },
         scale: { duration: 0.6, ease: "easeOut" }
       }
