@@ -191,11 +191,13 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
     audio.play().catch((e) => {
       console.error("Error playing drumroll:", e);
       setCurrentTopThreeIndex(1);
+      setTimeout(() => setShowConfetti(true), 1000); // 1位表示の1秒後に紙吹雪
       setIsDrumrollPlaying(false);
     });
     audio.onended = () => {
       if (currentTopThreeIndex === 2) {
         setCurrentTopThreeIndex(1);
+        setTimeout(() => setShowConfetti(true), 1000); // 1位表示の1秒後に紙吹雪
       }
       setIsDrumrollPlaying(false);
     };
@@ -224,11 +226,10 @@ export const useRankingAnimation = (teamsData: Team[], gameId: string) => {
           if (isDrumrollPlaying) {
             stopDrumroll();
             setCurrentTopThreeIndex(1);
+            setTimeout(() => setShowConfetti(true), 1000); // 1位表示の1秒後に紙吹雪
           } else {
             startDrumroll();
           }
-        } else if (currentTopThreeIndex === 1 && !showConfetti) {
-          setTimeout(() => setShowConfetti(true), 1000);
         }
       }
     };
