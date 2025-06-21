@@ -51,7 +51,7 @@ export default function CurrentRanking(props: Props) {
     game.questions.length > currentQuestionIndex
       ? game.questions[currentQuestionIndex].correctIndex
       : null;
-  const ranking = game?.users.sort((a, b) => b.score - a.score);
+  const ranking = game?.users.toSorted((a, b) => b.score - a.score);
 
   useEffect(() => {
     const gameUnsub = listenGame(props.gameId, (game) => {

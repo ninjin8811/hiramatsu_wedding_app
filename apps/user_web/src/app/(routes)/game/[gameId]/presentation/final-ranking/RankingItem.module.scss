@@ -1,13 +1,25 @@
 .rankingItem {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 8px 16px 8px 66px;
   background: #000000;
-  border: 1px solid #9A9A9A;
+  border: 1px solid #9a9a9a;
   margin-bottom: 8px;
   box-shadow: 0 2px 8px rgba(154, 154, 154, 0.3);
   width: 494px;
   height: 96px;
+  margin-left: 50px;
+}
+
+.normalItemThumbnail {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 50%;
+  position: absolute;
+  border: 2px solid #9a9a9a;
+  left: 0px;
+  top: 0px;
 }
 
 .rankNumber {
@@ -27,7 +39,7 @@
   flex: 1;
   font-size: 33px;
   margin: 0 16px;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .scoreContainer {
@@ -37,14 +49,14 @@
 }
 
 .score {
-  font-size: 33px;
+  font-size: 48px;
   font-weight: bold;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .unit {
-  font-size: 24px;
-  color: #9A9A9A;
+  font-size: 32px;
+  color: #9a9a9a;
 }
 
 .rankingItemGorgeous {
@@ -65,32 +77,35 @@
   }
 
   &[data-rank="1"] {
-    border: 2px solid #FCD000;
-    .teamNameGorgeous, .scoreGorgeous {
-      color: #FCD000;
+    border: 2px solid #fcd000;
+    .teamNameGorgeous,
+    .scoreGorgeous {
+      color: #fcd000;
     }
     .mainThumbnail {
-      border: 2px solid #FCD000;
+      border: 2px solid #fcd000;
     }
   }
 
   &[data-rank="2"] {
-    border: 2px solid #D4D5D0;
-    .teamNameGorgeous, .scoreGorgeous {
-      color: #D4D5D0;
+    border: 2px solid #d4d5d0;
+    .teamNameGorgeous,
+    .scoreGorgeous {
+      color: #d4d5d0;
     }
     .mainThumbnail {
-      border: 2px solid #D4D5D0;
+      border: 2px solid #d4d5d0;
     }
   }
 
   &[data-rank="3"] {
-    border: 2px solid #FD8F0D;
-    .teamNameGorgeous, .scoreGorgeous {
-      color: #FD8F0D;
+    border: 2px solid #fd8f0d;
+    .teamNameGorgeous,
+    .scoreGorgeous {
+      color: #fd8f0d;
     }
     .mainThumbnail {
-      border: 2px solid #FD8F0D;
+      border: 2px solid #fd8f0d;
     }
   }
 }
@@ -113,7 +128,7 @@
   padding: 2px;
   width: 240px;
   height: 240px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .rankOverlay {
@@ -150,12 +165,12 @@
 }
 
 .scoreGorgeous {
-  font-size: 32px;
+  font-size: 48px;
   font-weight: bold;
 }
 
 .unitGorgeous {
-  font-size: 0.9em;
+  font-size: 32px;
   margin-left: 4px;
-  color: #9A9A9A;
-} 
+  color: #9a9a9a;
+}

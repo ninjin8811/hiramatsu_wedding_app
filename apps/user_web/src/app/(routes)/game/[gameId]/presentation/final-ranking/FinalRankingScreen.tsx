@@ -86,7 +86,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
 
   return (
     <div className={styles.container}>
-      <AnimatedBackground className={styles.background} />
+      <AnimatedBackground className={styles.background} animationDuration={100}/>
 
       {/* 既存の固定背景を削除またはコメントアウト */}
       {/* <Image
@@ -146,7 +146,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
                         rank={team.rank}
                         name={team.name}
                         score={team.score}
-                        // thumbnail={team.thumbnail} // RankingItemNormal には thumbnail props がない想定だったが、もし必要なら渡す
+                        thumbnail={team.sadThumbnail} // RankingItemNormal には thumbnail props がない想定だったが、もし必要なら渡す
                       />
                     </div>
                   )
