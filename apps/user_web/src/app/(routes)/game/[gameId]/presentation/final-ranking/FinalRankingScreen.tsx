@@ -86,7 +86,7 @@ const FinalRankingScreen: React.FC<FinalRankingScreenProps> = ({ gameId }) => {
 
   return (
     <div className={styles.container}>
-      <AnimatedBackground className={styles.background} />
+      <AnimatedBackground className={styles.background} animationDuration={100}/>
 
       {/* 既存の固定背景を削除またはコメントアウト */}
       {/* <Image
