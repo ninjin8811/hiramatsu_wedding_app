@@ -1,8 +1,8 @@
-import { useState, useCallback } from "react";
-import { User, AnimatedUser, TireTrail, ItemEvent } from "./types";
-import { ItemEffect, GameUser } from "@/app/_types";
-import { getXPosition } from "./animationUtils";
-import { KinokoService } from "./KinokoService";
+import { useState, useCallback } from "react"
+import { User, AnimatedUser, TireTrail, ItemEvent } from "./types"
+import { ItemEffect, GameUser } from "@/app/_types"
+import { getXPosition } from "./animationUtils"
+import { KinokoService } from "./KinokoService"
 import {
   doc,
   setDoc,
@@ -10,24 +10,24 @@ import {
   serverTimestamp,
   updateDoc,
   getDoc,
-} from "firebase/firestore";
+} from "firebase/firestore"
 
 interface UseRankingAnimationProps {
-  users: User[];
-  itemEvents: ItemEvent[];
-  totalQuestions: number; // 総問題数
-  gameId: string; // Firestore保存用のゲームID
+  users: User[]
+  itemEvents: ItemEvent[]
+  totalQuestions: number // 総問題数
+  gameId: string // Firestore保存用のゲームID
 }
 
 // アイテムイベントをグループ化するためのタイプ
 interface GroupedItemEvent {
-  itemName: string;
-  itemMovie: string;
-  userIds: string[];
-  isCorrectAnswer: boolean;
-  effect: ItemEffect;
-  groupedEvents: ItemEvent[]; // 元のイベントを保持
-  priority: number; // priority情報を保持
+  itemName: string
+  itemMovie: string
+  userIds: string[]
+  isCorrectAnswer: boolean
+  effect: ItemEffect
+  groupedEvents: ItemEvent[] // 元のイベントを保持
+  priority: number // priority情報を保持
 }
 
 export const useRankingAnimation = ({
@@ -37,13 +37,13 @@ export const useRankingAnimation = ({
   gameId,
 }: UseRankingAnimationProps) => {
   /** 初手アニメーションの完了フラグ（重複実行防止） */
-  const [animationCompleted, setAnimationCompleted] = useState(false);
+  const [animationCompleted, setAnimationCompleted] = useState(false)
 
   /** 全体のアニメーションが実行中かどうか */
-  const [isGlobalAnimating, setIsGlobalAnimating] = useState(false);
+  const [isGlobalAnimating, setIsGlobalAnimating] = useState(false)
 
   /** タイヤ痕の表示データ */
-  const [tireTrails, setTireTrails] = useState<TireTrail[]>([]);
+  const [tireTrails, setTireTrails] = useState<TireTrail[]>([])
 
   /**
    * ボム効果前のスコアをFirestoreのusersフィールドに保存する
@@ -51,67 +51,65 @@ export const useRankingAnimation = ({
   const saveBombPreScoresToUsers = useCallback(
     async (users: AnimatedUser[]) => {
       try {
-        const db = getFirestore();
-        const gameRef = doc(db, `Games/${gameId}`);
+        const db = getFirestore()
+        const gameRef = doc(db, `Games/${gameId}`)
 
         // 現在のゲームドキュメントを取得
-        const gameDoc = await getDoc(gameRef);
+        const gameDoc = await getDoc(gameRef)
         if (!gameDoc.exists()) {
-          console.error("Game document not found");
-          return;
+          console.error("Game document not found")
+          return
         }
 
-        const gameData = gameDoc.data();
-        const currentUsers = gameData.users || [];
+        const gameData = gameDoc.data()
+        const currentUsers = gameData.users || []
 
         // 各ユーザーのitemAffectedScoreを更新
         const updatedUsers = currentUsers.map((gameUser: GameUser) => {
-          const matchingUser = users.find(
-            (user) => user.userId === gameUser.id
-          );
+          const matchingUser = users.find((user) => user.userId === gameUser.id)
           if (matchingUser) {
             return {
               ...gameUser,
               itemAffectedScore: matchingUser.currentScore,
-            };
+            }
           }
-          return gameUser;
-        });
+          return gameUser
+        })
 
-        await updateDoc(gameRef, { users: updatedUsers });
+        await updateDoc(gameRef, { users: updatedUsers })
 
         console.log(
-          `💾 Bomb pre-scores saved to users.itemAffectedScore for ${users.length} users`
-        );
+          `💾 Bomb pre-scores saved to users.itemAffectedScore for ${users.length} users`,
+        )
       } catch (error) {
-        console.error("❌ Failed to save bomb pre-scores to users:", error);
+        console.error("❌ Failed to save bomb pre-scores to users:", error)
       }
     },
-    [gameId]
-  );
+    [gameId],
+  )
 
   // アイテムイベントをpriority順を維持してグループ化（kinoko系アイテムをそれぞれまとめる）
   const groupedItemEvents: GroupedItemEvent[] = (() => {
-    const result: GroupedItemEvent[] = [];
-    const kinokoEventsByPriority = new Map<number, ItemEvent[]>();
-    const specialKinokoEventsByPriority = new Map<number, ItemEvent[]>();
+    const result: GroupedItemEvent[] = []
+    const kinokoEventsByPriority = new Map<number, ItemEvent[]>()
+    const specialKinokoEventsByPriority = new Map<number, ItemEvent[]>()
 
     // priority順でアイテムを処理し、kinoko系は優先度ごとにグループ分け
     itemEvents.forEach((event) => {
-      const priority = event.priority;
+      const priority = event.priority
 
       if (KinokoService.isRegularKinokoItem(event.itemId)) {
         // 通常のkinokoイベントをpriority別にグループ分け
         if (!kinokoEventsByPriority.has(priority)) {
-          kinokoEventsByPriority.set(priority, []);
+          kinokoEventsByPriority.set(priority, [])
         }
-        kinokoEventsByPriority.get(priority)!.push(event);
+        kinokoEventsByPriority.get(priority)!.push(event)
       } else if (KinokoService.isSpecialKinokoItem(event.itemId)) {
         // special_kinokoイベントをpriority別にグループ分け
         if (!specialKinokoEventsByPriority.has(priority)) {
-          specialKinokoEventsByPriority.set(priority, []);
+          specialKinokoEventsByPriority.set(priority, [])
         }
-        specialKinokoEventsByPriority.get(priority)!.push(event);
+        specialKinokoEventsByPriority.get(priority)!.push(event)
       } else {
         // kinoko系以外は個別のグループとして追加
         result.push({
@@ -122,21 +120,21 @@ export const useRankingAnimation = ({
           effect: event.effect,
           groupedEvents: [event],
           priority: priority, // priority情報を保持
-        });
+        })
       }
-    });
+    })
 
     // kinoko系アイテムをpriorityごとにグループ化してresultに追加
     const allKinokoPriorities = [
       ...Array.from(kinokoEventsByPriority.keys()),
       ...Array.from(specialKinokoEventsByPriority.keys()),
-    ].sort((a, b) => a - b); // priority順にソート
+    ].sort((a, b) => a - b) // priority順にソート
 
     allKinokoPriorities.forEach((priority) => {
       // 通常のkinokoアイテムを処理
       if (kinokoEventsByPriority.has(priority)) {
-        const events = kinokoEventsByPriority.get(priority)!;
-        const firstEvent = events[0];
+        const events = kinokoEventsByPriority.get(priority)!
+        const firstEvent = events[0]
         result.push({
           itemName: "kinoko",
           itemMovie: firstEvent.itemMovie,
@@ -145,13 +143,13 @@ export const useRankingAnimation = ({
           effect: firstEvent.effect,
           groupedEvents: events,
           priority: priority,
-        });
+        })
       }
 
       // special_kinokoアイテムを処理
       if (specialKinokoEventsByPriority.has(priority)) {
-        const events = specialKinokoEventsByPriority.get(priority)!;
-        const firstEvent = events[0];
+        const events = specialKinokoEventsByPriority.get(priority)!
+        const firstEvent = events[0]
         result.push({
           itemName: "special_kinoko",
           itemMovie: firstEvent.itemMovie,
@@ -160,28 +158,28 @@ export const useRankingAnimation = ({
           effect: firstEvent.effect,
           groupedEvents: events,
           priority: priority,
-        });
+        })
       }
-    });
+    })
 
     // 最終的にpriority順でソート
-    return result.sort((a, b) => a.priority - b.priority);
-  })();
+    return result.sort((a, b) => a.priority - b.priority)
+  })()
 
   /** 動画再生関連の状態 */
   const [moviePlaybackState, setMoviePlaybackState] = useState({
     isPlayingMovies: false,
     currentMovieIndex: 0,
     allMoviesCompleted: false,
-  });
+  })
 
   const currentGroupedEvent: GroupedItemEvent | undefined =
-    groupedItemEvents[moviePlaybackState.currentMovieIndex];
+    groupedItemEvents[moviePlaybackState.currentMovieIndex]
 
   const isKillerAnimating =
     animationCompleted &&
     isGlobalAnimating &&
-    currentGroupedEvent?.effect.effectType === "copy_rank_score";
+    currentGroupedEvent?.effect.effectType === "copy_rank_score"
 
   /**
    * 初期表示用のアニメーションデータを作成
@@ -198,13 +196,13 @@ export const useRankingAnimation = ({
         isRankDown: false, // 順位下降フラグ初期化
         isRankUp: false, // 順位上昇フラグ初期化
         damageEffect: undefined, // ダメージエフェクト初期化
-      };
-    });
-  };
+      }
+    })
+  }
 
   /** アニメーションするユーザーデータ */
   const [animatedUsers, setAnimatedUsers] =
-    useState<AnimatedUser[]>(createInitialData);
+    useState<AnimatedUser[]>(createInitialData)
 
   /**
    * currentScoreベースで順位を計算する
@@ -212,16 +210,16 @@ export const useRankingAnimation = ({
   const getRankByScore = useCallback(
     (
       users: { currentScore: number; userId: string }[],
-      userId: string
+      userId: string,
     ): number => {
       const sortedUsers = users.toSorted(
         (a, b) =>
-          b.currentScore - a.currentScore || a.userId.localeCompare(b.userId)
-      );
-      return sortedUsers.findIndex((u) => u.userId === userId);
+          b.currentScore - a.currentScore || a.userId.localeCompare(b.userId),
+      )
+      return sortedUsers.findIndex((u) => u.userId === userId)
     },
-    []
-  );
+    [],
+  )
 
   /**
    * エフェクトを実行してユーザーのスコアを更新
@@ -232,16 +230,17 @@ export const useRankingAnimation = ({
       currentUsers: AnimatedUser[],
       isCorrectAnswer: boolean,
       targetUserId?: string,
-      itemId?: string
+      itemId?: string,
     ): AnimatedUser[] => {
       // 現在のランキングを計算（currentScoreベース）
       const currentRanking = currentUsers.toSorted(
         (a, b) =>
-          b.currentScore - a.currentScore || a.userId.localeCompare(b.userId)
-      );
+          b.currentScore - a.currentScore || a.userId.localeCompare(b.userId),
+      )
 
-      let targetUsers: AnimatedUser[] = [];
-      const effectType = effect.effectType || "score_change";
+      let targetUsers: AnimatedUser[] = []
+      console.log("effect", effect)
+      const effectType = effect.effectType || "score_change"
 
       // 条件付きエフェクトのチェック
       if (
@@ -249,120 +248,118 @@ export const useRankingAnimation = ({
         effect.condition === "correct_answer" &&
         !isCorrectAnswer
       ) {
-        console.log("🚫 Conditional effect not triggered (not correct answer)");
-        return currentUsers;
+        console.log("🚫 Conditional effect not triggered (not correct answer)")
+        return currentUsers
       }
 
       // ボム効果の場合、スコア変更前にFirestoreに保存
       if (effectType === "set_score_by_correct_rate") {
-        console.log("💣 Bomb effect detected - saving pre-scores to Firestore");
+        console.log("💣 Bomb effect detected - saving pre-scores to Firestore")
         saveBombPreScoresToUsers(currentUsers).catch((error: Error) => {
-          console.error("Failed to save bomb pre-scores:", error);
-        });
+          console.error("Failed to save bomb pre-scores:", error)
+        })
       }
 
       // ターゲットユーザーを特定
       if (effectType === "set_score_by_correct_rate") {
         // ボム効果は全ユーザーに適用
-        targetUsers = [...currentUsers];
+        targetUsers = [...currentUsers]
       } else if (effect.targetType) {
         switch (effect.targetType) {
           case "rank_position":
-            const rankPosition = Number(effect.targetValue) - 1; // 1-basedから0-basedに変換
+            const rankPosition = Number(effect.targetValue) - 1 // 1-basedから0-basedに変換
             if (rankPosition >= 0 && rankPosition < currentRanking.length) {
-              targetUsers = [currentRanking[rankPosition]];
+              targetUsers = [currentRanking[rankPosition]]
             }
-            break;
+            break
           case "item_used_user":
             // targetUserIdが指定されている場合はそれを使用、そうでなければグループ化されたイベントの最初のユーザー
-            const userId = targetUserId || currentGroupedEvent?.userIds[0];
-            const targetUser = currentUsers.find((u) => u.userId === userId);
+            const userId = targetUserId || currentGroupedEvent?.userIds[0]
+            const targetUser = currentUsers.find((u) => u.userId === userId)
             if (targetUser) {
-              targetUsers = [targetUser];
+              targetUsers = [targetUser]
             }
-            break;
+            break
           case "all_users":
             // topRanksOnlyが指定されている場合は上位N位のみ
             if (effect.topRanksOnly) {
-              targetUsers = currentRanking.slice(0, effect.topRanksOnly);
+              targetUsers = currentRanking.slice(0, effect.topRanksOnly)
             } else {
-              targetUsers = [...currentUsers];
+              targetUsers = [...currentUsers]
             }
-            break;
+            break
           case "random_users":
-            const count = Number(effect.targetValue) || 1;
+            const count = Number(effect.targetValue) || 1
             // topRanksOnlyが指定されている場合は上位N位からランダム選択
             // スコアが0のユーザーは対象外
             const candidateUsers = (
               effect.topRanksOnly
                 ? currentRanking.slice(0, effect.topRanksOnly)
                 : currentUsers
-            ).filter((user) => user.currentScore > 0);
-            const shuffled = [...candidateUsers].sort(
-              () => Math.random() - 0.5
-            );
+            ).filter((user) => user.currentScore > 0)
+            const shuffled = [...candidateUsers].sort(() => Math.random() - 0.5)
             targetUsers = shuffled.slice(
               0,
-              Math.min(count, candidateUsers.length)
-            );
-            break;
+              Math.min(count, candidateUsers.length),
+            )
+            break
         }
       }
 
       // エフェクトを適用
       return currentUsers.map((user) => {
         const isTargetUser = targetUsers.some(
-          (target) => target.userId === user.userId
-        );
+          (target) => target.userId === user.userId,
+        )
         if (isTargetUser) {
-          const originalScore = user.currentScore;
-          let newScore = user.currentScore;
+          const originalScore = user.currentScore
+          let newScore = user.currentScore
 
           switch (effectType) {
             case "score_change":
             case "conditional_bonus":
               newScore = Math.max(
                 0,
-                user.currentScore + (effect.scoreChange || 0)
-              );
-              break;
+                user.currentScore + (effect.scoreChange || 0),
+              )
+              break
             case "copy_rank_score":
               if (effect.copyFromRank) {
-                const copyFromIndex = effect.copyFromRank - 1; // 1-basedから0-basedに変換
+                const copyFromIndex = effect.copyFromRank - 1 // 1-basedから0-basedに変換
                 if (
                   copyFromIndex >= 0 &&
                   copyFromIndex < currentRanking.length
                 ) {
-                  newScore = currentRanking[copyFromIndex].currentScore + 1; // 1pt加算
+                  newScore = currentRanking[copyFromIndex].currentScore + 1 // 1pt加算
                   console.log(
-                    `📋 Copying score from rank ${effect.copyFromRank}: ${user.teamName} gets ${newScore}pt`
-                  );
+                    `📋 Copying score from rank ${effect.copyFromRank}: ${user.teamName} gets ${newScore}pt`,
+                  )
                 }
               }
-              break;
+              break
             case "set_score_by_correct_rate":
               // ボム効果：各ユーザーの正解率×(問題数-1)×100でスコアを設定
-              const multiplier = Math.max(1, totalQuestions - 1); // 問題数-1、最小値は1
-              const userCorrectRate = user.correctRate; // そのユーザー自身の正答率を使用
+              const multiplier = Math.max(1, totalQuestions - 1) // 問題数-1、最小値は1
+              const userCorrectRate = user.correctRate // そのユーザー自身の正答率を使用
 
-              newScore = Math.round(userCorrectRate * multiplier * 100);
+              newScore = Math.round(userCorrectRate * multiplier * 100)
               console.log(
                 `💣 Bomb effect: Setting ${
                   user.teamName
                 }'s score to ${newScore} (user's correct rate: ${Math.round(
-                  userCorrectRate * 100
-                )}%, multiplier: ${multiplier}, totalQuestions: ${totalQuestions})`
-              );
-              break;
+                  userCorrectRate * 100,
+                )}%, multiplier: ${multiplier}, totalQuestions: ${totalQuestions})`,
+              )
+              break
           }
 
           console.log(
-            `🎯 Effect applied to ${user.teamName}: ${originalScore} → ${newScore} (${effectType})`
-          );
+            `🎯 Effect applied to ${user.teamName}: ${originalScore} → ${newScore} (${effectType})`,
+          )
 
           // ダメージを受けた場合（スコアが減少）、またはボム効果の場合、エフェクトを設定
-          const isDamaged = newScore < originalScore;
-          const isBombEffect = effectType === "set_score_by_correct_rate";
+          const isDamaged = newScore < originalScore
+          const isBombEffect = effectType === "set_score_by_correct_rate"
           const updatedUser = {
             ...user,
             currentScore: newScore,
@@ -370,93 +367,91 @@ export const useRankingAnimation = ({
               (isDamaged || isBombEffect) && itemId
                 ? { isVisible: true, itemId }
                 : user.damageEffect,
-          };
+          }
 
           if ((isDamaged || isBombEffect) && itemId) {
             console.log(
               `🎬 Setting ${isBombEffect ? "bomb" : "damage"} effect for ${
                 user.teamName
-              }: itemId=${itemId}`
-            );
+              }: itemId=${itemId}`,
+            )
           }
 
-          return updatedUser;
+          return updatedUser
         }
-        return user;
-      });
+        return user
+      })
     },
-    [currentGroupedEvent?.userIds, saveBombPreScoresToUsers]
-  );
+    [currentGroupedEvent?.userIds, saveBombPreScoresToUsers],
+  )
 
   /**
    * エフェクト実行後のランキングアニメーションを開始
    */
   const startEffectAnimation = useCallback(
     async (updatedUsers: AnimatedUser[], onComplete: () => void) => {
-      console.log("🎬 Starting effect animation...");
+      console.log("🎬 Starting effect animation...")
 
-      setIsGlobalAnimating(true);
+      setIsGlobalAnimating(true)
 
       // エフェクト適用前後でスコアが変化したユーザーを特定
       const changedUsers = updatedUsers.filter((user) => {
-        const originalUser = animatedUsers.find(
-          (u) => u.userId === user.userId
-        );
-        return originalUser && originalUser.currentScore !== user.currentScore;
-      });
+        const originalUser = animatedUsers.find((u) => u.userId === user.userId)
+        return originalUser && originalUser.currentScore !== user.currentScore
+      })
 
       // 順位が変化したユーザーを特定（スコア変化なしでも）
       const rankChangedUsers = updatedUsers.filter((user) => {
-        const prevRank = getRankByScore(animatedUsers, user.userId);
-        const newRank = getRankByScore(updatedUsers, user.userId);
+        const prevRank = getRankByScore(animatedUsers, user.userId)
+        const newRank = getRankByScore(updatedUsers, user.userId)
         const hasScoreChange = changedUsers.some(
-          (c) => c.userId === user.userId
-        );
+          (c) => c.userId === user.userId,
+        )
 
-        return prevRank !== newRank && !hasScoreChange; // 順位変化したがスコア変化していない
-      });
+        return prevRank !== newRank && !hasScoreChange // 順位変化したがスコア変化していない
+      })
 
       // アニメーション対象：スコア変化 + 順位変化
-      const allAnimationUsers = [...changedUsers, ...rankChangedUsers];
+      const allAnimationUsers = [...changedUsers, ...rankChangedUsers]
 
       if (allAnimationUsers.length === 0) {
-        console.log("🚫 No score or rank changes detected, skipping animation");
-        setIsGlobalAnimating(false);
-        onComplete();
-        return;
+        console.log("🚫 No score or rank changes detected, skipping animation")
+        setIsGlobalAnimating(false)
+        onComplete()
+        return
       }
 
       // 変化したユーザーのアニメーション情報を準備
       const animationData = allAnimationUsers
         .map((userToAnimate) => {
           const originalUser = animatedUsers.find(
-            (u) => u.userId === userToAnimate.userId
-          );
-          if (!originalUser) return null;
+            (u) => u.userId === userToAnimate.userId,
+          )
+          if (!originalUser) return null
 
           // スコア変化があるかどうかを判定
           const hasScoreChange = changedUsers.some(
-            (c) => c.userId === userToAnimate.userId
-          );
+            (c) => c.userId === userToAnimate.userId,
+          )
 
           // タイヤ痕の軌跡を記録（スコア変化がある場合のみ）
-          const startX = getXPosition(originalUser.currentScore);
-          const endX = getXPosition(userToAnimate.currentScore);
+          const startX = getXPosition(originalUser.currentScore)
+          const endX = getXPosition(userToAnimate.currentScore)
 
           // 元のランキングと新しいランキングでの順位を取得
-          const prevRank = getRankByScore(animatedUsers, userToAnimate.userId);
-          const newRank = getRankByScore(updatedUsers, userToAnimate.userId);
+          const prevRank = getRankByScore(animatedUsers, userToAnimate.userId)
+          const newRank = getRankByScore(updatedUsers, userToAnimate.userId)
 
           // 特殊アニメーションの判定
-          const isPromotionFromBottom = prevRank >= 6 && newRank < 6;
-          const isDemotionToBottom = prevRank < 6 && newRank >= 6;
-          const isRankUp = prevRank < 6 && newRank < 6 && newRank < prevRank;
-          const isRankDown = prevRank < 6 && newRank < 6 && newRank > prevRank;
+          const isPromotionFromBottom = prevRank >= 6 && newRank < 6
+          const isDemotionToBottom = prevRank < 6 && newRank >= 6
+          const isRankUp = prevRank < 6 && newRank < 6 && newRank < prevRank
+          const isRankDown = prevRank < 6 && newRank < 6 && newRank > prevRank
 
-          const changeType = hasScoreChange ? "Score+Rank" : "Rank only";
+          const changeType = hasScoreChange ? "Score+Rank" : "Rank only"
           console.log(
-            `📊 Effect ${userToAnimate.teamName}: ${prevRank}→${newRank} (${originalUser.currentScore}→${userToAnimate.currentScore}pt) [${changeType}] | ⬆️${isPromotionFromBottom} ⬇️${isDemotionToBottom} 🔺${isRankUp} 🔻${isRankDown}`
-          );
+            `📊 Effect ${userToAnimate.teamName}: ${prevRank}→${newRank} (${originalUser.currentScore}→${userToAnimate.currentScore}pt) [${changeType}] | ⬆️${isPromotionFromBottom} ⬇️${isDemotionToBottom} 🔺${isRankUp} 🔻${isRankDown}`,
+          )
 
           return {
             userToAnimate,
@@ -471,16 +466,14 @@ export const useRankingAnimation = ({
             isRankDown,
             hasScoreChange,
             delay: Math.random() * 2000, // ランダムな遅延（0-2秒）
-          };
+          }
         })
-        .filter(Boolean);
+        .filter(Boolean)
 
       // 変化しなかったユーザーのanimatedScoreも同期（ダメージエフェクト情報も含む）
       setAnimatedUsers((prev) =>
         prev.map((user) => {
-          const updatedUser = updatedUsers.find(
-            (u) => u.userId === user.userId
-          );
+          const updatedUser = updatedUsers.find((u) => u.userId === user.userId)
           if (updatedUser) {
             if (!allAnimationUsers.some((c) => c.userId === user.userId)) {
               // スコア変化も順位変化もないが、currentScoreとanimatedScoreを同期
@@ -489,22 +482,22 @@ export const useRankingAnimation = ({
                 animatedScore: updatedUser.currentScore,
                 currentScore: updatedUser.currentScore,
                 damageEffect: updatedUser.damageEffect, // ダメージエフェクト情報も更新
-              };
+              }
             } else {
               // アニメーション対象ユーザーもダメージエフェクト情報は即座に反映
               return {
                 ...user,
                 damageEffect: updatedUser.damageEffect,
-              };
+              }
             }
           }
-          return user;
-        })
-      );
+          return user
+        }),
+      )
 
       // アニメーションプロミスを作成
       const animationPromises = animationData.map(async (data) => {
-        if (!data) return;
+        if (!data) return
 
         const {
           userToAnimate,
@@ -519,10 +512,10 @@ export const useRankingAnimation = ({
           isRankDown,
           hasScoreChange,
           delay,
-        } = data;
+        } = data
 
         // 段階的開始のための遅延
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay))
 
         // アニメーション開始：フラグ設定
         setAnimatedUsers((prev) => {
@@ -530,8 +523,8 @@ export const useRankingAnimation = ({
             if (user.userId === userToAnimate.userId) {
               // updatedUsersから最新の情報を取得
               const latestUser = updatedUsers.find(
-                (u) => u.userId === user.userId
-              );
+                (u) => u.userId === user.userId,
+              )
               return {
                 ...user,
                 isAnimating: true,
@@ -541,14 +534,14 @@ export const useRankingAnimation = ({
                 isRankDown,
                 currentScore: userToAnimate.currentScore, // currentScoreも更新
                 damageEffect: latestUser?.damageEffect, // ダメージエフェクト情報も保持
-              };
+              }
             }
-            return user;
-          });
-        });
+            return user
+          })
+        })
 
         // タイヤ痕エフェクトを追加
-        const safePrevRank = Math.max(0, Math.min(5, prevRank));
+        const safePrevRank = Math.max(0, Math.min(5, prevRank))
         setTireTrails((prev) => [
           ...prev,
           {
@@ -557,35 +550,35 @@ export const useRankingAnimation = ({
             endX,
             laneIndex: safePrevRank,
           },
-        ]);
+        ])
 
         // スコアカウントアップアニメーション
         await new Promise<void>((resolve) => {
-          const duration = 3000;
-          const startTime = Date.now();
+          const duration = 3000
+          const startTime = Date.now()
 
           const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easeOut = 1 - Math.pow(1 - progress, 3);
+            const elapsed = Date.now() - startTime
+            const progress = Math.min(elapsed / duration, 1)
+            const easeOut = 1 - Math.pow(1 - progress, 3)
 
-            const startScore = originalUser.currentScore;
-            const endScore = userToAnimate.currentScore;
+            const startScore = originalUser.currentScore
+            const endScore = userToAnimate.currentScore
             const currentScore = Math.round(
-              startScore + (endScore - startScore) * easeOut
-            );
+              startScore + (endScore - startScore) * easeOut,
+            )
 
             // リアルタイムでスコアを更新
             setAnimatedUsers((prev) =>
               prev.map((user) =>
                 user.userId === userToAnimate.userId
                   ? { ...user, animatedScore: currentScore }
-                  : user
-              )
-            );
+                  : user,
+              ),
+            )
 
             if (progress < 1) {
-              requestAnimationFrame(animate);
+              requestAnimationFrame(animate)
             } else {
               // アニメーション完了：最終状態に設定
               setAnimatedUsers((prev) =>
@@ -600,41 +593,41 @@ export const useRankingAnimation = ({
                         isRankUp: false,
                         isRankDown: false,
                       }
-                    : user
-                )
-              );
-              resolve();
+                    : user,
+                ),
+              )
+              resolve()
             }
-          };
+          }
 
-          requestAnimationFrame(animate);
-        });
+          requestAnimationFrame(animate)
+        })
 
         // タイヤ痕をフェードアウト後削除
         setTimeout(() => {
           setTireTrails((prev) =>
-            prev.filter((trail) => trail.userId !== userToAnimate.userId)
-          );
-        }, 4000);
-      });
+            prev.filter((trail) => trail.userId !== userToAnimate.userId),
+          )
+        }, 4000)
+      })
 
       // 全てのアニメーションが完了するまで待機
-      await Promise.all(animationPromises);
+      await Promise.all(animationPromises)
 
-      setIsGlobalAnimating(false);
+      setIsGlobalAnimating(false)
 
       // アニメーション完了後のコールバックを実行
-      onComplete();
+      onComplete()
     },
-    [animatedUsers, getRankByScore]
-  );
+    [animatedUsers, getRankByScore],
+  )
 
   /**
    * 次の動画に進む
    */
   const proceedToNextMovie = useCallback(() => {
     setMoviePlaybackState((prev) => {
-      const nextIndex = prev.currentMovieIndex + 1;
+      const nextIndex = prev.currentMovieIndex + 1
 
       if (nextIndex >= groupedItemEvents.length) {
         // 全ての動画再生完了
@@ -642,16 +635,16 @@ export const useRankingAnimation = ({
           ...prev,
           isPlayingMovies: false,
           allMoviesCompleted: true,
-        };
+        }
       } else {
         // 次の動画に進む
         return {
           ...prev,
           currentMovieIndex: nextIndex,
-        };
+        }
       }
-    });
-  }, [groupedItemEvents.length]);
+    })
+  }, [groupedItemEvents.length])
 
   /**
    * 動画再生を開始する
@@ -662,16 +655,16 @@ export const useRankingAnimation = ({
         isPlayingMovies: true,
         currentMovieIndex: 0,
         allMoviesCompleted: false,
-      });
+      })
     } else {
       // 動画がない場合は即座に完了扱い
       setMoviePlaybackState({
         isPlayingMovies: false,
         currentMovieIndex: 0,
         allMoviesCompleted: true,
-      });
+      })
     }
-  }, [groupedItemEvents.length]);
+  }, [groupedItemEvents.length])
 
   /**
    * 段階的ランキングアニメーションの実行
@@ -680,32 +673,32 @@ export const useRankingAnimation = ({
   const startAnimation = useCallback(async () => {
     // 重複実行防止
     if (animationCompleted) {
-      console.log("🚫 Animation already completed, skipping...");
-      return;
+      console.log("🚫 Animation already completed, skipping...")
+      return
     }
 
     // スコア変化したユーザーを特定
     const changedUsers = users.filter(
-      (user) => user.prevScore !== user.currentScore
-    );
+      (user) => user.prevScore !== user.currentScore,
+    )
 
     // 順位が変化したユーザーを特定（スコア変化なしでも）
     const rankChangedUsers = users.filter((user) => {
       const prevRank = getRankByScore(
         users.map((u) => ({ ...u, currentScore: u.prevScore })),
-        user.userId
-      );
+        user.userId,
+      )
       const newRank = getRankByScore(
         users.map((u) => ({ ...u, currentScore: u.currentScore })),
-        user.userId
-      );
-      const hasScoreChange = changedUsers.some((c) => c.userId === user.userId);
+        user.userId,
+      )
+      const hasScoreChange = changedUsers.some((c) => c.userId === user.userId)
 
-      return prevRank !== newRank && !hasScoreChange; // 順位変化したがスコア変化していない
-    });
+      return prevRank !== newRank && !hasScoreChange // 順位変化したがスコア変化していない
+    })
 
     // アニメーション対象：スコア変化 + 順位変化
-    const allAnimationUsers = [...changedUsers, ...rankChangedUsers];
+    const allAnimationUsers = [...changedUsers, ...rankChangedUsers]
 
     // 変化しなかったユーザーのanimatedScoreも同期
     setAnimatedUsers((prev) =>
@@ -717,43 +710,43 @@ export const useRankingAnimation = ({
             animatedScore: user.currentScore,
             currentScore: user.currentScore,
             damageEffect: user.damageEffect, // ダメージエフェクト情報を保持
-          };
+          }
         }
-        return user;
-      })
-    );
+        return user
+      }),
+    )
 
     // 各チームのアニメーション情報を準備
     const animationData = allAnimationUsers.map((userToAnimate) => {
       // スコア変化があるかどうかを判定
       const hasScoreChange = changedUsers.some(
-        (c) => c.userId === userToAnimate.userId
-      );
+        (c) => c.userId === userToAnimate.userId,
+      )
 
       // タイヤ痕の軌跡を記録（スコア変化がある場合のみ）
-      const startX = getXPosition(userToAnimate.prevScore);
-      const endX = getXPosition(userToAnimate.currentScore);
+      const startX = getXPosition(userToAnimate.prevScore)
+      const endX = getXPosition(userToAnimate.currentScore)
 
       // 前回スコア順の順位と今回スコア順の順位を取得
       const prevRank = getRankByScore(
         users.map((u) => ({ ...u, currentScore: u.prevScore })),
-        userToAnimate.userId
-      );
+        userToAnimate.userId,
+      )
       const newRank = getRankByScore(
         users.map((u) => ({ ...u, currentScore: u.currentScore })),
-        userToAnimate.userId
-      );
+        userToAnimate.userId,
+      )
 
       // 特殊アニメーションの判定
-      const isPromotionFromBottom = prevRank >= 6 && newRank < 6; // 7位以降→6位以内
-      const isDemotionToBottom = prevRank < 6 && newRank >= 6; // 6位以内→7位以降
-      const isRankUp = prevRank < 6 && newRank < 6 && newRank < prevRank; // 上位6位内での順位上昇
-      const isRankDown = prevRank < 6 && newRank < 6 && newRank > prevRank; // 上位6位内での順位下降
+      const isPromotionFromBottom = prevRank >= 6 && newRank < 6 // 7位以降→6位以内
+      const isDemotionToBottom = prevRank < 6 && newRank >= 6 // 6位以内→7位以降
+      const isRankUp = prevRank < 6 && newRank < 6 && newRank < prevRank // 上位6位内での順位上昇
+      const isRankDown = prevRank < 6 && newRank < 6 && newRank > prevRank // 上位6位内での順位下降
 
-      const changeType = hasScoreChange ? "Score+Rank" : "Rank only";
+      const changeType = hasScoreChange ? "Score+Rank" : "Rank only"
       console.log(
-        `📊 Initial ${userToAnimate.teamName}: ${prevRank}→${newRank} (${userToAnimate.prevScore}→${userToAnimate.currentScore}pt) [${changeType}] | ⬆️${isPromotionFromBottom} ⬇️${isDemotionToBottom} 🔺${isRankUp} 🔻${isRankDown}`
-      );
+        `📊 Initial ${userToAnimate.teamName}: ${prevRank}→${newRank} (${userToAnimate.prevScore}→${userToAnimate.currentScore}pt) [${changeType}] | ⬆️${isPromotionFromBottom} ⬇️${isDemotionToBottom} 🔺${isRankUp} 🔻${isRankDown}`,
+      )
 
       return {
         userToAnimate,
@@ -767,8 +760,8 @@ export const useRankingAnimation = ({
         isRankDown,
         hasScoreChange,
         delay: Math.random() * 2000, // ランダムな遅延（0-2秒）
-      };
-    });
+      }
+    })
 
     // 全てのアニメーションを段階的に同時開始
     const animationPromises = animationData.map(async (data) => {
@@ -784,10 +777,10 @@ export const useRankingAnimation = ({
         isRankDown,
         hasScoreChange,
         delay,
-      } = data;
+      } = data
 
       // 段階的開始のための遅延
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay))
 
       // アニメーション開始：フラグ設定
       setAnimatedUsers((prev) => {
@@ -801,13 +794,13 @@ export const useRankingAnimation = ({
                 isRankUp,
                 isRankDown,
               }
-            : user
-        );
-      });
+            : user,
+        )
+      })
 
       // タイヤ痕エフェクトを追加（スコア変化がある場合のみ）
       if (hasScoreChange) {
-        const safePrevRank = Math.max(0, Math.min(5, prevRank));
+        const safePrevRank = Math.max(0, Math.min(5, prevRank))
         setTireTrails((prev) => [
           ...prev,
           {
@@ -816,36 +809,36 @@ export const useRankingAnimation = ({
             endX,
             laneIndex: safePrevRank,
           },
-        ]);
+        ])
       }
 
       // スコアカウントアップアニメーション
       await new Promise<void>((resolve) => {
-        const duration = 3000;
-        const startTime = Date.now();
+        const duration = 3000
+        const startTime = Date.now()
 
         const animate = () => {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const easeOut = 1 - Math.pow(1 - progress, 3); // イージングアウト関数
+          const elapsed = Date.now() - startTime
+          const progress = Math.min(elapsed / duration, 1)
+          const easeOut = 1 - Math.pow(1 - progress, 3) // イージングアウト関数
 
-          const startScore = userToAnimate.prevScore;
-          const endScore = userToAnimate.currentScore;
+          const startScore = userToAnimate.prevScore
+          const endScore = userToAnimate.currentScore
           const currentScore = Math.round(
-            startScore + (endScore - startScore) * easeOut
-          );
+            startScore + (endScore - startScore) * easeOut,
+          )
 
           // リアルタイムでスコアを更新
           setAnimatedUsers((prev) =>
             prev.map((user) =>
               user.userId === userToAnimate.userId
                 ? { ...user, animatedScore: currentScore }
-                : user
-            )
-          );
+                : user,
+            ),
+          )
 
           if (progress < 1) {
-            requestAnimationFrame(animate);
+            requestAnimationFrame(animate)
           } else {
             // アニメーション完了：最終状態に設定
             setAnimatedUsers((prev) =>
@@ -860,35 +853,35 @@ export const useRankingAnimation = ({
                       isRankUp: false, // フラグをリセット
                       isRankDown: false, // フラグをリセット
                     }
-                  : user
-              )
-            );
-            resolve();
+                  : user,
+              ),
+            )
+            resolve()
           }
-        };
+        }
 
-        requestAnimationFrame(animate);
-      });
+        requestAnimationFrame(animate)
+      })
 
       // タイヤ痕をフェードアウト後削除
       setTimeout(() => {
         setTireTrails((prev) =>
-          prev.filter((trail) => trail.userId !== userToAnimate.userId)
-        );
-      }, 2000);
-    });
+          prev.filter((trail) => trail.userId !== userToAnimate.userId),
+        )
+      }, 2000)
+    })
 
     // 全てのアニメーションが完了するまで待機
-    await Promise.all(animationPromises);
+    await Promise.all(animationPromises)
 
     // 全アニメーション完了
     // アニメーション完了後に動画再生を開始
     setTimeout(() => {
-      setAnimationCompleted(true);
-      setIsGlobalAnimating(false);
-      startMoviePlayback();
-    }, 3000);
-  }, [users, animationCompleted, startMoviePlayback, getRankByScore]);
+      setAnimationCompleted(true)
+      setIsGlobalAnimating(false)
+      startMoviePlayback()
+    }, 3000)
+  }, [users, animationCompleted, startMoviePlayback, getRankByScore])
 
   /**
    * ダメージエフェクトを終了する関数
@@ -896,46 +889,45 @@ export const useRankingAnimation = ({
   const handleDamageEffectEnd = useCallback((userId: string) => {
     setAnimatedUsers((prev) =>
       prev.map((user) =>
-        user.userId === userId ? { ...user, damageEffect: undefined } : user
-      )
-    );
-    console.log(`✖️ Damage Effect Ended: ${userId}`);
-  }, []);
+        user.userId === userId ? { ...user, damageEffect: undefined } : user,
+      ),
+    )
+    console.log(`✖️ Damage Effect Ended: ${userId}`)
+  }, [])
 
   /**
    * 動画終了後にエフェクトを実行する
    */
   const playNextMovie = useCallback(() => {
-    const currentEvent =
-      groupedItemEvents[moviePlaybackState.currentMovieIndex];
+    const currentEvent = groupedItemEvents[moviePlaybackState.currentMovieIndex]
 
     // 現在の動画のエフェクトを実行
     if (currentEvent) {
       console.log(
-        `🎬 Applying effects for item: ${currentEvent.itemName} (users: ${currentEvent.userIds.length})`
-      );
+        `🎬 Applying effects for item: ${currentEvent.itemName} (users: ${currentEvent.userIds.length})`,
+      )
 
       // グループ化されたイベントの場合、各ユーザーに対してエフェクトを適用
-      let updatedUsers = animatedUsers;
+      let updatedUsers = animatedUsers
       currentEvent.groupedEvents.forEach((event) => {
-        console.log(`🎯 Applying effect for user: ${event.userId}`);
+        console.log(`🎯 Applying effect for user: ${event.userId}`)
         // 個別のイベントに対してエフェクト適用（itemIdも渡す）
         updatedUsers = applyItemEffect(
           event.effect,
           updatedUsers,
           event.isCorrectAnswer,
           event.userId,
-          event.itemId
-        );
-      });
+          event.itemId,
+        )
+      })
 
       // エフェクトアニメーションを開始（完了後に次の動画に進む）
       setTimeout(() => {
-        startEffectAnimation(updatedUsers, proceedToNextMovie);
-      }, 500); // 少し遅延してからアニメーション開始
+        startEffectAnimation(updatedUsers, proceedToNextMovie)
+      }, 500) // 少し遅延してからアニメーション開始
     } else {
       // エフェクトがない場合は直接次の動画に進む
-      proceedToNextMovie();
+      proceedToNextMovie()
     }
   }, [
     groupedItemEvents,
@@ -944,7 +936,7 @@ export const useRankingAnimation = ({
     applyItemEffect,
     startEffectAnimation,
     proceedToNextMovie,
-  ]);
+  ])
 
   return {
     isGlobalAnimating,
@@ -958,5 +950,5 @@ export const useRankingAnimation = ({
     currentGroupedEvent,
     isKillerAnimating,
     handleDamageEffectEnd,
-  };
-};
+  }
+}

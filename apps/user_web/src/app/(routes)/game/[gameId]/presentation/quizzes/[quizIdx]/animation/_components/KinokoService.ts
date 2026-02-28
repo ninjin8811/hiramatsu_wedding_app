@@ -1,20 +1,20 @@
-import { ItemEvent } from "./types";
+import { ItemEvent } from "./types"
 
 /**
  * kinokoアイテム（kinoko、special_kinoko）に関する処理を管理するサービスクラス
  */
 export class KinokoService {
-  private static readonly KINOKO_ITEM_ID = "kinoko" as const;
-  private static readonly SPECIAL_KINOKO_ITEM_ID = "special_kinoko" as const;
+  private static readonly KINOKO_ITEM_ID = "kinoko" as const
+  private static readonly SPECIAL_KINOKO_ITEM_ID = "special_kinoko" as const
   private static readonly KINOKO_ITEM_IDS = [
     this.KINOKO_ITEM_ID,
     this.SPECIAL_KINOKO_ITEM_ID,
-  ] as const;
+  ] as const
 
   private static readonly KINOKO_IMAGE_URL =
-    "https://firebasestorage.googleapis.com/v0/b/fussa-wedding-app-prod/o/items%2Fkinoko.png?alt=media&token=8c042c21-f6fa-4375-b1fc-f4c7aa1d2ad7" as const;
+    "https://firebasestorage.googleapis.com/v0/b/fussa-wedding-app-prod/o/items%2Fdash-kinoko.png?alt=media&token=1c40c954-5792-4701-8e6a-60eafb595cc1" as const
   private static readonly SPECIAL_KINOKO_IMAGE_URL =
-    "https://firebasestorage.googleapis.com/v0/b/fussa-wedding-app-prod/o/items%2Fspecial_kinoko.png?alt=media&token=8c042c21-f6fa-4375-b1fc-f4c7aa1d2ad7" as const;
+    "https://firebasestorage.googleapis.com/v0/b/fussa-wedding-app-prod/o/items%2Fspecial_kinoko.png?alt=media&token=73cda5a3-841d-4419-8f95-2685c907d2f8" as const
 
   /**
    * kinoko系アイテム（kinoko、special_kinoko）を使用したユーザーのIDリストを取得
@@ -24,7 +24,7 @@ export class KinokoService {
   static getKinokoUserIds(itemEvents: ItemEvent[]): string[] {
     return itemEvents
       .filter((event) => this.isKinokoRelatedItem(event.itemId))
-      .map((event) => event.userId);
+      .map((event) => event.userId)
   }
 
   /**
@@ -35,7 +35,7 @@ export class KinokoService {
   static getRegularKinokoUserIds(itemEvents: ItemEvent[]): string[] {
     return itemEvents
       .filter((event) => event.itemId === this.KINOKO_ITEM_ID)
-      .map((event) => event.userId);
+      .map((event) => event.userId)
   }
 
   /**
@@ -46,7 +46,7 @@ export class KinokoService {
   static getSpecialKinokoUserIds(itemEvents: ItemEvent[]): string[] {
     return itemEvents
       .filter((event) => event.itemId === this.SPECIAL_KINOKO_ITEM_ID)
-      .map((event) => event.userId);
+      .map((event) => event.userId)
   }
 
   /**
@@ -55,7 +55,7 @@ export class KinokoService {
    * @returns kinoko系の動画が再生完了したかどうか
    */
   static hasKinokoMoviePlayed(playedItems: Set<string>): boolean {
-    return this.KINOKO_ITEM_IDS.some((itemId) => playedItems.has(itemId));
+    return this.KINOKO_ITEM_IDS.some((itemId) => playedItems.has(itemId))
   }
 
   /**
@@ -64,7 +64,7 @@ export class KinokoService {
    * @returns kinoko動画が再生完了したかどうか
    */
   static hasRegularKinokoMoviePlayed(playedItems: Set<string>): boolean {
-    return playedItems.has(this.KINOKO_ITEM_ID);
+    return playedItems.has(this.KINOKO_ITEM_ID)
   }
 
   /**
@@ -73,7 +73,7 @@ export class KinokoService {
    * @returns special_kinoko動画が再生完了したかどうか
    */
   static hasSpecialKinokoMoviePlayed(playedItems: Set<string>): boolean {
-    return playedItems.has(this.SPECIAL_KINOKO_ITEM_ID);
+    return playedItems.has(this.SPECIAL_KINOKO_ITEM_ID)
   }
 
   /**
@@ -84,9 +84,9 @@ export class KinokoService {
    */
   static getPlayedKinokoUserIds(
     kinokoUserIds: string[],
-    playedItems: Set<string>
+    playedItems: Set<string>,
   ): string[] {
-    return this.hasKinokoMoviePlayed(playedItems) ? kinokoUserIds : [];
+    return this.hasKinokoMoviePlayed(playedItems) ? kinokoUserIds : []
   }
 
   /**
@@ -96,7 +96,7 @@ export class KinokoService {
    * @returns ユーザーがkinokoアイテムを使用したかどうか
    */
   static isKinokoUser(userId: string, kinokoUserIds: string[]): boolean {
-    return kinokoUserIds.includes(userId);
+    return kinokoUserIds.includes(userId)
   }
 
   /**
@@ -105,7 +105,7 @@ export class KinokoService {
    * @returns アイテムがkinoko系かどうか
    */
   static isKinokoRelatedItem(itemId: string): boolean {
-    return (this.KINOKO_ITEM_IDS as readonly string[]).includes(itemId);
+    return (this.KINOKO_ITEM_IDS as readonly string[]).includes(itemId)
   }
 
   /**
@@ -114,7 +114,7 @@ export class KinokoService {
    * @returns アイテムが通常のkinokoかどうか
    */
   static isRegularKinokoItem(itemId: string): boolean {
-    return itemId === this.KINOKO_ITEM_ID;
+    return itemId === this.KINOKO_ITEM_ID
   }
 
   /**
@@ -123,7 +123,7 @@ export class KinokoService {
    * @returns アイテムがspecial_kinokoかどうか
    */
   static isSpecialKinokoItem(itemId: string): boolean {
-    return itemId === this.SPECIAL_KINOKO_ITEM_ID;
+    return itemId === this.SPECIAL_KINOKO_ITEM_ID
   }
 
   /**
@@ -133,9 +133,9 @@ export class KinokoService {
    */
   static getKinokoImageUrl(itemId?: string): string {
     if (itemId === this.SPECIAL_KINOKO_ITEM_ID) {
-      return this.SPECIAL_KINOKO_IMAGE_URL;
+      return this.SPECIAL_KINOKO_IMAGE_URL
     }
-    return this.KINOKO_IMAGE_URL; // デフォルトは通常のkinoko
+    return this.KINOKO_IMAGE_URL // デフォルトは通常のkinoko
   }
 
   /**
@@ -143,7 +143,7 @@ export class KinokoService {
    * @returns kinokoアイテムの画像URL
    */
   static getRegularKinokoImageUrl(): string {
-    return this.KINOKO_IMAGE_URL;
+    return this.KINOKO_IMAGE_URL
   }
 
   /**
@@ -151,7 +151,7 @@ export class KinokoService {
    * @returns special_kinokoアイテムの画像URL
    */
   static getSpecialKinokoImageUrl(): string {
-    return this.SPECIAL_KINOKO_IMAGE_URL;
+    return this.SPECIAL_KINOKO_IMAGE_URL
   }
 
   /**
@@ -159,7 +159,7 @@ export class KinokoService {
    * @returns kinokoアイテムID
    */
   static getKinokoItemId(): string {
-    return this.KINOKO_ITEM_ID;
+    return this.KINOKO_ITEM_ID
   }
 
   /**
@@ -167,7 +167,7 @@ export class KinokoService {
    * @returns special_kinokoアイテムID
    */
   static getSpecialKinokoItemId(): string {
-    return this.SPECIAL_KINOKO_ITEM_ID;
+    return this.SPECIAL_KINOKO_ITEM_ID
   }
 
   /**
@@ -176,7 +176,7 @@ export class KinokoService {
    * @returns アイテムがkinoko系かどうか
    */
   static isKinokoItem(itemId: string): boolean {
-    return this.isKinokoRelatedItem(itemId);
+    return this.isKinokoRelatedItem(itemId)
   }
 
   /**
@@ -187,12 +187,12 @@ export class KinokoService {
    */
   static isKinokoIncorrectUser(
     userId: string,
-    itemEvents: ItemEvent[]
+    itemEvents: ItemEvent[],
   ): boolean {
     const userKinokoEvent = itemEvents.find(
       (event) =>
-        event.userId === userId && this.isKinokoRelatedItem(event.itemId)
-    );
-    return userKinokoEvent ? !userKinokoEvent.isCorrectAnswer : false;
+        event.userId === userId && this.isKinokoRelatedItem(event.itemId),
+    )
+    return userKinokoEvent ? !userKinokoEvent.isCorrectAnswer : false
   }
 }

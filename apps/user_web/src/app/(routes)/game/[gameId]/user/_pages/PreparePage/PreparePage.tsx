@@ -1,35 +1,35 @@
-"use client";
-import Image from "next/image";
-import styles from "./PreparePage.module.scss";
-import UserMainItemBox from "@/app/_images/UserMainItemBox.png";
-import { useState } from "react";
-import ItemGetModal from "../../_components/ItemGetModal/ItemGetModal";
-import PrepareBox from "../../_components/PrepareBox/PrepareBox";
-import { Game, Item, GameUser } from "@/app/_types";
-import CapImage from "../../_components/CapImage/CapImage";
-import { useClientReplace } from "../../_utils/useClientReplace";
-import { UserAppItem } from "../../_utils/userappTypes";
+"use client"
+import Image from "next/image"
+import styles from "./PreparePage.module.scss"
+import UserMainItemBox from "@/app/_images/UserMainItemBox.png"
+import { useState } from "react"
+import ItemGetModal from "../../_components/ItemGetModal/ItemGetModal"
+import PrepareBox from "../../_components/PrepareBox/PrepareBox"
+import { Game, Item, GameUser } from "@/app/_types"
+import CapImage from "../../_components/CapImage/CapImage"
+import { useClientReplace } from "../../_utils/useClientReplace"
+import { UserAppItem } from "../../_utils/userappTypes"
 
 type Props = {
-  gameId: string;
-  userId: string;
-  user: GameUser;
-  game: Game;
-  items: UserAppItem[];
-};
+  gameId: string
+  userId: string
+  user: GameUser
+  game: Game
+  items: UserAppItem[]
+}
 
 export default function PreparePage(props: Props) {
-  const [showItemGetModal, setShowItemGetModal] = useState(false);
+  const [showItemGetModal, setShowItemGetModal] = useState(false)
 
-  useClientReplace(props.gameId, props.userId, "created");
+  useClientReplace(props.gameId, props.userId, "created")
 
   const userIndex = props.game.users.findIndex(
-    (summary) => summary.id === props.userId
-  );
+    (summary) => summary.id.toLowerCase() == props.userId.toLowerCase(),
+  )
 
   const ownItems = props.game.users[userIndex].itemIds
     .map((itemId) => props.items.find((item) => item.itemId === itemId))
-    .filter((item) => item !== undefined);
+    .filter((item) => item !== undefined)
 
   return (
     <div className={styles.preparePage}>
@@ -71,5 +71,5 @@ export default function PreparePage(props: Props) {
         />
       )}
     </div>
-  );
+  )
 }
