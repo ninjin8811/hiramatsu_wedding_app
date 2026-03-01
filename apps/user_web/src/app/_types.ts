@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod"
 
 /**
  * fyi: スプレッドシートの叩き
@@ -24,7 +24,7 @@ export const QuestionSchema = z.object({
     .optional()
     .describe("答え合わせ時に表示する画像パス (Firebase Storage URL)"),
   point: z.number().int().nonnegative().describe("正解時に獲得するポイント"),
-});
+})
 
 // [Game]/{gameId}/[User]/{userId} （一般ユーザーデータ）
 export const UserSchema = z.object({
@@ -34,7 +34,7 @@ export const UserSchema = z.object({
     .string()
     .url()
     .describe("チームサムネイル画像URL (Firebase Storage JPG)"),
-});
+})
 
 // [Game]/{gameId}/[Answer]/{answerId}
 export const AnswerSchema = z.object({
@@ -54,7 +54,7 @@ export const AnswerSchema = z.object({
     .string()
     .nullable()
     .describe("使用したアイテムID（未使用の場合はnull）"),
-});
+})
 
 // [Game]/{gameId}/users/（ゲーム参加者）
 export const GameUserSchema = z.object({
@@ -80,7 +80,7 @@ export const GameUserSchema = z.object({
     .nonnegative()
     .optional()
     .describe("アイテム効果適用前のスコア（ボムアイテム用）"),
-});
+})
 
 // [Game]/{gameId}/currentProcess/ （現在の進行状態）
 export const CurrentProcessSchema = z.object({
@@ -90,14 +90,14 @@ export const CurrentProcessSchema = z.object({
     .nonnegative()
     .describe("現在の質問または処理のインデックス"),
   type: z.enum(["question", "answer", "animation"]).describe("現在の進行種別"),
-});
+})
 
 const FinalRankingStatusSchema = z.enum([
   "awaiting_third_place",
   "awaiting_second_place",
   "awaiting_first_place",
   "announcing_winner",
-]);
+])
 
 // [Game]/{gameId}
 export const GameSchema = z.object({
@@ -108,7 +108,7 @@ export const GameSchema = z.object({
     .enum(["created", "inProgress", "completed"])
     .describe("ゲームステータス"),
   finalRankingStatus: FinalRankingStatusSchema.optional().describe(
-    "最終ランキング発表ステータス（順位発表の進行状況）"
+    "最終ランキング発表ステータス（順位発表の進行状況）",
   ),
   answerTime: z
     .number()
@@ -116,26 +116,25 @@ export const GameSchema = z.object({
     .positive()
     .describe("各質問の回答制限時間（秒）"),
   users: z.array(GameUserSchema).describe("参加ユーザーのゲーム内情報の配列"),
-  Users: z.array(UserSchema).describe("参加ユーザーのメタデータ配列"),
   currentProcess: CurrentProcessSchema.describe("現在のゲーム進行状況"),
-});
+})
 
 // アイテムエフェクトのターゲット指定方法
 export const EffectTargetTypeSchema = z
   .enum(["rank_position", "item_used_user", "all_users", "random_users"])
-  .describe("エフェクトのターゲット指定方法");
+  .describe("エフェクトのターゲット指定方法")
 
 // 単一のエフェクト定義
 export const ItemEffectSchema = z.object({
   targetType:
     EffectTargetTypeSchema.optional().describe(
-      "エフェクトのターゲット指定方法"
+      "エフェクトのターゲット指定方法",
     ),
   targetValue: z
     .union([z.number(), z.string()])
     .optional()
     .describe(
-      "rank_position: 順位(1-based), specific_user: userId, random_users: 対象数"
+      "rank_position: 順位(1-based), specific_user: userId, random_users: 対象数",
     ),
   scoreChange: z
     .number()
@@ -162,7 +161,7 @@ export const ItemEffectSchema = z.object({
     .number()
     .optional()
     .describe("上位N位のみを対象にする場合のN"),
-});
+})
 
 // [Item]/{itemId}
 export const ItemSchema = z.object({
@@ -180,14 +179,14 @@ export const ItemSchema = z.object({
     .int()
     .nonnegative()
     .describe("アイテム使用優先度（数値が小さいほど優先）"),
-});
+})
 
-export type Game = z.infer<typeof GameSchema>;
-export type GameUser = z.infer<typeof GameUserSchema>;
-export type CurrentProcess = z.infer<typeof CurrentProcessSchema>;
-export type Question = z.infer<typeof QuestionSchema>;
-export type User = z.infer<typeof UserSchema>;
-export type Answer = z.infer<typeof AnswerSchema>;
-export type Item = z.infer<typeof ItemSchema>;
-export type EffectTargetType = z.infer<typeof EffectTargetTypeSchema>;
-export type ItemEffect = z.infer<typeof ItemEffectSchema>;
+export type Game = z.infer<typeof GameSchema>
+export type GameUser = z.infer<typeof GameUserSchema>
+export type CurrentProcess = z.infer<typeof CurrentProcessSchema>
+export type Question = z.infer<typeof QuestionSchema>
+export type User = z.infer<typeof UserSchema>
+export type Answer = z.infer<typeof AnswerSchema>
+export type Item = z.infer<typeof ItemSchema>
+export type EffectTargetType = z.infer<typeof EffectTargetTypeSchema>
+export type ItemEffect = z.infer<typeof ItemEffectSchema>
