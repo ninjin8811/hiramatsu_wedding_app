@@ -514,20 +514,6 @@
   position: relative; /* パーティクルの位置基準 */
 }
 
-.bottomRankingArea {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(8vw, 1fr)
-  ); /* 自動調整で16チーム対応 */
-  gap: 0.5vw; /* アイテム間にスペース */
-  height: 14vh;
-  flex-shrink: 0;
-  padding: 1vh 1vw;
-  overflow-x: auto; /* 横スクロール対応 */
-}
-
 .bottomRankItem {
   display: flex;
   background-color: transparent;

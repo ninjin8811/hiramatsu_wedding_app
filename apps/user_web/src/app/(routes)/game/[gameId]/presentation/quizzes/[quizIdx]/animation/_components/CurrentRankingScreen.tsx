@@ -1,28 +1,28 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import styles from "./CurrentRanking.module.css";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { navigateToNextStep, updateUsersScore } from "../actions";
-import { User, ItemEvent, AnimatedUser } from "./types";
-import { TireTrail, SpeedLines } from "./RankingEffects";
-import { useRankingAnimation } from "./useRankingAnimation";
-import { MoviePlayer } from "./MoviePlayer";
-import RankingCart from "./RankingCart";
-import BottomRankingCart from "./BottomRankingCart";
-import { KinokoService } from "./KinokoService";
+import { useEffect, useState } from "react"
+import { AnimatePresence } from "framer-motion"
+import styles from "./CurrentRanking.module.css"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { navigateToNextStep, updateUsersScore } from "../actions"
+import { User, ItemEvent, AnimatedUser } from "./types"
+import { TireTrail, SpeedLines } from "./RankingEffects"
+import { useRankingAnimation } from "./useRankingAnimation"
+import { MoviePlayer } from "./MoviePlayer"
+import RankingCart from "./RankingCart"
+import BottomRankingCart from "./BottomRankingCart"
+import { KinokoService } from "./KinokoService"
 
-export type { User } from "./types";
+export type { User } from "./types"
 
 /** コンポーネントのProps */
 interface CurrentRankingScreenProps {
-  gameId: string;
-  currentQuizIdx: number;
-  users: Array<User>;
-  itemEvents: Array<ItemEvent>;
-  totalQuestions: number; // 総問題数を追加
+  gameId: string
+  currentQuizIdx: number
+  users: Array<User>
+  itemEvents: Array<ItemEvent>
+  totalQuestions: number // 総問題数を追加
 }
 
 const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
@@ -32,7 +32,7 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   itemEvents,
   totalQuestions,
 }) => {
-  const router = useRouter();
+  const router = useRouter()
 
   // カスタムフックを使用してアニメーションロジックを分離
   const {
@@ -47,38 +47,36 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     currentGroupedEvent,
     isKillerAnimating,
     handleDamageEffectEnd,
-  } = useRankingAnimation({ users, itemEvents, totalQuestions, gameId });
+  } = useRankingAnimation({ users, itemEvents, totalQuestions, gameId })
 
   // kinoko系アイテムを使ったユーザーのIDを個別に取得
-  const regularKinokoUserIds =
-    KinokoService.getRegularKinokoUserIds(itemEvents);
-  const specialKinokoUserIds =
-    KinokoService.getSpecialKinokoUserIds(itemEvents);
+  const regularKinokoUserIds = KinokoService.getRegularKinokoUserIds(itemEvents)
+  const specialKinokoUserIds = KinokoService.getSpecialKinokoUserIds(itemEvents)
 
   // 再生完了したアイテムを追跡
-  const [playedItems, setPlayedItems] = useState<Set<string>>(new Set());
+  const [playedItems, setPlayedItems] = useState<Set<string>>(new Set())
 
   // 演出完了後にのみ表示するkinokoユーザーのID（個別管理）
   const playedRegularKinokoUserIds = KinokoService.hasRegularKinokoMoviePlayed(
-    playedItems
+    playedItems,
   )
     ? regularKinokoUserIds
-    : [];
+    : []
   const playedSpecialKinokoUserIds = KinokoService.hasSpecialKinokoMoviePlayed(
-    playedItems
+    playedItems,
   )
     ? specialKinokoUserIds
-    : [];
+    : []
 
   // moviePlayerの動画終了を監視してplayedItemsを更新
   const handleMovieEnd = () => {
     if (currentGroupedEvent) {
       setPlayedItems((prev: Set<string>) =>
-        new Set(prev).add(currentGroupedEvent.itemName)
-      );
+        new Set(prev).add(currentGroupedEvent.itemName),
+      )
     }
-    playNextMovie();
-  };
+    playNextMovie()
+  }
 
   /**
    * アニメーション自動開始（2秒後）
@@ -86,18 +84,18 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
   useEffect(() => {
     if (!animationCompleted && !isGlobalAnimating) {
       const timer = setTimeout(() => {
-        setIsGlobalAnimating(true);
-        startAnimation();
-      }, 2000);
+        setIsGlobalAnimating(true)
+        startAnimation()
+      }, 2000)
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(timer)
     }
   }, [
     startAnimation,
     animationCompleted,
     isGlobalAnimating,
     setIsGlobalAnimating,
-  ]);
+  ])
 
   useEffect(() => {
     // 現在のスコア情報を抽出して更新
@@ -105,10 +103,10 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
       const usersScores = animatedUsers.map((user: AnimatedUser) => ({
         userId: user.userId,
         score: user.currentScore,
-      }));
-      updateUsersScore(gameId, usersScores);
+      }))
+      updateUsersScore(gameId, usersScores)
     }
-  }, [moviePlaybackState, animatedUsers, gameId]);
+  }, [moviePlaybackState, animatedUsers, gameId])
 
   /**
    * キーボードナビゲーション
@@ -117,20 +115,20 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
         if (window.confirm("前の画面へ戻りますか?")) {
-          router.back();
+          router.back()
         }
       } else if (event.key === "ArrowRight" || event.key === "Enter") {
         // 動画再生中の場合はスキップ
         if (moviePlaybackState.isPlayingMovies) {
-          playNextMovie();
+          playNextMovie()
         } else if (moviePlaybackState.allMoviesCompleted) {
-          navigateToNextStep(gameId, currentQuizIdx);
+          navigateToNextStep(gameId, currentQuizIdx)
         }
       }
-    };
+    }
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
   }, [
     gameId,
     currentQuizIdx,
@@ -138,22 +136,22 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
     moviePlaybackState,
     playNextMovie,
     animatedUsers,
-  ]);
+  ])
 
   // animatedScoreベースで並び順を決定（prev→currentへの変化をアニメーションで表現）
   const sortedUsers = animatedUsers.toSorted(
-    (a: AnimatedUser, b: AnimatedUser) => b.animatedScore - a.animatedScore
-  );
+    (a: AnimatedUser, b: AnimatedUser) => b.animatedScore - a.animatedScore,
+  )
 
-  // 7位以降の判定（昇格アニメーション中のユーザーは除外）
+  // 6位以降の判定（昇格アニメーション中のユーザーは除外）
   const otherUsers = sortedUsers.filter(
-    (user: AnimatedUser, index: number) => 
-      index >= 6 && !(user.isPromotionFromBottom && user.isAnimating)
-  );
+    (user: AnimatedUser, index: number) =>
+      index >= 5 && !(user.isPromotionFromBottom && user.isAnimating),
+  )
 
   const getThumbnail = (user: AnimatedUser): string => {
     if (!isGlobalAnimating) {
-      return user.thumbnail;
+      return user.thumbnail
     }
 
     if (
@@ -161,16 +159,16 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
       user.isRankUp ||
       user.isPromotionFromBottom
     ) {
-      return user.smileThumbnail;
+      return user.smileThumbnail
     } else if (
       user.animatedScore > user.currentScore ||
       user.isRankDown ||
       user.isDemotionToBottom
     ) {
-      return user.sadThumbnail;
+      return user.sadThumbnail
     }
-    return user.thumbnail;
-  };
+    return user.thumbnail
+  }
 
   return (
     <main className={styles.bg}>
@@ -192,14 +190,13 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
       <div className={styles.rankingArea}>
         <div className={styles.laneBorderTop}></div>
         <div className={styles.lanesContainer}>
-          {/* 🛣️ レーン背景（6レーン） */}
-          {Array.from({ length: 6 }, (_, laneIndex) => (
+          {/* 🛣️ レーン背景（5レーン） */}
+          {Array.from({ length: 5 }, (_, laneIndex) => (
             <div
               key={`lane-bg-${laneIndex}`}
               className={`${styles.laneBackground} ${
-                laneIndex === 5 ? styles.lastLane : ""
-              }`}
-            >
+                laneIndex === 4 ? styles.lastLane : ""
+              }`}>
               <div className={styles.laneNumber}>
                 <Image
                   src={`/images/lane/lane_${laneIndex + 1}.png`}
@@ -227,14 +224,14 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
 
           <div className={styles.cartsLayer}>
             <AnimatePresence>
-              {/* 上位6位または降格アニメーション中のユーザーを表示 */}
+              {/* 上位5位または降格アニメーション中のユーザーを表示 */}
               {sortedUsers
                 .filter(
                   (user, index) =>
-                    // 上位6位または降格・昇格アニメーション中
-                    index < 6 || 
+                    // 上位5位または降格・昇格アニメーション中
+                    index < 5 ||
                     (user.isDemotionToBottom && user.isAnimating) ||
-                    (user.isPromotionFromBottom && user.isAnimating)
+                    (user.isPromotionFromBottom && user.isAnimating),
                 )
                 .map((user, index) => (
                   <RankingCart
@@ -256,28 +253,6 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
         <div className={styles.laneBorderBottom}></div>
       </div>
 
-      {/* 下部ランキングエリア（7位以降） */}
-      <div className={styles.bottomRankingArea}>
-        <AnimatePresence>
-          {otherUsers.map((user, index) => {
-            const displayRankNumber = index + 7; // 7位から開始
-
-            return (
-              <BottomRankingCart
-                key={user.userId}
-                user={user}
-                displayRankNumber={displayRankNumber}
-                thumbnail={getThumbnail(user)}
-                playedRegularKinokoUserIds={playedRegularKinokoUserIds}
-                playedSpecialKinokoUserIds={playedSpecialKinokoUserIds}
-                itemEvents={itemEvents}
-                onDamageEffectEnd={handleDamageEffectEnd}
-              />
-            );
-          })}
-        </AnimatePresence>
-      </div>
-
       {/* 動画プレイヤー */}
       <AnimatePresence>
         {currentGroupedEvent &&
@@ -285,23 +260,23 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
             // グループ化されたアイテムイベントから複数のユーザー情報を取得
             const itemUsers = currentGroupedEvent.userIds
               .map((userId: string) => {
-                const user = animatedUsers.find((u) => u.userId === userId);
+                const user = animatedUsers.find((u) => u.userId === userId)
                 return user
                   ? {
                       userId: user.userId,
                       teamName: user.teamName,
                       thumbnail: user.thumbnail,
                     }
-                  : null;
+                  : null
               })
               .filter(Boolean) as Array<{
-              userId: string;
-              teamName: string;
-              thumbnail: string;
-            }>;
+              userId: string
+              teamName: string
+              thumbnail: string
+            }>
 
             // グループ化されたイベントから最初のイベントをitemEventとして渡す
-            const firstEvent = currentGroupedEvent.groupedEvents[0];
+            const firstEvent = currentGroupedEvent.groupedEvents[0]
 
             return (
               <MoviePlayer
@@ -314,11 +289,11 @@ const CurrentRankingScreen: React.FC<CurrentRankingScreenProps> = ({
                 itemUsers={itemUsers}
                 itemEvent={firstEvent}
               />
-            );
+            )
           })()}
       </AnimatePresence>
     </main>
-  );
-};
+  )
+}
 
-export default CurrentRankingScreen;
+export default CurrentRankingScreen

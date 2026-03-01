@@ -1,28 +1,28 @@
-"use client";
+"use client"
 
-import { motion } from "framer-motion";
-import Image from "next/image";
-import styles from "./RankingCart.module.css";
-import { AnimatedUser, ItemEvent } from "./types";
-import { ExhaustParticles, DarkSmokeParticles } from "./RankingEffects";
-import { CartDamageEffect } from "./CartDamageEffect";
-import { KinokoService } from "./KinokoService";
+import { motion } from "framer-motion"
+import Image from "next/image"
+import styles from "./RankingCart.module.css"
+import { AnimatedUser, ItemEvent } from "./types"
+import { ExhaustParticles, DarkSmokeParticles } from "./RankingEffects"
+import { CartDamageEffect } from "./CartDamageEffect"
+import { KinokoService } from "./KinokoService"
 import {
   getXPosition,
   getLaneYPosition,
   getAnimationSettings,
-} from "./animationUtils";
+} from "./animationUtils"
 
 interface RankingCartProps {
-  user: AnimatedUser;
-  index: number;
-  thumbnail: string;
-  isKillerAnimating: boolean;
-  currentItemEvent: ItemEvent | undefined;
-  playedRegularKinokoUserIds: string[]; // 演出完了した通常kinokoユーザー
-  playedSpecialKinokoUserIds: string[]; // 演出完了したspecial_kinokoユーザー
-  itemEvents?: ItemEvent[]; // kinoko系アイテムの詳細判定のため追加
-  onDamageEffectEnd?: (userId: string) => void;
+  user: AnimatedUser
+  index: number
+  thumbnail: string
+  isKillerAnimating: boolean
+  currentItemEvent: ItemEvent | undefined
+  playedRegularKinokoUserIds: string[] // 演出完了した通常kinokoユーザー
+  playedSpecialKinokoUserIds: string[] // 演出完了したspecial_kinokoユーザー
+  itemEvents?: ItemEvent[] // kinoko系アイテムの詳細判定のため追加
+  onDamageEffectEnd?: (userId: string) => void
 }
 
 const RankingCart: React.FC<RankingCartProps> = ({
@@ -36,32 +36,32 @@ const RankingCart: React.FC<RankingCartProps> = ({
   itemEvents,
   onDamageEffectEnd,
 }) => {
-  const xPosition = getXPosition(user.animatedScore);
-  const laneIndex = Math.min(index, 5);
-  const animationSettings = getAnimationSettings(user);
+  const xPosition = getXPosition(user.animatedScore)
+  const laneIndex = Math.min(index, 5)
+  const animationSettings = getAnimationSettings(user)
 
   // チーム名の表示位置を決定（右端から見切れる場合は左側に表示）
-  const shouldShowTeamNameOnLeft = xPosition > 70; // 70%を超えたら左側に表示
+  const shouldShowTeamNameOnLeft = xPosition > 70 // 70%を超えたら左側に表示
 
   // ダメージエフェクト終了ハンドラー
   const handleDamageEffectEnd = () => {
     if (onDamageEffectEnd) {
-      onDamageEffectEnd(user.userId);
+      onDamageEffectEnd(user.userId)
     }
-  };
+  }
 
   // ユーザーが使用したkinoko系アイテムを特定
   const getUserKinokoItem = (): string | null => {
-    if (!itemEvents) return null;
+    if (!itemEvents) return null
     const userKinokoEvent = itemEvents.find(
       (event) =>
         event.userId === user.userId &&
-        KinokoService.isKinokoRelatedItem(event.itemId)
-    );
-    return userKinokoEvent ? userKinokoEvent.itemId : null;
-  };
+        KinokoService.isKinokoRelatedItem(event.itemId),
+    )
+    return userKinokoEvent ? userKinokoEvent.itemId : null
+  }
 
-  const userKinokoItemId = getUserKinokoItem();
+  const userKinokoItemId = getUserKinokoItem()
 
   return (
     <motion.div
@@ -73,14 +73,15 @@ const RankingCart: React.FC<RankingCartProps> = ({
       } ${user.isRankDown ? styles.rankDownCart : ""}`}
       initial={{
         marginLeft: `${xPosition}%`,
-        top: user.isPromotionFromBottom && user.isAnimating 
-          ? "100vh" 
-          : `${getLaneYPosition(laneIndex) - 4}%`,
+        top:
+          user.isPromotionFromBottom && user.isAnimating
+            ? "100vh"
+            : `${getLaneYPosition(laneIndex)}%`,
         ...animationSettings.initial,
       }}
       animate={{
         marginLeft: `${xPosition}%`,
-        top: `${getLaneYPosition(laneIndex) - 4}%`,
+        top: `${getLaneYPosition(laneIndex)}%`,
         ...animationSettings.animate,
       }}
       transition={{
@@ -93,8 +94,7 @@ const RankingCart: React.FC<RankingCartProps> = ({
           ease: "easeOut",
         },
         ...animationSettings.transition,
-      }}
-    >
+      }}>
       {/* 💨 パーティクルエフェクト（通常・上昇・下降・降格用） */}
       <div style={{ position: "relative" }}>
         {user.isDemotionToBottom || user.isRankDown ? (
@@ -131,8 +131,7 @@ const RankingCart: React.FC<RankingCartProps> = ({
             className={`${styles.teamName} ${styles.teamNameLeft}`}
             style={{
               color: user.characterColor,
-            }}
-          >
+            }}>
             {user.teamName}
           </div>
         )}
@@ -192,7 +191,7 @@ const RankingCart: React.FC<RankingCartProps> = ({
                     {itemEvents &&
                       KinokoService.isKinokoIncorrectUser(
                         user.userId,
-                        itemEvents
+                        itemEvents,
                       ) && (
                         <div className={styles.kinokoFailureBadge}>
                           <span className={styles.kinokoFailureX}>×</span>
@@ -236,10 +235,10 @@ const RankingCart: React.FC<RankingCartProps> = ({
           style={{
             backgroundColor: `rgba(${parseInt(
               user.characterColor.slice(1, 3),
-              16
+              16,
             )}, ${parseInt(user.characterColor.slice(3, 5), 16)}, ${parseInt(
               user.characterColor.slice(5, 7),
-              16
+              16,
             )}, 0.8)`,
           }}
           animate={{
@@ -248,8 +247,7 @@ const RankingCart: React.FC<RankingCartProps> = ({
           transition={{
             duration: user.isAnimating ? 0.6 : 0,
             ease: "easeOut",
-          }}
-        >
+          }}>
           {user.animatedScore}
           <span>pt</span>
         </motion.div>
@@ -260,14 +258,13 @@ const RankingCart: React.FC<RankingCartProps> = ({
             className={styles.teamName}
             style={{
               color: user.characterColor,
-            }}
-          >
+            }}>
             {user.teamName}
           </div>
         )}
       </div>
     </motion.div>
-  );
-};
+  )
+}
 
-export default RankingCart;
+export default RankingCart
