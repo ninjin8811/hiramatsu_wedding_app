@@ -338,17 +338,17 @@ export const useRankingAnimation = ({
               }
               break
             case "set_score_by_correct_rate":
-              // ボム効果：各ユーザーの正解率×(問題数-1)×100でスコアを設定
-              const multiplier = Math.max(1, totalQuestions - 1) // 問題数-1、最小値は1
-              const userCorrectRate = user.correctRate // そのユーザー自身の正答率を使用
-
-              newScore = Math.round(userCorrectRate * multiplier * 100)
+              // ボム効果：全チームからランダムにポイントをマイナス
+              if (user.currentScore > 0) {
+                // 1〜現在のスコアの範囲でランダムに減算
+                const minusAmount =
+                  Math.floor(Math.random() * user.currentScore) + 1
+                newScore = user.currentScore - minusAmount
+              } else {
+                newScore = 0
+              }
               console.log(
-                `💣 Bomb effect: Setting ${
-                  user.teamName
-                }'s score to ${newScore} (user's correct rate: ${Math.round(
-                  userCorrectRate * 100,
-                )}%, multiplier: ${multiplier}, totalQuestions: ${totalQuestions})`,
+                `💣 Bomb effect: ${user.teamName}'s score ${user.currentScore} → ${newScore} (minus ${user.currentScore - newScore}pt)`,
               )
               break
           }
