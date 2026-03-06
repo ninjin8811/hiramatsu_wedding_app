@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
-import Image from "next/image";
-import styles from "./WaitingScreen.module.css";
-import { GameScreen } from "../page";
-import { AnimatePresence, motion } from "framer-motion";
-import AnimatedBackground from "./AnimatedBackground";
+import React, { useEffect } from "react"
+import Image from "next/image"
+import styles from "./WaitingScreen.module.css"
+import { GameScreen } from "../page"
+import { AnimatePresence, motion } from "framer-motion"
+import AnimatedBackground from "./AnimatedBackground"
 
 interface WaitingScreenProps {
-  gameId: string;
-  onNavigate: (screen: GameScreen) => void;
+  gameId: string
+  onNavigate: (screen: GameScreen) => void
 }
 
 const WaitingScreen: React.FC<WaitingScreenProps> = ({
@@ -17,29 +17,29 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight" || event.key === "Enter") {
-        onNavigate("teams");
+        onNavigate("teams")
       } else if (event.key === "ArrowLeft") {
-        onNavigate("title");
+        onNavigate("title")
       }
-    };
+    }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown)
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onNavigate]);
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [onNavigate])
 
   const items = [
     {
-      name: "キノコ",
-      description: "クイズに正解すると、追加でスコア獲得！",
-      image: "/images/dash-kinoko.png",
+      name: "スペシャルキノコ",
+      description: "クイズに正解すると、追加でスコア大量獲得！",
+      image: "/images/special-kinoko.png",
       alt: "キノコ",
     },
     {
       name: "ボムへい",
-      description: "ド派手な爆発で「何か」を吹き飛ばす！",
+      description: "ド派手に爆発するぞ！",
       image: "/images/bomb.png",
       alt: "ボム兵",
     },
@@ -55,7 +55,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
       image: "/images/koura.png",
       alt: "ランダムこうら",
     },
-  ];
+  ]
 
   return (
     <main className={styles.bg}>
@@ -81,8 +81,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                   ease: "easeOut",
                   delay: 0.2 + index * 0.25,
                 }}
-                exit={{ x: -100, opacity: 0 }}
-              >
+                exit={{ x: -100, opacity: 0 }}>
                 <div className={styles.item}>
                   <div className={styles.itemImageContainer}>
                     <Image
@@ -112,8 +111,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 duration: 2,
                 ease: "easeInOut",
                 repeatType: "loop",
-              }}
-            >
+              }}>
               <Image
                 src="/images/jugem.png"
                 alt="ジュゲム"
@@ -126,7 +124,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
         </div>
       </div>
     </main>
-  );
-};
+  )
+}
 
-export default WaitingScreen;
+export default WaitingScreen
