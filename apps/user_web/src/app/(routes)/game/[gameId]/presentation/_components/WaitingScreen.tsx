@@ -34,7 +34,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
     {
       name: "スペシャルキノコ",
       description: "クイズに正解すると、追加でスコア大量獲得！",
-      image: "/images/special-kinoko.png",
+      image: "/images/special_kinoko.png",
       alt: "キノコ",
     },
     {
