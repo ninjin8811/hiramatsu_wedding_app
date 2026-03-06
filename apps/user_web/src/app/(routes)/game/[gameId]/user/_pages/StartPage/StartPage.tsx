@@ -1,41 +1,41 @@
-"use client";
-import HomeLogo from "@/app/_images/HomeLogo.png";
-import Background from "@/app/_images/Background.png";
-import HomeItemBox from "@/app/_images/HomeItemBox.png";
-import Image from "next/image";
-import styles from "./StartPage.module.scss";
-import MainCharactersBox from "@/app/_components/MainCharactersBox/MainCharactersBox";
-import FumiyaImage from "@/app/_images/Fumiya.png";
-import AoiImage from "@/app/_images/Aoi.png";
-import CommonButton from "../../_components/CommonButton/CommonButton";
-import Link from "next/link";
-import { UserPreparePath } from "@/app/_utils/page_link";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useClientReplace } from "../../_utils/useClientReplace";
+"use client"
+import HomeLogo from "@/app/_images/HomeLogo.png"
+import Background from "@/app/_images/Background.png"
+import HomeItemBox from "@/app/_images/HomeItemBox.png"
+import Image from "next/image"
+import styles from "./StartPage.module.scss"
+import MainCharactersBox from "@/app/_components/MainCharactersBox/MainCharactersBox"
+import YutoImage from "@/app/_images/Yuto.jpg"
+import NatsumiImage from "@/app/_images/Natsumi.jpg"
+import CommonButton from "../../_components/CommonButton/CommonButton"
+import Link from "next/link"
+import { UserPreparePath } from "@/app/_utils/page_link"
+import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
+import { useClientReplace } from "../../_utils/useClientReplace"
 
 type Props = {
-  gameId: string;
-  userId: string;
-};
+  gameId: string
+  userId: string
+}
 
 export default function StartPage(props: Props) {
   const [animationStage, setAnimationStage] = useState<
     "initial" | "moved" | "complete"
-  >("initial");
+  >("initial")
 
-  useClientReplace(props.gameId, props.userId, "created");
+  useClientReplace(props.gameId, props.userId, "created")
 
   useEffect(() => {
     // 段階的アニメーションのタイミング制御
-    const timer1 = setTimeout(() => setAnimationStage("moved"), 1000);
-    const timer2 = setTimeout(() => setAnimationStage("complete"), 1800);
+    const timer1 = setTimeout(() => setAnimationStage("moved"), 1000)
+    const timer2 = setTimeout(() => setAnimationStage("complete"), 1800)
 
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-    };
-  }, []);
+      clearTimeout(timer1)
+      clearTimeout(timer2)
+    }
+  }, [])
 
   return (
     <div className={styles.startPage}>
@@ -50,8 +50,7 @@ export default function StartPage(props: Props) {
             duration: 30,
             repeat: Infinity,
             ease: "linear",
-          }}
-        >
+          }}>
           {/* 画像サイズ750x1624px（縦長）を考慮した3x3グリッド配置 */}
           <Image
             src={Background}
@@ -129,16 +128,16 @@ export default function StartPage(props: Props) {
                   ? index === 0
                     ? [0, -15, 0]
                     : index === 1
-                    ? [0, -12, 0]
-                    : [0, -18, 0]
+                      ? [0, -12, 0]
+                      : [0, -18, 0]
                   : 0,
               x:
                 animationStage === "complete"
                   ? index === 0
                     ? [0, 8, 0]
                     : index === 1
-                    ? [0, -6, 0]
-                    : [0, 10, 0]
+                      ? [0, -6, 0]
+                      : [0, 10, 0]
                   : 0,
             }}
             transition={{
@@ -157,8 +156,7 @@ export default function StartPage(props: Props) {
                 repeatType: "reverse",
                 ease: "easeInOut",
               },
-            }}
-          >
+            }}>
             <Image src={HomeItemBox} alt="start" />
           </motion.div>
         ))}
@@ -182,8 +180,7 @@ export default function StartPage(props: Props) {
             duration: animationStage === "initial" ? 0.8 : 0.6,
             ease: "easeOut",
             delay: animationStage === "moved" ? 0.2 : 0,
-          }}
-        >
+          }}>
           <Image src={HomeLogo} alt="start" className={styles.logo} />
         </motion.div>
         <motion.div
@@ -193,23 +190,21 @@ export default function StartPage(props: Props) {
             opacity: animationStage === "complete" ? 1 : 0,
             y: animationStage === "complete" ? 0 : "10vh",
           }}
-          transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}
-        >
+          transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}>
           <MainCharactersBox
-            leftImage={<Image src={FumiyaImage} alt="left" />}
-            leftName="FUMIYA"
-            rightImage={<Image src={AoiImage} alt="right" />}
-            rightName="AOI"
+            leftImage={<Image src={YutoImage} alt="left" />}
+            leftName="YUTO"
+            rightImage={<Image src={NatsumiImage} alt="right" />}
+            rightName="NATSUMI"
             size="small"
           />
         </motion.div>
       </div>
       <Link
         href={UserPreparePath(props.gameId, props.userId)}
-        className={styles.button}
-      >
+        className={styles.button}>
         <CommonButton color="blue">次へ</CommonButton>
       </Link>
     </div>
-  );
+  )
 }

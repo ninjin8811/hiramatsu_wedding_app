@@ -1,56 +1,56 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import styles from "./TitleScreen.module.css";
-import { GameScreen } from "../page";
-import HomeItemBoxImg from "../../../../../_images/HomeItemBox.png";
-import HomeLogoImg from "../../../../../_images/HomeLogo.png";
-import MainCharactersBox from "../../../../../_components/MainCharactersBox/MainCharactersBox";
-import FumiyaImg from "../../../../../_images/Fumiya.png";
-import AoiImg from "../../../../../_images/Aoi.png";
-import { AnimatePresence, motion } from "framer-motion";
-import AnimatedBackground from "./AnimatedBackground";
+import React, { useEffect, useState } from "react"
+import Image from "next/image"
+import styles from "./TitleScreen.module.css"
+import { GameScreen } from "../page"
+import HomeItemBoxImg from "../../../../../_images/HomeItemBox.png"
+import HomeLogoImg from "../../../../../_images/HomeLogo.png"
+import MainCharactersBox from "../../../../../_components/MainCharactersBox/MainCharactersBox"
+import YutoImg from "../../../../../_images/Yuto.jpg"
+import NatsumiImg from "../../../../../_images/Natsumi.jpg"
+import { AnimatePresence, motion } from "framer-motion"
+import AnimatedBackground from "./AnimatedBackground"
 
 interface TitleScreenProps {
-  gameId: string;
-  onNavigate: (screen: GameScreen) => void;
+  gameId: string
+  onNavigate: (screen: GameScreen) => void
 }
 
 const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
   const [animationStage, setAnimationStage] = useState<
     "initial" | "moved" | "complete"
-  >("initial");
+  >("initial")
 
   useEffect(() => {
     // 段階的アニメーションのタイミング制御
-    const timer1 = setTimeout(() => setAnimationStage("moved"), 1000);
-    const timer2 = setTimeout(() => setAnimationStage("complete"), 1800);
+    const timer1 = setTimeout(() => setAnimationStage("moved"), 1000)
+    const timer2 = setTimeout(() => setAnimationStage("complete"), 1800)
 
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-    };
-  }, []);
+      clearTimeout(timer1)
+      clearTimeout(timer2)
+    }
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight" || event.key === "Enter") {
-        onNavigate("waiting");
+        onNavigate("waiting")
       }
-    };
+    }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown)
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onNavigate]);
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [onNavigate])
 
   const fumiyaImage = (
-    <Image src={FumiyaImg} alt="Fumiya" style={{ objectFit: "cover" }} />
-  );
+    <Image src={YutoImg} alt="Fumiya" style={{ objectFit: "cover" }} />
+  )
   const aoiImage = (
-    <Image src={AoiImg} alt="Aoi" style={{ objectFit: "cover" }} />
-  );
+    <Image src={NatsumiImg} alt="Aoi" style={{ objectFit: "cover" }} />
+  )
 
   return (
     <main className={styles.main}>
@@ -75,8 +75,7 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
               duration: animationStage === "initial" ? 0.8 : 0.6,
               ease: "easeOut",
               delay: animationStage === "moved" ? 0.2 : 0,
-            }}
-          >
+            }}>
             <Image
               src={HomeLogoImg}
               alt="Quiz Kart Logo"
@@ -115,8 +114,7 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
               repeatType: "reverse",
               ease: "easeInOut",
             },
-          }}
-        >
+          }}>
           <Image
             src={HomeItemBoxImg}
             alt="Item Box 1"
@@ -154,8 +152,7 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
               repeatType: "reverse",
               ease: "easeInOut",
             },
-          }}
-        >
+          }}>
           <Image
             src={HomeItemBoxImg}
             alt="Item Box 2"
@@ -193,8 +190,7 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
               repeatType: "reverse",
               ease: "easeInOut",
             },
-          }}
-        >
+          }}>
           <Image
             src={HomeItemBoxImg}
             alt="Item Box 3"
@@ -212,19 +208,18 @@ const TitleScreen: React.FC<TitleScreenProps> = ({ gameId, onNavigate }) => {
             opacity: animationStage === "complete" ? 1 : 0,
             y: animationStage === "complete" ? 0 : "10vh",
           }}
-          transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}
-        >
+          transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}>
           <MainCharactersBox
             leftImage={fumiyaImage}
-            leftName="FUMIYA"
+            leftName="YUTO"
             rightImage={aoiImage}
-            rightName="AOI"
+            rightName="NATSUMI"
             size="large"
           />
         </motion.div>
       </div>
     </main>
-  );
-};
+  )
+}
 
-export default TitleScreen;
+export default TitleScreen
